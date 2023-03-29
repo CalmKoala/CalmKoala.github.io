@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>CI/CD(Github Action)</title>
+    <url>//CI-CD-Github-Action/</url>
+    <content><![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
+<span id="more"></span>
+
+<h2 id="何謂CI-x2F-CD"><a href="#何謂CI-x2F-CD" class="headerlink" title="何謂CI&#x2F;CD"></a>何謂CI&#x2F;CD</h2><ul>
+<li><p>CI(Continuous integration)持續整合or自動化整合<br>將開發至一個階段性的程式碼(通常是版本控制的一個commit)經由自動化工具測試(Unit test)，協助檢查程式碼問題並建置出佈署的版本。</p>
+</li>
+<li><p>CD (Continuous Deployment)持續部署or自動化佈署<br>將測試通過的代碼自動部署到伺服器上，縮短部署的時間，減少了為錯誤。好的CD包含監控系統進行服務存活檢查，並在發生異常時主動通知開發人員。</p>
+</li>
+</ul>
+<h2 id="常見CI-x2F-CD工具"><a href="#常見CI-x2F-CD工具" class="headerlink" title="常見CI&#x2F;CD工具"></a>常見CI&#x2F;CD工具</h2><h3 id="架設在本地端"><a href="#架設在本地端" class="headerlink" title="架設在本地端"></a>架設在本地端</h3><ul>
+<li>Jenkins: 最古老的工具<ul>
+<li>優點：能夠自行編寫插件達成各式各樣功能</li>
+<li>缺點：學習成本高、維護不易、設定檔難撰寫</li>
+</ul>
+</li>
+<li>Drone: 近年新出的工具，用Golang開發，會自動建立Docker執行流程並在完成後刪除<ul>
+<li>優點：較易學習、建置速度快、容量小、所有流程都在Docker內完成</li>
+<li>缺點：套件不多</li>
+</ul>
+</li>
+</ul>
+<h3 id="雲端"><a href="#雲端" class="headerlink" title="雲端"></a>雲端</h3><ul>
+<li>GitLab CI: 只能使用在GitLab</li>
+<li>GitHub Action: 相對年輕的工具，只能用在Github<ul>
+<li>優點：與 Github 相容性極佳、易於使用、免費、開放性、靈活性</li>
+<li>缺點：權限設置較為複雜、環境變數(secrets, variables)只能由Repo擁有者設定</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="GitHub-Action"><a href="#GitHub-Action" class="headerlink" title="GitHub Action"></a>GitHub Action</h1><p>在現代軟體開發中，CI&#x2F;CD是必不可少的流程，而Github Action則是一個相當熱門的工具，可以協助開發者打造自動化的CI&#x2F;CD流程。接下來將會介紹什麼是Github Action，以及如何使用它來自動化你的軟體開發流程。</p>
+<h2 id="什麼是Github-Action？"><a href="#什麼是Github-Action？" class="headerlink" title="什麼是Github Action？"></a>什麼是Github Action？</h2><p>Github Action是一個基於事件驅動的自動化工具，它可以在你的Github repository中註冊一些行為，在某些事件發生時執行一些動作，例如：自動化測試、自動化部署等等。Github Action的核心是一個YAML語言的配置文件，你可以在其中定義工作流程、觸發事件、環境變數、依賴關係等等。Github Action是一個強大的工具，它可以大幅簡化軟體開發流程，同時也可以提升開發效率和品質。</p>
+<!-- [文件](https://docs.github.com/zh/actions/learn-github-actions/understanding-github-actions)
+由repository內的yaml檔定義，在事件觸發時運行(可手動或排程)。
+在`.github/workflows`資料夾內建立`*.yml`即完成，會把結果用email寄信通知開發人員(目前已知觸發push時會傳送給push人員，其他條件寄信給誰尚不清楚，似乎是看用哪個帳號執行)。 -->
+
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><p>在使用 Github Action 之前，需要了解一些基本概念。Github Actions 由四個元素組成，範圍由大至小為：</p>
+<pre class="mermaid">graph LR;
+id1(Workflow) -.-> id2(Job) -.-> id3(Step) -.-> id4(Actions/command)</pre>
+<ul>
+<li>Workflow：整個CI&#x2F;CD運行一次的流程，定義了一系列的工作，以執行特定的任務，當中可能包含多個 Job。</li>
+<li>Job：任務，工作流程中的單個任務。一個Workflow可能有一至多個 Job 組成。</li>
+<li>Step：步驟，工作流程中的一個操作，一個 Job 由一至多個 Step 組成。</li>
+<li>Actions&#x2F;commands：命令或動作，是Github Action的最小元素，用於執行一個特定的操作，例如：構建、測試、部署等等。動作可以是內置的或來自第三方。</li>
+</ul>
+<p>另外需要了解的是 Event：</p>
+<ul>
+<li>Event：事件，是觸發工作流程的觸發器，例如：程式碼提交、Pull Request等等。</li>
+</ul>
+<h2 id="如何使用Github-Action？"><a href="#如何使用Github-Action？" class="headerlink" title="如何使用Github Action？"></a>如何使用Github Action？</h2><p>使用Github Action非常簡單，只需要在Github倉庫中創建<code>.github/workflows</code>目錄，然後在其中添加YAML文件即可。通常使用 config 類型的語法都是千變萬化的，以下使用一個簡單的範例來解釋：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Go-test</span> <span class="comment"># 可自行定義，主要目的是要能看出哪個workflow在執行</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span> [ <span class="string">&quot;master&quot;</span> ]</span><br><span class="line">  <span class="attr">workflow_dispatch:</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v3</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Set</span> <span class="string">up</span> <span class="string">Go</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/setup-go@v3</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">go-version:</span> <span class="number">1.19</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Build</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">go</span> <span class="string">build</span> <span class="string">-v</span> <span class="string">./...</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Test</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">go</span> <span class="string">test</span> <span class="string">-v</span> <span class="string">./...</span></span><br><span class="line">  <span class="attr">deploy:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">Deploy</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">environment:</span> <span class="string">production</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/checkout@v3</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">AWS</span> <span class="string">credentials</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">aws-actions/configure-aws-credentials@v1</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">aws-access-key-id:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.AWS_ACCESS_KEY_ID</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">aws-secret-access-key:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.AWS_SECRET_ACCESS_KEY</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">aws-region:</span> <span class="string">$&#123;&#123;</span> <span class="string">env.AWS_REGION</span> <span class="string">&#125;&#125;</span></span><br><span class="line">    <span class="string">...</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>name</code>：這個workflow的名子，省略時預設為.yml的檔名</p>
+</li>
+<li><p><code>on</code>：workflow的觸發條件，可以設定多種條件。以此範例來說，設定了一個push條件，並且指定只有 <code>push</code> 到master這個branch才會出發，另外還設定<code>workflow_dispatch</code> 來讓我們能夠直接手動觸發。除此之外還有許多的觸發條件，詳細請參考 <a href="https://docs.github.com/zh/actions/using-workflows/events-that-trigger-workflows">文件</a></p>
+</li>
+<li></li>
+<li><p><code>jobs</code>：在本範例中有 <code>build</code> 和 <code>deploy</code> 兩個job</p>
+<ul>
+<li>name：幫job另外取名，如果不寫的話會直接使用<code>build</code>和<code>deploy</code>來作為job名稱</li>
+<li>runs-on：指定要運行的環境，通常多使用ubuntu，當然也可以選擇windows或macOS。由於指定的內容為docker image，因此也看過直接使用其他image來作環境的使用方法，但我自己沒有測試過。當然也可以自行製作運行環境，詳細請參考 <a href="https://docs.github.com/zh/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idruns-on">文件</a></li>
+</ul>
+<p>所有job會同時執行，除非寫上條仵<code>needs</code>或<code>if</code>，讓jobs之間產生依賴關係就可以指定執行順序，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">jobs:</span><br><span class="line">  job1:</span><br><span class="line">  job2:</span><br><span class="line">    needs: job-1</span><br><span class="line">  job3:</span><br><span class="line">    needs: [job1, job2]</span><br></pre></td></tr></table></figure>
+<p>在上面這個情況下， job2 會等待 job1 執行完成後才執行， job3 則會等待 job1 和 job2 完成，因此執行順序就會是 job1 –&gt; job2 –&gt; job3。</p>
+</li>
+<li><p><code>steps</code>：真正定義workflow需要執行的指令</p>
+<ul>
+<li>name：一樣是幫step取名，不寫時預設為 <code>Run</code> 加上 <code>users</code>的名稱，例如<code>Run actions/checkout@v3</code>，為了未來能夠清楚了解此步驟在做什麼，建議一律都命名。</li>
+<li>uses：使用別人寫好的actions，可以在github的marketplace搜尋，例如本專案中的 <code>actions/checkout@v3</code> 就是使用<a href="https://github.com/marketplace/actions/checkout">官方提供的action</a>，此步驟在大部分的job內都需要填寫，他會把Repo中的程式碼複製到虛擬主機中。<div class="note info ng no-icon">
+            <p>這也是Github Actions的特色之一，透過重複使用step來減少重複撰寫相同的config檔，除了遵照DRY原則也增加可讀性與可維護性。</p>
+          </div></li>
+<li>run：在沒有使用預先寫好的steps時，可以使用run指令來下bash指令，每一個指令就是一個action。</li>
+</ul>
+</li>
+</ul>
+<p>另外在範例中可以看到使用<code>secrets.AWS_ACCESS_KEY_ID</code>和<code>env.AWS_REGION</code>，此類變數可以在 Settings 中的 secrets and variables 設定。</p>
+<div class="note warning no-icon">
+            <p>帳號密碼請勿寫在.yml檔內，<strong>所有能看到repository的人都能看到</strong>。</p><ul><li>一般變數可設定在Enviroment Variables<ul><li>在workflow中會以明碼顯示</li></ul></li><li>敏感資訊可設定在Secrets<ul><li>在workflow中會遮蔽部分文字</li></ul></li></ul><p>上面兩項只有repository owner能設定。</p>
+          </div>
+
+
+<br>
+
+<hr>
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><p><a href="https://www.youtube.com/watch?v=eOlI6-BBN4E">CICD到底是什麼呢|全網最詳解</a></p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>後端</category>
+        <category>DevOps</category>
+      </categories>
+      <tags>
+        <tag>DevOps</tag>
+        <tag>學習筆記</tag>
+      </tags>
+  </entry>
+</search>
