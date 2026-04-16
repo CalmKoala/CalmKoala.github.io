@@ -40,8 +40,7 @@
 在`.github/workflows`資料夾內建立`*.yml`即完成，會把結果用email寄信通知開發人員(目前已知觸發push時會傳送給push人員，其他條件寄信給誰尚不清楚，似乎是看用哪個帳號執行)。 -->
 
 <h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><p>在使用 Github Action 之前，需要了解一些基本概念。Github Actions 由四個元素組成，範圍由大至小為：</p>
-<pre class="mermaid">graph LR;
-id1(Workflow) -.-> id2(Job) -.-> id3(Step) -.-> id4(Actions/command)</pre>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">graph LR;</span><br><span class="line">id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions/command)</span><br></pre></td></tr></table></figure>
 <ul>
 <li>Workflow：整個CI&#x2F;CD運行一次的流程，定義了一系列的工作，以執行特定的任務，當中可能包含多個 Job。</li>
 <li>Job：任務，工作流程中的單個任務。一個Workflow可能有一至多個 Job 組成。</li>
@@ -72,17 +71,29 @@ id1(Workflow) -.-> id2(Job) -.-> id3(Step) -.-> id4(Actions/command)</pre>
 <li><p><code>steps</code>：真正定義workflow需要執行的指令</p>
 <ul>
 <li>name：一樣是幫step取名，不寫時預設為 <code>Run</code> 加上 <code>users</code>的名稱，例如<code>Run actions/checkout@v3</code>，為了未來能夠清楚了解此步驟在做什麼，建議一律都命名。</li>
-<li>uses：使用別人寫好的actions，可以在github的marketplace搜尋，例如本專案中的 <code>actions/checkout@v3</code> 就是使用<a href="https://github.com/marketplace/actions/checkout">官方提供的action</a>，此步驟在大部分的job內都需要填寫，他會把Repo中的程式碼複製到虛擬主機中。<div class="note info ng no-icon">
-            <p>這也是Github Actions的特色之一，透過重複使用step來減少重複撰寫相同的config檔，除了遵照DRY原則也增加可讀性與可維護性。</p>
-          </div></li>
+<li>uses：使用別人寫好的actions，可以在github的marketplace搜尋，例如本專案中的 <code>actions/checkout@v3</code> 就是使用<a href="https://github.com/marketplace/actions/checkout">官方提供的action</a>，此步驟在大部分的job內都需要填寫，他會把Repo中的程式碼複製到虛擬主機中。<details class="note info"><summary><p>ng no-icon</p>
+</summary>
+<p>這也是Github Actions的特色之一，透過重複使用step來減少重複撰寫相同的config檔，除了遵照DRY原則也增加可讀性與可維護性。</p>
+
+</details></li>
 <li>run：在沒有使用預先寫好的steps時，可以使用run指令來下bash指令，每一個指令就是一個action。</li>
 </ul>
 </li>
 </ul>
 <p>另外在範例中可以看到使用<code>secrets.AWS_ACCESS_KEY_ID</code>和<code>env.AWS_REGION</code>，此類變數可以在 Settings 中的 secrets and variables 設定。</p>
-<div class="note warning no-icon">
-            <p>帳號密碼請勿寫在.yml檔內，<strong>所有能看到repository的人都能看到</strong>。</p><ul><li>一般變數可設定在Enviroment Variables<ul><li>在workflow中會以明碼顯示</li></ul></li><li>敏感資訊可設定在Secrets<ul><li>在workflow中會遮蔽部分文字</li></ul></li></ul><p>上面兩項只有repository owner能設定。</p>
-          </div>
+<div class="note warning no-icon"><p>帳號密碼請勿寫在.yml檔內，<strong>所有能看到repository的人都能看到</strong>。</p>
+<ul>
+<li>一般變數可設定在Enviroment Variables<ul>
+<li>在workflow中會以明碼顯示</li>
+</ul>
+</li>
+<li>敏感資訊可設定在Secrets<ul>
+<li>在workflow中會遮蔽部分文字</li>
+</ul>
+</li>
+</ul>
+<p>上面兩項只有repository owner能設定。</p>
+</div>
 
 
 <br>
