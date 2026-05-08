@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="為什麼會做這個過去半年用 AI 寫程式，常常踩到三類問題：  同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格 對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案 同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題  試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。 後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tessa：純 markdown 的 AI 多角色協作框架">
+<meta property="og:url" content="https://calmkoala.github.io/tessa/">
+<meta property="og:site_name" content="Ckoala Blog">
+<meta property="og:description" content="為什麼會做這個過去半年用 AI 寫程式，常常踩到三類問題：  同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格 對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案 同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題  試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。 後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2026-05-07T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-08T14:27:50.353Z">
+<meta property="article:author" content="Ckoala">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="個人專案">
+<meta property="article:tag" content="開發工具">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://calmkoala.github.io/tessa/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/tessa/","path":"/tessa/","title":"tessa：純 markdown 的 AI 多角色協作框架"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>tessa：純 markdown 的 AI 多角色協作框架 | Ckoala Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Ckoala Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">5</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">5</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">2</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E6%9C%83%E5%81%9A%E9%80%99%E5%80%8B"><span class="nav-number">1.</span> <span class="nav-text">為什麼會做這個</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tessa-%E6%98%AF%E4%BB%80%E9%BA%BC"><span class="nav-number">2.</span> <span class="nav-text">tessa 是什麼</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B7%91%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B%E6%98%AF%E4%BB%80%E9%BA%BC%E6%A8%A3"><span class="nav-number">3.</span> <span class="nav-text">跑一次完整流程是什麼樣</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#planner-%E5%87%BA-4-%E6%A2%9D%E5%80%99%E9%81%B8"><span class="nav-number">3.1.</span> <span class="nav-text">planner 出 4 條候選</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#planning-manager-%E5%AF%A9%E4%BA%86%E4%BB%80%E9%BA%BC"><span class="nav-number">3.2.</span> <span class="nav-text">planning_manager 審了什麼</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#executor-%E5%AF%AB%E7%A8%BF%E6%99%82%E7%9A%84%E7%B4%85%E7%B7%9A%E5%AE%88%E5%82%99"><span class="nav-number">3.3.</span> <span class="nav-text">executor 寫稿時的紅線守備</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#qa-execution-manager-%E9%A9%97%E6%94%B6"><span class="nav-number">3.4.</span> <span class="nav-text">qa + execution_manager 驗收</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AA%E8%83%BD%E5%AF%AB-code"><span class="nav-number">4.</span> <span class="nav-text">不只能寫 code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%8E%E9%BA%BC%E8%B7%91"><span class="nav-number">5.</span> <span class="nav-text">怎麼跑</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%9C%E6%96%BC%E9%80%99%E7%AF%87%E6%96%87%E7%AB%A0"><span class="nav-number">6.</span> <span class="nav-text">關於這篇文章</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">參考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Ckoala</p>
+  <div class="site-description" itemprop="description">半路轉職的工程師<br> 最先接觸Python大數據相關<br> 目前在當Golang後端工程師<br> 部落格主要拿來寫學習筆記<br> 希望能與大家互相學習 </div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/tessa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Ckoala">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ckoala Blog">
+      <meta itemprop="description" content="半路轉職的工程師<br> 最先接觸Python大數據相關<br> 目前在當Golang後端工程師<br> 部落格主要拿來寫學習筆記<br> 希望能與大家互相學習 ">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="tessa：純 markdown 的 AI 多角色協作框架 | Ckoala Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tessa：純 markdown 的 AI 多角色協作框架
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+
+      <time title="創建時間：2026-05-07 00:00:00" itemprop="dateCreated datePublished" datetime="2026-05-07T00:00:00+00:00">2026-05-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新於</span>
+      <time title="修改時間：2026-05-08 14:27:50" itemprop="dateModified" datetime="2026-05-08T14:27:50+00:00">2026-05-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">個人專案</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>3.2k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>11 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
+<ul>
+<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
+<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
+<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
+</ul>
+<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
+<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
+<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
+<span id="more"></span>
+
+<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
+<ul>
+<li><strong>planner</strong>：拆需求、列候選方案</li>
+<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
+<li><strong>executor</strong>：照規格動手產出</li>
+<li><strong>qa</strong>：對照規格驗收</li>
+<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
+</ul>
+<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
+<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
+<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
+<p>整個流程被拆成 6 段，依序跑：</p>
+<ol>
+<li>planner 出候選結構</li>
+<li>planning_manager 審候選</li>
+<li>planner 寫完整規格書</li>
+<li>planning_manager 審規格書</li>
+<li>executor 照規格產出</li>
+<li>qa + execution_manager 驗收</li>
+</ol>
+<p>每段中間都有「審過才往下走」的閘門。</p>
+<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
+<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
+<ul>
+<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
+<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
+<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
+<li>其中 2 條是 planner 自己也沒答的開放問題</li>
+</ul>
+<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
+<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
+<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
+<ul>
+<li>對 planner 推薦的方案逐條對齊原始需求</li>
+<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
+<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
+<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
+</ul>
+<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
+<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
+<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
+<ul>
+<li>不可以寫某幾個競品名</li>
+<li>不可以提某幾個個人專案名</li>
+<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
+</ul>
+<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
+<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
+<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
+<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
+<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
+<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
+<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
+<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
+<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
+<ul>
+<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
+<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
+<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
+</ul>
+<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
+<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
+<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
+<p>這個資料夾裡裝的是：</p>
+<ul>
+<li>幾個角色的職責描述（markdown）</li>
+<li>幾個流程的步驟清單（markdown）</li>
+<li>幾條團隊共用的紀律規則（markdown）</li>
+<li>團隊共同的記憶檔（markdown）</li>
+</ul>
+<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
+<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
+<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
+<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
+<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
+<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
+<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
+<hr>
+<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
+<li><a target="_blank" rel="noopener" href="https://claude.com/claude-code">Claude Code</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" rel="tag"># 個人專案</a>
+              <a href="/tags/%E9%96%8B%E7%99%BC%E5%B7%A5%E5%85%B7/" rel="tag"># 開發工具</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/CI-CD-Github-Action/" rel="prev" title="CI&#x2F;CD(Github Action)">
+                  <i class="fa fa-angle-left"></i> CI/CD(Github Action)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Ckoala</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="總字數">7k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="所需總閱讀時間">22 分鐘</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"CalmKoala/blog-comments","issue_term":"pathname","theme":"preferred-color-scheme"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+</body>
+</html>
