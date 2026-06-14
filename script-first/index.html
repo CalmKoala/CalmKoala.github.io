@@ -20,26 +20,28 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="後端工程師 寫程式學習筆記，以及 AI 工具、框架的觀察">
-<meta property="og:type" content="website">
-<meta property="og:title" content="CalmKoala">
-<meta property="og:url" content="https://calmkoala.github.io/">
+    <meta name="description" content="過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~ 於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。 最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="重複的事，別每次都讓 AI 重做一遍">
+<meta property="og:url" content="https://calmkoala.github.io/script-first/">
 <meta property="og:site_name" content="CalmKoala">
-<meta property="og:description" content="後端工程師 寫程式學習筆記，以及 AI 工具、框架的觀察">
+<meta property="og:description" content="過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~ 於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。 最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出">
 <meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2026-06-14T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-14T10:00:33.810Z">
 <meta property="article:author" content="PingChun">
-<meta property="article:tag" content="backend">
-<meta property="article:tag" content="software">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="工作流">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://calmkoala.github.io/">
+<link rel="canonical" href="https://calmkoala.github.io/script-first/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-TW","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/script-first/","path":"/script-first/","title":"重複的事，別每次都讓 AI 重做一遍"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>CalmKoala</title>
+<title>重複的事，別每次都讓 AI 重做一遍 | CalmKoala</title>
   
 
 
@@ -91,7 +93,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">CalmKoala</h1>
+      <p class="site-title">CalmKoala</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
@@ -118,7 +120,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目錄
@@ -131,6 +133,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E5%AF%A6%EF%BC%8C%E5%9B%9E%E5%88%B0%E4%BB%A5%E5%89%8D%E7%9A%84%E5%81%9A%E6%B3%95%E5%B0%B1%E5%A5%BD"><span class="nav-number">1.</span> <span class="nav-text">其實，回到以前的做法就好</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%86%E4%B8%8D%E6%98%AF%E4%BB%80%E9%BA%BC%E9%83%BD%E8%A9%B2%E8%85%B3%E6%9C%AC%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">但不是什麼都該腳本化</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -176,16 +179,17 @@
 
     </div>
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
     <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/script-first/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -199,13 +203,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | CalmKoala">
+      <meta itemprop="name" content="重複的事，別每次都讓 AI 重做一遍 | CalmKoala">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/script-first/" class="post-title-link" itemprop="url">重複的事，別每次都讓 AI 重做一遍</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          重複的事，別每次都讓 AI 重做一遍
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -256,8 +260,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-          <p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
+    <div class="post-body" itemprop="articleBody"><p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
 <p>於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。</p>
 <p>最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出來。每個月、每一份都重來一次。</p>
 <p>第一次叫 AI 做，成果非常好，沒什麼問題。問題是第二次、第三次，我還是叫它「再做一次」，它就又跑一輪推理，重新理解一次需求，重新產出。</p>
@@ -290,7 +293,6 @@
 <hr>
 <p>總之對我這種窮人來說，能少燒一點 token 是一點，跟 AI 公司的 token 之戰仍在持續(?</p>
 
-      
     </div>
 
     
@@ -298,242 +300,22 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/" rel="tag"># 工作流</a>
+          </div>
 
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/tessa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="PingChun">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CalmKoala">
-      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | CalmKoala">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/tessa/" class="post-title-link" itemprop="url">tessa：純 markdown 的 AI 多角色協作框架</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">發表於</span>
-
-      <time title="創建時間：2026-05-07 00:00:00" itemprop="dateCreated datePublished" datetime="2026-05-07T00:00:00+00:00">2026-05-07</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-06-14 10:00:33" itemprop="dateModified" datetime="2026-06-14T10:00:33+00:00">2026-06-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分類於</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">個人專案</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="文章字數">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">文章字數：</span>
-      <span>3.2k</span>
-    </span>
-    <span class="post-meta-item" title="所需閱讀時間">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
-      <span>11 分鐘</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
-<ul>
-<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
-<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
-<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
-</ul>
-<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
-<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
-<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/tessa/#more" rel="contents">
-                閱讀全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/CI-CD-Github-Action/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="PingChun">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CalmKoala">
-      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | CalmKoala">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/CI-CD-Github-Action/" class="post-title-link" itemprop="url">CI/CD(Github Action)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">發表於</span>
-
-      <time title="創建時間：2023-02-07 18:04:13" itemprop="dateCreated datePublished" datetime="2023-02-07T18:04:13+00:00">2023-02-07</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-06-14 10:00:33" itemprop="dateModified" datetime="2026-06-14T10:00:33+00:00">2026-06-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分類於</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/%E5%BE%8C%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">後端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/%E5%BE%8C%E7%AB%AF/DevOps/" itemprop="url" rel="index"><span itemprop="name">DevOps</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="文章字數">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">文章字數：</span>
-      <span>3.4k</span>
-    </span>
-    <span class="post-meta-item" title="所需閱讀時間">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
-      <span>11 分鐘</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/CI-CD-Github-Action/#more" rel="contents">
-                閱讀全文 &raquo;
-              </a>
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/tessa/" rel="prev" title="tessa：純 markdown 的 AI 多角色協作框架">
+                  <i class="fa fa-angle-left"></i> tessa：純 markdown 的 AI 多角色協作框架
+                </a>
             </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
   </article>
 </div>
@@ -542,6 +324,8 @@
 
 
 
+
+    <div class="comments utterances-container"></div>
 </div>
   </main>
 
