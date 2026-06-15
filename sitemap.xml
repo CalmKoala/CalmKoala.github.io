@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://calmkoala.github.io/tags/</loc>
+    <loc>https://calmkoala.github.io/CI-CD-Github-Action/</loc>
     
     <lastmod>2026-06-15</lastmod>
     
@@ -29,6 +29,15 @@
   </url>
   
   <url>
+    <loc>https://calmkoala.github.io/404</loc>
+    
+    <lastmod>2026-06-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://calmkoala.github.io/categories/</loc>
     
     <lastmod>2026-06-15</lastmod>
@@ -38,16 +47,7 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/CI-CD-Github-Action/</loc>
-    
-    <lastmod>2026-06-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/404</loc>
+    <loc>https://calmkoala.github.io/tags/</loc>
     
     <lastmod>2026-06-15</lastmod>
     
