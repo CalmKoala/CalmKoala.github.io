@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- CalmKoala favicon: 簡約無尾熊頭像 -->
+  <rect width="64" height="64" rx="14" fill="#EAF1F2"/>
+  <!-- 耳朵 -->
+  <circle cx="15" cy="22" r="11" fill="#8C99A3"/>
+  <circle cx="49" cy="22" r="11" fill="#8C99A3"/>
+  <circle cx="15" cy="22" r="6" fill="#CBB7C7"/>
+  <circle cx="49" cy="22" r="6" fill="#CBB7C7"/>
+  <!-- 臉 -->
+  <circle cx="32" cy="37" r="20" fill="#9AA6B0"/>
+  <!-- 眼睛 -->
+  <circle cx="23" cy="34" r="2.6" fill="#2E353B"/>
+  <circle cx="41" cy="34" r="2.6" fill="#2E353B"/>
+  <!-- 鼻子 -->
+  <ellipse cx="32" cy="43" rx="8.5" ry="7" fill="#2E353B"/>
+  <ellipse cx="29" cy="41" rx="1.8" ry="2.4" fill="#5A636B"/>
+</svg>

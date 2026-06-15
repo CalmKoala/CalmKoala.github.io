@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- CalmKoala 側欄頭像：細節豐富版無尾熊 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EFF4F5"/>
+      <stop offset="1" stop-color="#DDE7E9"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <!-- 耳朵 -->
+  <circle cx="70" cy="85" r="42" fill="#8C99A3"/>
+  <circle cx="170" cy="85" r="42" fill="#8C99A3"/>
+  <circle cx="70" cy="85" r="23" fill="#CBB7C7"/>
+  <circle cx="170" cy="85" r="23" fill="#CBB7C7"/>
+  <!-- 臉 -->
+  <circle cx="120" cy="140" r="76" fill="#9AA6B0"/>
+  <!-- 腮紅 -->
+  <ellipse cx="70" cy="158" rx="15" ry="9" fill="#E8B6BE" opacity="0.55"/>
+  <ellipse cx="170" cy="158" rx="15" ry="9" fill="#E8B6BE" opacity="0.55"/>
+  <!-- 眼睛 -->
+  <circle cx="86" cy="128" r="10" fill="#2E353B"/>
+  <circle cx="154" cy="128" r="10" fill="#2E353B"/>
+  <circle cx="89" cy="124" r="3.2" fill="#FFFFFF"/>
+  <circle cx="157" cy="124" r="3.2" fill="#FFFFFF"/>
+  <!-- 鼻子 -->
+  <ellipse cx="120" cy="162" rx="33" ry="27" fill="#2E353B"/>
+  <ellipse cx="109" cy="153" rx="7" ry="9" fill="#5A636B"/>
+</svg>
