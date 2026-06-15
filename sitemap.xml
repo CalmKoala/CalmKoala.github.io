@@ -11,15 +11,6 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/CI-CD-Github-Action/</loc>
-    
-    <lastmod>2026-06-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://calmkoala.github.io/tessa/</loc>
     
     <lastmod>2026-06-15</lastmod>
@@ -38,7 +29,7 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/404</loc>
+    <loc>https://calmkoala.github.io/categories/</loc>
     
     <lastmod>2026-06-15</lastmod>
     
@@ -47,7 +38,16 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/categories/</loc>
+    <loc>https://calmkoala.github.io/CI-CD-Github-Action/</loc>
+    
+    <lastmod>2026-06-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/404</loc>
     
     <lastmod>2026-06-15</lastmod>
     
