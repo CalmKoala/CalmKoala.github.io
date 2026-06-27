@@ -1,6 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
+    <url>//tessa/</url>
+    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
+<ul>
+<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
+<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
+<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
+</ul>
+<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
+<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
+<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
+<span id="more"></span>
+
+<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
+<ul>
+<li><strong>planner</strong>：拆需求、列候選方案</li>
+<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
+<li><strong>executor</strong>：照規格動手產出</li>
+<li><strong>qa</strong>：對照規格驗收</li>
+<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
+</ul>
+<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
+<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
+<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
+<p>整個流程被拆成 6 段，依序跑：</p>
+<ol>
+<li>planner 出候選結構</li>
+<li>planning_manager 審候選</li>
+<li>planner 寫完整規格書</li>
+<li>planning_manager 審規格書</li>
+<li>executor 照規格產出</li>
+<li>qa + execution_manager 驗收</li>
+</ol>
+<p>每段中間都有「審過才往下走」的閘門。</p>
+<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
+<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
+<ul>
+<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
+<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
+<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
+<li>其中 2 條是 planner 自己也沒答的開放問題</li>
+</ul>
+<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
+<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
+<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
+<ul>
+<li>對 planner 推薦的方案逐條對齊原始需求</li>
+<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
+<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
+<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
+</ul>
+<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
+<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
+<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
+<ul>
+<li>不可以寫某幾個競品名</li>
+<li>不可以提某幾個個人專案名</li>
+<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
+</ul>
+<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
+<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
+<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
+<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
+<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
+<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
+<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
+<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
+<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
+<ul>
+<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
+<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
+<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
+</ul>
+<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
+<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
+<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
+<p>這個資料夾裡裝的是：</p>
+<ul>
+<li>幾個角色的職責描述（markdown）</li>
+<li>幾個流程的步驟清單（markdown）</li>
+<li>幾條團隊共用的紀律規則（markdown）</li>
+<li>團隊共同的記憶檔（markdown）</li>
+</ul>
+<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
+<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
+<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
+<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
+<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
+<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
+<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
+<hr>
+<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
+<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
+<li><a href="https://claude.com/claude-code">Claude Code</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>個人專案</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>個人專案</tag>
+        <tag>開發工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CI/CD(Github Action)</title>
     <url>//CI-CD-Github-Action/</url>
     <content><![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
@@ -112,114 +220,6 @@
       </tags>
   </entry>
   <entry>
-    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <url>//tessa/</url>
-    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
-<ul>
-<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
-<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
-<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
-</ul>
-<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
-<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
-<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
-<span id="more"></span>
-
-<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
-<ul>
-<li><strong>planner</strong>：拆需求、列候選方案</li>
-<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
-<li><strong>executor</strong>：照規格動手產出</li>
-<li><strong>qa</strong>：對照規格驗收</li>
-<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
-</ul>
-<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
-<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
-<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
-<p>整個流程被拆成 6 段，依序跑：</p>
-<ol>
-<li>planner 出候選結構</li>
-<li>planning_manager 審候選</li>
-<li>planner 寫完整規格書</li>
-<li>planning_manager 審規格書</li>
-<li>executor 照規格產出</li>
-<li>qa + execution_manager 驗收</li>
-</ol>
-<p>每段中間都有「審過才往下走」的閘門。</p>
-<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
-<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
-<ul>
-<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
-<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
-<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
-<li>其中 2 條是 planner 自己也沒答的開放問題</li>
-</ul>
-<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
-<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
-<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
-<ul>
-<li>對 planner 推薦的方案逐條對齊原始需求</li>
-<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
-<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
-<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
-</ul>
-<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
-<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
-<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
-<ul>
-<li>不可以寫某幾個競品名</li>
-<li>不可以提某幾個個人專案名</li>
-<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
-</ul>
-<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
-<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
-<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
-<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
-<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
-<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
-<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
-<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
-<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
-<ul>
-<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
-<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
-<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
-</ul>
-<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
-<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
-<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
-<p>這個資料夾裡裝的是：</p>
-<ul>
-<li>幾個角色的職責描述（markdown）</li>
-<li>幾個流程的步驟清單（markdown）</li>
-<li>幾條團隊共用的紀律規則（markdown）</li>
-<li>團隊共同的記憶檔（markdown）</li>
-</ul>
-<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
-<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
-<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
-<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
-<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
-<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
-<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
-<hr>
-<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
-<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
-<li><a href="https://claude.com/claude-code">Claude Code</a></li>
-<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>個人專案</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>個人專案</tag>
-        <tag>開發工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
     <url>//script-first/</url>
     <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
@@ -287,8 +287,8 @@
       </categories>
       <tags>
         <tag>Python</tag>
-        <tag>APScheduler</tag>
         <tag>Windows</tag>
+        <tag>APScheduler</tag>
       </tags>
   </entry>
 </search>
