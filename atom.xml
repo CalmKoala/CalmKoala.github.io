@@ -10,7 +10,7 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-07-04T17:14:42.176Z</updated>
+  <updated>2026-07-04T17:33:09.224Z</updated>
   <entry>
     <author>
       <name>PingChun</name>
@@ -21,17 +21,16 @@
     <category term="Python" scheme="https://calmkoala.github.io/tags/Python/"/>
     <category term="Windows" scheme="https://calmkoala.github.io/tags/Windows/"/>
     <content>
-      <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p><h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p><p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p><p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p><h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>]]>
+      <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p><span id="more"></span><h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p><p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p><p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p><h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>]]>
     </content>
     <id>https://calmkoala.github.io/subprocess-cp950/</id>
     <link href="https://calmkoala.github.io/subprocess-cp950/"/>
     <published>2026-06-28T00:00:00.000Z</published>
     <summary>
-      <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
-<h1]]>
+      <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-07-04T17:14:42.176Z</updated>
+    <updated>2026-07-04T17:33:09.224Z</updated>
   </entry>
   <entry>
     <author>
@@ -43,17 +42,17 @@
     <category term="APScheduler" scheme="https://calmkoala.github.io/tags/APScheduler/"/>
     <category term="Windows" scheme="https://calmkoala.github.io/tags/Windows/"/>
     <content>
-      <![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p><p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p><h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p><p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p><p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p><p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p><h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p><p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p><hr><p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>]]>
+      <![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p><p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p><span id="more"></span><h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p><p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p><p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p><p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p><h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p><p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p><hr><p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>]]>
     </content>
     <id>https://calmkoala.github.io/apscheduler-windows-misfire/</id>
     <link href="https://calmkoala.github.io/apscheduler-windows-misfire/"/>
     <published>2026-06-21T00:00:00.000Z</published>
     <summary>
       <![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
-<p>通常程式掛掉，至少會留個 stack trac]]>
+<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-07-04T17:14:42.176Z</updated>
+    <updated>2026-07-04T17:33:09.224Z</updated>
   </entry>
   <entry>
     <author>
@@ -64,7 +63,7 @@
     <category term="AI" scheme="https://calmkoala.github.io/tags/AI/"/>
     <category term="工作流" scheme="https://calmkoala.github.io/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/"/>
     <content>
-      <![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p><p>於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。</p><p>最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出來。每個月、每一份都重來一次。</p><p>第一次叫 AI 做，成果非常好，沒什麼問題。問題是第二次、第三次，我還是叫它「再做一次」，它就又跑一輪推理，重新理解一次需求，重新產出。</p><p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p><h1 id="其實，回到以前的做法就好"><a href="#其實，回到以前的做法就好" class="headerlink" title="其實，回到以前的做法就好"></a>其實，回到以前的做法就好</h1><p>但仔細想想，這件事的規則其實完全固定：把檔案解開、抽出表格。這種事在以前還沒有 AI 的時候，我會寫個腳本，每次需要的時候執行就好。</p><p>怎麼有了 AI，反而退化成每次都從頭做一遍？</p><p>解法其實很簡單，回到以前的做法：先讓 AI 把它寫成一支腳本，之後只要執行腳本就好。把 AI 做的事，從「每次重做」改成「寫出腳本」。</p><p>規則固定、會重複很多次的工作，先讓 AI 寫成腳本，之後每次只要叫 AI 執行那支腳本。AI 的角色，從「每次重做的苦力」，變成「維護一支工具、需要時跑它」。</p><p>回到對帳單：我把流程寫成一支腳本，丟進資料夾，腳本自己用存好的密碼解開、批次處理、輸出整理好的表格。現在我只要把檔案放進去、跑腳本就好，AI 不必再一份一份重解，省下的時間和 token 很可觀，而且每個月輸出格式都一模一樣。</p><p>換成腳本之後，你會拿回這些東西：</p><ul><li><strong>一致性</strong>：腳本每次輸出都一樣。LLM 每次重跑，格式、用詞、漏項都可能漂移。</li><li><strong>省時省額度</strong>：跑一支寫好的腳本，比重跑一輪 LLM 推理快得多，也不燒 token。</li><li><strong>可檢查</strong>：腳本是固定邏輯，你可以讀、可以測。LLM 中間怎麼想的是黑箱，錯了不好查。</li><li><strong>可累積</strong>：今天寫好，以後每次直接用，不用每次重新交代一遍前因後果。</li></ul><h1 id="但不是什麼都該腳本化"><a href="#但不是什麼都該腳本化" class="headerlink" title="但不是什麼都該腳本化"></a>但不是什麼都該腳本化</h1><p>當然，不是所有事情都該寫成腳本，硬寫反而會綁手綁腳。</p><ul><li><strong>該寫</strong>：規則固定、輸入輸出結構明確、會重複很多次。格式轉換、批次處理、固定報表這類。</li><li><strong>不該寫</strong>：一次性的、規則模糊、每次都要靠語意判斷的。這種就留給 LLM，它的強項本來就在這。</li></ul><p>判斷標準很簡單：這件事下次還會用同樣的規則再做一遍嗎？如果會，那就值得寫成腳本。</p><p>實際上手也不難：</p><ol><li>第一次遇到重複性工作，先讓 AI 寫成腳本。</li><li>你讀過一遍，確認邏輯對。</li><li>之後每次，直接叫 AI 跑這支腳本。</li></ol><p>核心是把 LLM 當推理引擎，不是當苦力。確定性的、重複的事，交給確定性的程式碼，AI 留著做真正需要判斷的部分。</p><hr><p>總之對我這種窮人來說，能少燒一點 token 是一點，跟 AI 公司的 token 之戰仍在持續(?</p>]]>
+      <![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p><p>於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。</p><p>最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出來。每個月、每一份都重來一次。</p><p>第一次叫 AI 做，成果非常好，沒什麼問題。問題是第二次、第三次，我還是叫它「再做一次」，它就又跑一輪推理，重新理解一次需求，重新產出。</p><p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p><span id="more"></span><h1 id="其實，回到以前的做法就好"><a href="#其實，回到以前的做法就好" class="headerlink" title="其實，回到以前的做法就好"></a>其實，回到以前的做法就好</h1><p>但仔細想想，這件事的規則其實完全固定：把檔案解開、抽出表格。這種事在以前還沒有 AI 的時候，我會寫個腳本，每次需要的時候執行就好。</p><p>怎麼有了 AI，反而退化成每次都從頭做一遍？</p><p>解法其實很簡單，回到以前的做法：先讓 AI 把它寫成一支腳本，之後只要執行腳本就好。把 AI 做的事，從「每次重做」改成「寫出腳本」。</p><p>規則固定、會重複很多次的工作，先讓 AI 寫成腳本，之後每次只要叫 AI 執行那支腳本。AI 的角色，從「每次重做的苦力」，變成「維護一支工具、需要時跑它」。</p><p>回到對帳單：我把流程寫成一支腳本，丟進資料夾，腳本自己用存好的密碼解開、批次處理、輸出整理好的表格。現在我只要把檔案放進去、跑腳本就好，AI 不必再一份一份重解，省下的時間和 token 很可觀，而且每個月輸出格式都一模一樣。</p><p>換成腳本之後，你會拿回這些東西：</p><ul><li><strong>一致性</strong>：腳本每次輸出都一樣。LLM 每次重跑，格式、用詞、漏項都可能漂移。</li><li><strong>省時省額度</strong>：跑一支寫好的腳本，比重跑一輪 LLM 推理快得多，也不燒 token。</li><li><strong>可檢查</strong>：腳本是固定邏輯，你可以讀、可以測。LLM 中間怎麼想的是黑箱，錯了不好查。</li><li><strong>可累積</strong>：今天寫好，以後每次直接用，不用每次重新交代一遍前因後果。</li></ul><h1 id="但不是什麼都該腳本化"><a href="#但不是什麼都該腳本化" class="headerlink" title="但不是什麼都該腳本化"></a>但不是什麼都該腳本化</h1><p>當然，不是所有事情都該寫成腳本，硬寫反而會綁手綁腳。</p><ul><li><strong>該寫</strong>：規則固定、輸入輸出結構明確、會重複很多次。格式轉換、批次處理、固定報表這類。</li><li><strong>不該寫</strong>：一次性的、規則模糊、每次都要靠語意判斷的。這種就留給 LLM，它的強項本來就在這。</li></ul><p>判斷標準很簡單：這件事下次還會用同樣的規則再做一遍嗎？如果會，那就值得寫成腳本。</p><p>實際上手也不難：</p><ol><li>第一次遇到重複性工作，先讓 AI 寫成腳本。</li><li>你讀過一遍，確認邏輯對。</li><li>之後每次，直接叫 AI 跑這支腳本。</li></ol><p>核心是把 LLM 當推理引擎，不是當苦力。確定性的、重複的事，交給確定性的程式碼，AI 留著做真正需要判斷的部分。</p><hr><p>總之對我這種窮人來說，能少燒一點 token 是一點，跟 AI 公司的 token 之戰仍在持續(?</p>]]>
     </content>
     <id>https://calmkoala.github.io/script-first/</id>
     <link href="https://calmkoala.github.io/script-first/"/>
@@ -72,10 +71,12 @@
     <summary>
       <![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
 <p>於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。</p>
-<]]>
+<p>最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出來。每個月、每一份都重來一次。</p>
+<p>第一次叫 AI 做，成果非常好，沒什麼問題。問題是第二次、第三次，我還是叫它「再做一次」，它就又跑一輪推理，重新理解一次需求，重新產出。</p>
+<p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-07-04T17:14:42.176Z</updated>
+    <updated>2026-07-04T17:33:09.224Z</updated>
   </entry>
   <entry>
     <author>
@@ -104,7 +105,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-07-04T17:14:42.176Z</updated>
+    <updated>2026-07-04T17:33:09.224Z</updated>
   </entry>
   <entry>
     <author>
@@ -125,6 +126,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-07-04T17:14:42.176Z</updated>
+    <updated>2026-07-04T17:33:09.224Z</updated>
   </entry>
 </feed>
