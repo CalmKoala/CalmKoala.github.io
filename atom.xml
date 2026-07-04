@@ -10,7 +10,7 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-06-28T01:51:11.364Z</updated>
+  <updated>2026-07-04T01:44:43.892Z</updated>
   <entry>
     <author>
       <name>PingChun</name>
@@ -31,7 +31,7 @@
 <h1]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-06-28T01:51:11.364Z</updated>
+    <updated>2026-07-04T01:44:43.892Z</updated>
   </entry>
   <entry>
     <author>
@@ -53,7 +53,7 @@
 <p>通常程式掛掉，至少會留個 stack trac]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-06-28T01:51:11.364Z</updated>
+    <updated>2026-07-04T01:44:43.892Z</updated>
   </entry>
   <entry>
     <author>
@@ -75,7 +75,7 @@
 <]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-06-28T01:51:11.364Z</updated>
+    <updated>2026-07-04T01:44:43.892Z</updated>
   </entry>
   <entry>
     <author>
@@ -104,7 +104,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-06-28T01:51:11.364Z</updated>
+    <updated>2026-07-04T01:44:43.892Z</updated>
   </entry>
   <entry>
     <author>
@@ -125,6 +125,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-06-28T01:51:11.364Z</updated>
+    <updated>2026-07-04T01:44:43.892Z</updated>
   </entry>
 </feed>
