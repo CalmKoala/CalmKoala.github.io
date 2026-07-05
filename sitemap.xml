@@ -194,7 +194,7 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/categories/study-notes/Python/</loc>
+    <loc>https://calmkoala.github.io/categories/study-notes/AI/</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -202,6 +202,13 @@
   
   <url>
     <loc>https://calmkoala.github.io/categories/study-notes/%E5%BE%8C%E7%AB%AF/</loc>
+    <lastmod>2026-07-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/categories/study-notes/Python/</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -216,13 +223,6 @@
   
   <url>
     <loc>https://calmkoala.github.io/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/AI/</loc>
-    <lastmod>2026-07-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/categories/study-notes/AI/</loc>
     <lastmod>2026-07-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
