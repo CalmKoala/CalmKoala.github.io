@@ -10,7 +10,31 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-07-04T17:33:09.224Z</updated>
+  <updated>2026-07-05T03:59:30.601Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="工具" scheme="https://calmkoala.github.io/categories/study-notes/%E5%B7%A5%E5%85%B7/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/tags/AI/"/>
+    <category term="ffmpeg" scheme="https://calmkoala.github.io/tags/ffmpeg/"/>
+    <category term="自動化" scheme="https://calmkoala.github.io/tags/%E8%87%AA%E5%8B%95%E5%8C%96/"/>
+    <content>
+      <![CDATA[<p>前陣子要整理某個 App 裡的一份清單，但這個 App 沒有匯出功能也沒有 API 可以用，唯一的辦法就是自己把畫面一直往下滑，再把幾百筆內容手動抄出來，懶人如我，當然不可能真的一筆一筆抄，看來這裡又是 AI 該發揮作用的地方了。</p><p>最後我的作法是把清單從頭到尾螢幕錄影錄起來，再用 ffmpeg 抽出少量影格並輸出成圖片，交給有視覺能力的 AI 逐張辨識。兩段影片一共輸出 105 張圖片，最後整理出 108 筆資料。</p><p>這個做法的重點不是「讓 AI 看影片」，而是把一個太大、太密集的輸入，拆成可控制、可檢查的小單位。</p><p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p><span id="more"></span><h1 id="為什麼不直接把整段影片交給-AI"><a href="#為什麼不直接把整段影片交給-AI" class="headerlink" title="為什麼不直接把整段影片交給 AI"></a>為什麼不直接把整段影片交給 AI</h1><p>其實直接處理影片也不是完全不可行，但不適合這次的情境。</p><p>先碰到的問題是檔案大小。第一段錄影超過 100 MB，已經超過當時傳輸管道的檔案限制，只能改從本機檔案處理。</p><p>再來是影片裡有大量的重複影格。原始錄影是 60 fps，代表影片每秒記錄 60 個影格；但清單滑動得很慢，相鄰影格的內容幾乎一樣。全部交給 AI 辨識只會增加重複資料，白白占掉 context，也增加處理成本。</p><p>用 ffmpeg 從影片取樣後，每個取樣到的影格會輸出成一張圖片。某張圖片辨識錯誤時，只要重新處理那張；取樣頻率不合適，也可以直接從原始影片重新抽取。</p><h1 id="用-ffmpeg-抽出需要的影格"><a href="#用-ffmpeg-抽出需要的影格" class="headerlink" title="用 ffmpeg 抽出需要的影格"></a>用 ffmpeg 抽出需要的影格</h1><p>ffmpeg 是一套處理影音的命令列工具，常用來轉檔、剪輯與壓縮。這次只需要一行指令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i recording.mp4 -vf fps=1 frame_%04d.png</span><br></pre></td></tr></table></figure><p>這行會讀取 <code>recording.mp4</code>，每秒取樣一個影格，再輸出成 <code>frame_0001.png</code>、<code>frame_0002.png</code> 這類依序編號的圖片。</p><p><code>fps=1</code> 不是每次的固定答案，還是要看錄影時滑動的速度。如果滑得很快，一秒一張可能會漏掉剛好從兩次取樣之間經過的資料，那就調成 <code>fps=2</code> 或 <code>fps=3</code>；滑得慢就不用特別調高，不然只會多切出一堆相似圖片，後面還要花時間辨識和去重。</p><p>這次第一段影片約 63 秒，輸出 63 張圖片；第二段輸出 42 張。用 105 張圖片取代原始影片裡的數千個影格，後面的處理範圍就清楚很多。</p><p>這裡跟我在 <a href="/script-first/">〈重複的事，別每次都讓 AI 重做一遍〉</a> 提過的想法很像。能用固定規則處理的抽影格先交給 ffmpeg，真正需要看懂圖片內容的部分，再交給 AI。</p><h1 id="讓-AI-讀圖前，先固定輸出欄位"><a href="#讓-AI-讀圖前，先固定輸出欄位" class="headerlink" title="讓 AI 讀圖前，先固定輸出欄位"></a>讓 AI 讀圖前，先固定輸出欄位</h1><p>接著把輸出的圖片逐張交給有視覺能力的 AI，要求它只讀出需要的欄位，並使用固定格式輸出。</p><p>如果每張圖片都讓 AI 自由描述，最後會得到一批格式不同的文字，很難合併，然後又要靠 AI 去整理每張圖片的描述，除了增加成本也容易讓最終結果歪掉。所以我們可以先把輸出欄位固定，像是日期、標題、項目與識別條件，後續才能整理成 CSV 或試算表，再做過濾與去重。</p><p>逐張處理還有一個好處，圖片裡的文字被截斷或看不清楚時，可以把該筆標成低信心，留到最後人工確認。辨識結果不是一次產出就直接採用，而是保留回頭校對的入口。</p><h1 id="真正的坑是重複"><a href="#真正的坑是重複" class="headerlink" title="真正的坑是重複"></a>真正的坑是重複</h1><p>滑動式錄影一定會讓相鄰圖片包含重疊內容。同一筆資料可能出現在連續兩三張圖片裡，如果把每次辨識結果都當成新資料，最後的筆數就會被灌水。</p><p>所以 AI 讀完圖之後，還不能直接當成最終結果。要先用幾個相對穩定的欄位組成識別條件，例如日期加標題，再合併重複項目。如果遇到文字略有差異的結果，要回到原圖確認，不能只靠完全相同的字串去重。</p><p><img src="/images/ffmpeg-frames-dedup.png" alt="相鄰圖片內容重疊：同一筆資料出現在好幾張裡，挑 key 去重"></p><h1 id="這個方法適合什麼情境"><a href="#這個方法適合什麼情境" class="headerlink" title="這個方法適合什麼情境"></a>這個方法適合什麼情境</h1><p>這套流程適合結構固定、文字清楚、可以慢慢捲動的清單頁面。前提是需要的欄位確實有出現在畫面上，視覺辨識只能讀取現有內容。它比較像一次性的資料救援，用少量人工校對，換掉幾百筆手抄工作。</p><p>如果同一份資料會反覆處理，應該優先找正式匯出、API 或穩定的網頁資料來源。若畫面變化很快、文字模糊，或結果要求完全正確，單靠抽影格與視覺辨識也不夠。</p><p>整個流程其實就是把影片先抽成圖片，讓 AI 讀出固定欄位，最後再把重複資料合併。拆開之後，哪一步出錯就回頭檢查哪一步，至少比把整段影片丟進去再等一個結果好處理。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/ffmpeg-frames-to-data/</id>
+    <link href="https://calmkoala.github.io/ffmpeg-frames-to-data/"/>
+    <published>2026-07-05T00:00:00.000Z</published>
+    <summary>
+      <![CDATA[<p>前陣子要整理某個 App 裡的一份清單，但這個 App 沒有匯出功能也沒有 API 可以用，唯一的辦法就是自己把畫面一直往下滑，再把幾百筆內容手動抄出來，懶人如我，當然不可能真的一筆一筆抄，看來這裡又是 AI 該發揮作用的地方了。</p>
+<p>最後我的作法是把清單從頭到尾螢幕錄影錄起來，再用 ffmpeg 抽出少量影格並輸出成圖片，交給有視覺能力的 AI 逐張辨識。兩段影片一共輸出 105 張圖片，最後整理出 108 筆資料。</p>
+<p>這個做法的重點不是「讓 AI 看影片」，而是把一個太大、太密集的輸入，拆成可控制、可檢查的小單位。</p>
+<p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
+    </summary>
+    <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
+    <updated>2026-07-05T03:59:30.601Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -30,7 +54,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-07-04T17:33:09.224Z</updated>
+    <updated>2026-07-05T03:59:30.601Z</updated>
   </entry>
   <entry>
     <author>
@@ -52,7 +76,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-07-04T17:33:09.224Z</updated>
+    <updated>2026-07-05T03:59:30.601Z</updated>
   </entry>
   <entry>
     <author>
@@ -76,7 +100,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-07-04T17:33:09.224Z</updated>
+    <updated>2026-07-05T03:59:30.601Z</updated>
   </entry>
   <entry>
     <author>
@@ -105,7 +129,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-07-04T17:33:09.224Z</updated>
+    <updated>2026-07-05T03:59:30.601Z</updated>
   </entry>
   <entry>
     <author>
@@ -126,6 +150,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-07-04T17:33:09.224Z</updated>
+    <updated>2026-07-05T03:59:30.601Z</updated>
   </entry>
 </feed>
