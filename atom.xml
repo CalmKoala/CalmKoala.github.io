@@ -10,7 +10,24 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-07-18T10:21:12.542Z</updated>
+  <updated>2026-07-19T01:10:29.311Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/categories/study-notes/AI/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/tags/AI/"/>
+    <content>
+      <![CDATA[<p>現在使用市面上的 AI agent framework，安裝完後遇到的第一個設定，通常就是選擇模型供應商，再填入一組 API key。</p><p>這個設計很合理，框架總得知道要去哪裡找模型。但我卡在一個很現實的地方，我本來就在付 Claude 和 ChatGPT 的訂閱費，平常使用 Claude Code 與 Codex CLI 也都包含在方案額度裡。</p><p>如果 agent 改走模型 API，等於又多開一條按 token 計費的路徑。技術上沒有問題，但我的錢很有問題啊啊啊。</p><p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p><span id="more"></span><h2 id="把-API-client-換成一個-CLI-process"><a href="#把-API-client-換成一個-CLI-process" class="headerlink" title="把 API client 換成一個 CLI process"></a>把 API client 換成一個 CLI process</h2><p>一般的 agent 架構大概長這樣：</p><pre><code class="mermaid">flowchart LR  USER[使用者] --&gt; APP[Agent program]  APP --&gt; SDK[模型 SDK &#x2F; API client]  SDK --&gt; API[模型 API]</code></pre><p>改用 CLI 後，中間那層換成 OS 裡的一個 subprocess：</p><pre><code class="mermaid">flowchart LR  USER[使用者] --&gt; APP[Agent program]  APP --&gt;|啟動 process、傳入 prompt| CLI[Claude Code &#x2F; Codex CLI]  CLI --&gt;|JSON &#x2F; 串流事件| APP  CLI --&gt; MODEL[模型服務]</code></pre><p>Agent program 啟動 CLI，把 prompt 寫進 stdin，再從 stdout 讀回結構化事件。對 agent program 而言，這和呼叫 SDK 的角色很接近，只是邊界從 function call 變成 process communication。</p><p>模型服務背後當然還是存在。這裡省掉的是「自己的 program 直接整合供應商 API」那一層，並非讓模型離線執行。</p><h2 id="CLI-憑什麼能當-backend"><a href="#CLI-憑什麼能當-backend" class="headerlink" title="CLI 憑什麼能當 backend"></a>CLI 憑什麼能當 backend</h2><p>CLI 平常看起來是人坐在終端機前使用的介面，但 Claude Code 與 Codex 都提供非互動模式，也能輸出 JSON Lines 等結構化格式。</p><p>Claude Code 可以用 <code>-p</code> 接收非互動輸入，搭配 <code>stream-json</code> 持續讀寫事件；Codex 則提供 <code>codex exec --json</code>，執行完一個任務後把過程以 JSON Lines 輸出。</p><p>這代表 agent 不必模擬鍵盤輸入，也不用從終端機畫面硬拆文字。只要替不同 CLI 做一層 adapter，就能把輸入與輸出轉成自己系統內統一的格式。</p><p>更有意思的是，CLI 已經包好不少 API client 原本要自己處理的東西，包括帳號登入、模型選擇、工具設定與本機權限。Agent program 可以專心處理自己的路由、排程和狀態。</p><p>Claude 已有 Telegram marketplace plugin，Codex app 也有 Remote，兩者都能讓使用者從手機繼續工作。<a href="https://github.com/anthropics/claude-plugins-official/blob/main/external_plugins/telegram/README.md">claude-plugins-official&#x2F;external_plugins&#x2F;telegram&#x2F;README.md at main · anthropics&#x2F;claude-plugins-official · GitHub</a>、<a href="https://learn.chatgpt.com/docs/remote-connections">Remote connections - OpenAI</a></p><div class="note info no-icon"><p>這些遠端功能解決的是「人如何從手機操作產品」。這篇談的是讓自己的 program 把 CLI 當成模型後端。若你只想遠端繼續對話，直接使用現成功能會簡單很多。</p></div><h2 id="真正麻煩的是-process-lifecycle"><a href="#真正麻煩的是-process-lifecycle" class="headerlink" title="真正麻煩的是 process lifecycle"></a>真正麻煩的是 process lifecycle</h2><p>把 CLI 包進 subprocess 只能算第一步。它開始長時間執行後，就會出現一批 API SDK 不太像的問題。</p><p>CLI process 可能卡住、意外結束，或碰到 rate limit。兩個請求也不能同時往同一條 input stream 裡寫，不然回傳事件會混在一起。Agent 得自己處理 timeout、序列化、重啟與錯誤復原。</p><p>對話狀態也要納入 backend contract。Claude 回傳 session ID 後，可以透過 <code>claude --resume &lt;session-id&gt;</code> 接回先前的 session；Codex 的非互動模式也提供 <code>codex exec resume</code>。兩邊都有續接能力，命令格式與生命週期卻不相同。<a href="https://docs.anthropic.com/en/docs/claude-code/cli-usage">CLI reference - Anthropic</a>、<a href="https://learn.chatgpt.com/docs/non-interactive-mode">Non-interactive mode - OpenAI</a></p><p>所以 adapter 除了傳 prompt、收答案，還得管理 CLI process。它要決定 process 什麼時候啟動或關閉；同時收到多個 request 時，先排好順序；也要保存 session ID，讓 process 掛掉或重啟後能接回原本的對話。這些行為都得寫在 adapter 裡，模型不會幫你處理。</p><h2 id="訂閱帳號也能沿用"><a href="#訂閱帳號也能沿用" class="headerlink" title="訂閱帳號也能沿用"></a>訂閱帳號也能沿用</h2><p>我會走這條路，還有一個很現實的原因。我本來就在付 Claude 與 ChatGPT 的訂閱費。</p><p>Claude Code 和 Codex CLI 都能使用訂閱帳號登入。只要使用量還在方案額度內，透過 CLI 執行的任務就不會另外產生一張 API key 的按量帳單。Codex 官方文件也把 ChatGPT 登入與 API key 列為不同的驗證和計費方式。<a href="https://learn.chatgpt.com/docs/auth">Authentication - OpenAI</a>、<a href="https://learn.chatgpt.com/docs/pricing">Pricing - OpenAI</a></p><p>這不等於免費。訂閱本身要付費，也有 rate limit 與使用上限；CLI 背後照樣會連到模型服務。比較準確的說法是，我沿用訂閱方案內含的使用額度，沒有讓自己的 agent 另外走 API key 計費。</p><h2 id="什麼時候不該這樣做"><a href="#什麼時候不該這樣做" class="headerlink" title="什麼時候不該這樣做"></a>什麼時候不該這樣做</h2><p>CLI backend 很適合本機、單人，而且本來就在使用訂閱版 CLI 的情境。離開這個範圍，代價會逐漸浮現。</p><p>CLI 版本更新可能改變事件格式，登入狀態也不適合複製到大量伺服器。正式服務需要多人共用、成本歸戶、穩定併發或 CI 自動化時，直接使用 API 通常比較容易管理。</p><p>它也會讓 agent 多出 process management 的責任。如果你的 program 只是偶爾呼叫一次模型，為了省一層 API client 卻加上 supervisor、timeout 和 session recovery，可能反而繞了遠路。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/subscription-cli-always-on-agent/</id>
+    <link href="https://calmkoala.github.io/subscription-cli-always-on-agent/"/>
+    <published>2026-07-19T00:00:00.000Z</published>
+    <summary>自己做 AI agent，不一定得從模型 API 開始。</summary>
+    <title>CLI 也能當 AI agent 的後端</title>
+    <updated>2026-07-19T01:10:29.311Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -28,7 +45,7 @@
     <published>2026-07-12T00:00:00.000Z</published>
     <summary>服務無聲消失了 16 小時，逼我替它補上自動重啟、外部心跳與開機自啟。查完才發現，這些問題早就是 SRE 的日常。</summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.311Z</updated>
   </entry>
   <entry>
     <author>
@@ -52,7 +69,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.311Z</updated>
   </entry>
   <entry>
     <author>
@@ -73,7 +90,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.311Z</updated>
   </entry>
   <entry>
     <author>
@@ -95,7 +112,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.311Z</updated>
   </entry>
   <entry>
     <author>
@@ -119,7 +136,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.311Z</updated>
   </entry>
   <entry>
     <author>
@@ -148,7 +165,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.311Z</updated>
   </entry>
   <entry>
     <author>
@@ -169,6 +186,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-07-18T10:21:12.542Z</updated>
+    <updated>2026-07-19T01:10:29.310Z</updated>
   </entry>
 </feed>
