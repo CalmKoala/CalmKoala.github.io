@@ -194,7 +194,7 @@
     
 
 
-<div class="post-block">
+<div class="post-block post-block-subtitle">
   
   
 
@@ -219,6 +219,7 @@
         <h2 class="post-title" itemprop="name headline">
           <a href="/subscription-cli-always-on-agent/" class="post-title-link" itemprop="url">CLI 也能當 AI agent 的後端</a>
         </h2>
+          <p class="post-subtitle" itemprop="alternativeHeadline">自己做 AI agent，不一定得從模型 API 開始。</p>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -227,9 +228,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">發表於</span>
-      
 
-      <time title="創建時間：2026-07-19 08:00:00 / 修改時間：09:10:29" itemprop="dateCreated datePublished" datetime="2026-07-19T08:00:00+08:00">2026-07-19</time>
+      <time title="創建時間：2026-07-19 08:00:00" itemprop="dateCreated datePublished" datetime="2026-07-19T08:00:00+08:00">2026-07-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新於</span>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -270,10 +277,13 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>自己做 AI agent，不一定得從模型 API 開始。</p>
+          <p>現在使用市面上的 AI agent framework，安裝完後遇到的第一個設定，通常就是選擇模型供應商，再填入一組 API key。</p>
+<p>這個設計很合理，框架總得知道要去哪裡找模型。但我卡在一個很現實的地方，我本來就在付 Claude 和 ChatGPT 的訂閱費，平常使用 Claude Code 與 Codex CLI 也都包含在方案額度裡。</p>
+<p>如果 agent 改走模型 API，等於又多開一條按 token 計費的路徑。技術上沒有問題，但我的錢很有問題啊啊啊。</p>
+<p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/subscription-cli-always-on-agent/">
+              <a class="btn" href="/subscription-cli-always-on-agent/#more" rel="contents">
                 閱讀全文 &raquo;
               </a>
             </div>
@@ -299,7 +309,7 @@
     
 
 
-<div class="post-block">
+<div class="post-block post-block-subtitle">
   
   
 
@@ -324,6 +334,7 @@
         <h2 class="post-title" itemprop="name headline">
           <a href="/long-running-service-watchdog/" class="post-title-link" itemprop="url">一個人也需要 SRE</a>
         </h2>
+          <p class="post-subtitle" itemprop="alternativeHeadline">服務無聲消失了 16 小時，逼我替它補上自動重啟、外部心跳與開機自啟。查完才發現，這些問題早就是 SRE 的日常。</p>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -340,7 +351,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -381,10 +392,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>服務無聲消失了 16 小時，逼我替它補上自動重啟、外部心跳與開機自啟。查完才發現，這些問題早就是 SRE 的日常。</p>
+          <p>我有一個常駐的 AI 助理 bot，平常會主動推播提醒、報告工作進度，<del>偶爾覺得它有點吵</del>。某天下午我要重啟它裝新功能，才發現它消失了一陣子。log 最後一行停在前一天早上十點多，沒報錯，也沒留下半點線索，就這樣安靜地不見了 16 個小時。事後推測應該是機器重開的時候沒有一起把服務重啟。</p>
+<p>這讓我開始思考一個問題：要是哪天換別的原因害它死掉，我會不會一樣過了半天才發現？畢竟我平常只有在它跳出訊息的時候去確認，它沒跳訊息的時候我不會特別去看它，所以很難發現它掛了。</p>
+<p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/long-running-service-watchdog/">
+              <a class="btn" href="/long-running-service-watchdog/#more" rel="contents">
                 閱讀全文 &raquo;
               </a>
             </div>
@@ -451,7 +464,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -565,7 +578,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -676,7 +689,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -788,7 +801,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -903,7 +916,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1022,7 +1035,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-07-19 09:10:29" itemprop="dateModified" datetime="2026-07-19T09:10:29+08:00">2026-07-19</time>
+      <time title="修改時間：2026-07-23 20:52:25" itemprop="dateModified" datetime="2026-07-23T20:52:25+08:00">2026-07-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">

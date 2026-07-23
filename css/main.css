@@ -1243,7 +1243,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #f9f986;
+    background: #ffa481;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2812,4 +2812,16 @@ header.header {
 }
 .mermaid {
   background: transparent;
+}
+.posts-expand .post-subtitle {
+  color: #999;
+  font-family: Lato, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 1.125em;
+  font-weight: normal;
+  line-height: 1.6;
+  margin: 12px auto 8px;
+  max-width: 760px;
+}
+.posts-expand .post-block-subtitle .post-header {
+  margin-bottom: 32px;
 }
