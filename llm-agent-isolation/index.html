@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+  <link rel="mask-icon" href="/images/koala-mono.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多人共用 AI bot，別讓它認錯使用者">
+<meta property="og:url" content="https://calmkoala.github.io/llm-agent-isolation/">
+<meta property="og:site_name" content="CalmKoala">
+<meta property="og:description" content="多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="article:published_time" content="2026-07-25T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-25T01:10:31.235Z">
+<meta property="article:author" content="PingChun">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="系統設計">
+<meta property="article:tag" content="安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+
+
+<link rel="canonical" href="https://calmkoala.github.io/llm-agent-isolation/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/llm-agent-isolation/","path":"/llm-agent-isolation/","title":"多人共用 AI bot，別讓它認錯使用者"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>多人共用 AI bot，別讓它認錯使用者 | CalmKoala</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="CalmKoala" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">CalmKoala</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">14</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">9</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E6%8A%8A-AI-%E5%A1%AB%E7%9A%84%E8%BA%AB%E4%BB%BD%E7%95%B6%E6%88%90%E7%9C%9F%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">工具把 AI 填的身份當成真的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E9%9D%A0-AI-%E5%AF%AB%E7%A8%8B%E5%BC%8F%EF%BC%8C%E4%B9%9F%E8%83%BD%E5%85%88%E6%AA%A2%E6%9F%A5%E4%B8%89%E4%BB%B6%E4%BA%8B"><span class="nav-number">2.</span> <span class="nav-text">主要靠 AI 寫程式，也能先檢查三件事</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%BD%E5%87%BA%E8%BA%AB%E4%BB%BD%E5%BE%9E%E5%93%AA%E8%A3%A1%E4%BE%86"><span class="nav-number">2.1.</span> <span class="nav-text">追出身份從哪裡來</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%87%E8%A8%AD%E6%A8%A1%E5%9E%8B%E8%83%BD%E4%BB%BB%E6%84%8F%E5%A1%AB%E5%AF%AB%E5%B7%A5%E5%85%B7%E5%8F%83%E6%95%B8"><span class="nav-number">2.2.</span> <span class="nav-text">假設模型能任意填寫工具參數</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E6%99%82%E6%B8%AC%E5%85%A9%E5%90%8D%E4%BD%BF%E7%94%A8%E8%80%85%EF%BC%8C%E6%AA%A2%E6%9F%A5%E8%BA%AB%E4%BB%BD%E6%98%AF%E5%90%A6%E6%B7%B7%E7%94%A8"><span class="nav-number">2.3.</span> <span class="nav-text">同時測兩名使用者，檢查身份是否混用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%B5%B1%E8%A6%81%E5%9C%A8%E5%85%A5%E5%8F%A3%E7%A2%BA%E8%AA%8D%E8%BA%AB%E4%BB%BD%EF%BC%8C%E5%86%8D%E4%B8%80%E8%B7%AF%E5%B8%B6%E5%88%B0%E8%B3%87%E6%96%99%E6%9F%A5%E8%A9%A2"><span class="nav-number">3.</span> <span class="nav-text">系統要在入口確認身份，再一路帶到資料查詢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%9A%84%E5%85%A9%E4%BA%BA%E7%89%88%EF%BC%8C%E5%8F%A6%E5%A4%96%E5%AE%88%E4%BD%8F%E5%9F%B7%E8%A1%8C%E7%92%B0%E5%A2%83%E3%80%81%E5%B7%A5%E5%85%B7%E8%88%87%E8%B3%87%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">我的兩人版，另外守住執行環境、工具與資料</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%8F%E4%BA%BA%E4%B8%80%E5%80%8B-process%EF%BC%8C%E4%B8%8D%E4%BB%A3%E8%A1%A8%E6%AA%94%E6%A1%88%E5%B7%B2%E7%B6%93%E9%9A%94%E9%9B%A2"><span class="nav-number">4.1.</span> <span class="nav-text">每人一個 process，不代表檔案已經隔離</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%9C%E6%8E%89%E9%80%9A%E7%94%A8%E5%B7%A5%E5%85%B7%EF%BC%8C%E5%8F%AA%E7%95%99%E4%B8%8B%E5%8F%97%E9%99%90%E5%8A%9F%E8%83%BD"><span class="nav-number">4.2.</span> <span class="nav-text">關掉通用工具，只留下受限功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E7%B3%BB%E7%B5%B1%E6%B3%A8%E5%85%A5%E7%9A%84%E8%BA%AB%E4%BB%BD%E6%9F%A5%E8%B3%87%E6%96%99"><span class="nav-number">4.3.</span> <span class="nav-text">工具使用系統注入的身份查資料</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8B%99%E6%9B%B4%E5%A4%9A%E4%BD%BF%E7%94%A8%E8%80%85%E6%99%82%EF%BC%8C%E8%BA%AB%E4%BB%BD%E8%A6%81%E8%B7%9F%E8%91%97%E5%9F%B7%E8%A1%8C%E7%92%B0%E5%A2%83%E6%88%96%E8%AB%8B%E6%B1%82%E8%B5%B0"><span class="nav-number">5.</span> <span class="nav-text">服務更多使用者時，身份要跟著執行環境或請求走</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hermes-%E5%88%86%E9%96%8B%E5%B0%8D%E8%A9%B1%EF%BC%8C%E4%B8%8D%E7%AD%89%E6%96%BC%E5%88%86%E9%96%8B%E8%B3%87%E6%96%99%E6%AC%8A%E9%99%90"><span class="nav-number">6.</span> <span class="nav-text">Hermes 分開對話，不等於分開資料權限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%BE%8C%E6%AA%A2%E6%9F%A5%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%90%A6%E6%8E%A7%E5%88%B6%E8%BA%AB%E4%BB%BD%E6%88%96%E7%B9%9E%E9%81%8E%E5%B7%A5%E5%85%B7"><span class="nav-number">7.</span> <span class="nav-text">最後檢查模型能否控制身份或繞過工具</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="PingChun"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">PingChun</p>
+  <div class="site-description" itemprop="description">後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml" rel="noopener me"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/llm-agent-isolation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="多人共用 AI bot，別讓它認錯使用者 | CalmKoala">
+      <meta itemprop="description" content="多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          多人共用 AI bot，別讓它認錯使用者
+        </h1>
+          <p class="post-subtitle" itemprop="alternativeHeadline">多人共用 AI bot 時，身份應該由系統確認，不能讓模型自己提供</p>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-07-25 08:00:00 / 修改時間：09:10:31" itemprop="dateCreated datePublished" datetime="2026-07-25T08:00:00+08:00">2026-07-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>4.9k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>16 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>試著想像一個故事：小明和小美共用同一個 AI bot。兩人都會請它記住一些事情，可能是待辦、工作筆記，也可能是不想讓對方看到的私人內容。</p>
+<p>當小明問「我上次說過什麼？」時，bot 卻把小美留下的內容回傳給他。一次錯誤回答，就變成了私人資料外洩。</p>
+<p>這裡要先分清楚 bot 和 AI。bot 是整套應用系統，負責接收訊息，並串起身份確認、工具與資料。AI 是其中負責理解文字、選擇下一步操作的元件。</p>
+<p>要避免拿錯資料，bot 必須在把訊息交給 AI 之前，先從聊天平台或登入系統確認訊息是誰傳的，不能讓 AI 自己判斷身分。AI 可以判斷小明想找什麼，但不能決定自己目前是代表小明還是小美。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+    U[&quot;小明傳來訊息&quot;] --&gt; P
+    subgraph B[&quot;AI bot 系統&quot;]
+        P[&quot;訊息入口&lt;br&#x2F;&gt;確認是小明&quot;] --&gt; A[&quot;AI&lt;br&#x2F;&gt;理解小明想做什麼&quot;]
+        A --&gt; T[&quot;記憶工具&lt;br&#x2F;&gt;沿用已確認的身份&quot;]
+    end
+    T --&gt; D[&quot;只讀小明的資料&quot;]
+</code>
+</pre>
+
+<p>圖中的 AI 位於 bot 系統裡面，只負責理解需求。訊息入口先確認現在是誰，記憶工具再沿用這個結果查詢資料。把身份也交給 AI 填，它就有機會用別人的身份讀資料。</p>
+<p>模型可能誤解對話、受到提示注入影響，或在呼叫工具時填錯資料。身份是權限的起點，不能建立在「模型應該會填對」的假設上。</p>
+<span id="more"></span>
+
+<h2 id="工具把-AI-填的身份當成真的"><a href="#工具把-AI-填的身份當成真的" class="headerlink" title="工具把 AI 填的身份當成真的"></a>工具把 AI 填的身份當成真的</h2><p>我的 bot 只有兩名固定使用者。AI 要讀取記憶時，會呼叫我提供的工具。第一版的工具要求 AI 填入兩個值。</p>
+<table>
+<thead>
+<tr>
+<th>欄位</th>
+<th>代表什麼</th>
+<th>第一版由誰填</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>memory_id</code></td>
+<td>想讀哪則記憶</td>
+<td>AI</td>
+</tr>
+<tr>
+<td><code>requester_id</code></td>
+<td>現在是哪位使用者</td>
+<td>AI</td>
+</tr>
+</tbody></table>
+<p>問題就在第二個值。當小明傳來訊息時，只要 AI 取得小美某則記憶的編號，再把 <code>requester_id</code> 填成小美，工具查到的「記憶主人」就會和 <code>requester_id</code> 相同。</p>
+<p>從工具的角度看，記憶主人和提出要求的人都是小美。它沒有收到平台確認的真正身份，因此不知道原始訊息來自小明，權限檢查仍然會通過。</p>
+<p>當時的程式碼大概長這樣。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span>, requester_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    memory = load(memory_id)</span><br><span class="line">    <span class="keyword">if</span> memory.owner != requester_id:</span><br><span class="line">        <span class="keyword">raise</span> PermissionError(<span class="string">&quot;not your memory&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> memory.content</span><br></pre></td></tr></table></figure>
+
+<p>程式裡的 <code>if</code> 只確認「記憶主人」和 <code>requester_id</code> 是否相同。由於 <code>requester_id</code> 也是 AI 填的，這個檢查無法確認真正傳來訊息的人。</p>
+<p><code>memory_id</code> 可以由模型選，工具再用可信身份檢查目前使用者是否有權讀取。<code>requester_id</code> 則是認證結果，必須來自聊天平台或登入系統，不能由模型自己聲明。</p>
+<h2 id="主要靠-AI-寫程式，也能先檢查三件事"><a href="#主要靠-AI-寫程式，也能先檢查三件事" class="headerlink" title="主要靠 AI 寫程式，也能先檢查三件事"></a>主要靠 AI 寫程式，也能先檢查三件事</h2><p>如果你平常主要靠 vibe coding，不必先學會審查每一行程式。請 AI 回答下面三件事，就能找到需要進一步檢查的地方。</p>
+<h3 id="追出身份從哪裡來"><a href="#追出身份從哪裡來" class="headerlink" title="追出身份從哪裡來"></a>追出身份從哪裡來</h3><p>請 AI 畫出身份從登入或訊息平台，一路傳到工具與資料庫的流程，並標出每個值由誰產生。</p>
+<p>一張可用的圖大概會長這樣。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+    U[&quot;小明傳送訊息&quot;] --&gt; P[&quot;聊天平台&lt;br&#x2F;&gt;確認是小明&quot;]
+    P --&gt;|&quot;已驗證身份&quot;| B[&quot;bot 訊息入口&quot;]
+
+    B --&gt;|&quot;訊息內容&quot;| A[&quot;AI&lt;br&#x2F;&gt;理解想做什麼&quot;]
+    B --&gt; C[&quot;伺服器端上下文&lt;br&#x2F;&gt;保存小明的身份&quot;]
+
+    A --&gt;|&quot;想讀哪則記憶&quot;| T[&quot;記憶工具&quot;]
+    C --&gt;|&quot;小明的身份&quot;| T
+
+    T --&gt; D[&quot;只查小明的資料&quot;]
+</code>
+</pre>
+
+<p>這張圖有兩條路。AI 提供「想做什麼」，伺服器端上下文提供「現在是誰」，兩者最後在工具會合。</p>
+<p>如果使用者身份改成從 AI 流向工具，就代表模型有機會替換身份。身份若來自使用者輸入、提示詞或 LLM 的工具參數，也不能直接拿來做授權。可信來源通常是通過驗證的登入狀態、平台訊息，或伺服器建立的請求上下文。</p>
+<h3 id="假設模型能任意填寫工具參數"><a href="#假設模型能任意填寫工具參數" class="headerlink" title="假設模型能任意填寫工具參數"></a>假設模型能任意填寫工具參數</h3><p>可以直接把這段要求交給 AI。</p>
+<blockquote>
+<p>假設 LLM 可以任意填寫每個工具參數，找出它跨使用者讀取、修改或刪除資料的所有路徑。</p>
+</blockquote>
+<p>看到 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 或 <code>requester_id</code> 出現在工具參數中，可以先追查這些值的來源。欄位名稱本身不代表一定有漏洞，重點是模型能否利用它改變自己的權限。</p>
+<h3 id="同時測兩名使用者，檢查身份是否混用"><a href="#同時測兩名使用者，檢查身份是否混用" class="headerlink" title="同時測兩名使用者，檢查身份是否混用"></a>同時測兩名使用者，檢查身份是否混用</h3><p>許多 AI 產生的範例只測試一名使用者，因此看不出身份混用。請 AI 同時模擬 A 與 B，檢查對話、暫存狀態、工作目錄與請求上下文是否互相影響。</p>
+<p>如果實作會修改一個全域的目前使用者，兩個並行請求就可能互相覆寫身份。</p>
+<h2 id="系統要在入口確認身份，再一路帶到資料查詢"><a href="#系統要在入口確認身份，再一路帶到資料查詢" class="headerlink" title="系統要在入口確認身份，再一路帶到資料查詢"></a>系統要在入口確認身份，再一路帶到資料查詢</h2><p>上面的圖把身份與操作分成兩條路。要讓身份這條路可信，訊息入口還得先驗證來源。</p>
+<p>網站要先驗證登入 session 或 token，聊天平台的 webhook 也要先驗證簽章。完成驗證後，訊息入口才把身份綁進伺服器端上下文或專屬執行環境。</p>
+<p>工具從這個位置取得身份。LLM 可以選擇操作與資源，例如「讀取這則記憶」，但工具仍會用通過驗證的身份限制資料範圍。</p>
+<h2 id="我的兩人版，另外守住執行環境、工具與資料"><a href="#我的兩人版，另外守住執行環境、工具與資料" class="headerlink" title="我的兩人版，另外守住執行環境、工具與資料"></a>我的兩人版，另外守住執行環境、工具與資料</h2><p>我的 bot 讓每位使用者各自使用一個長駐 Claude CLI process。訊息入口驗證使用者後，會從伺服器端保存的對應關係找到該使用者的 process。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">proc = <span class="keyword">await</span> asyncio.create_subprocess_exec(</span><br><span class="line">    <span class="string">&quot;claude&quot;</span>, <span class="string">&quot;-p&quot;</span>, <span class="string">&quot;--input-format&quot;</span>, <span class="string">&quot;stream-json&quot;</span>,</span><br><span class="line">    cwd=<span class="string">f&quot;state/private/<span class="subst">&#123;user_id&#125;</span>/&quot;</span>,</span><br><span class="line">    env=&#123;**os.environ, <span class="string">&quot;DYAD_USER_ID&quot;</span>: user_id&#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>每個 process 啟動時只收到自己的 <code>DYAD_USER_ID</code>。環境變數不是使用者清單，只表示這個 process 從啟動到結束代表誰。</p>
+<p>身份的可信度也不是來自環境變數本身。訊息入口已驗證使用者，再由伺服器啟動對應的 process 並注入身份，這條路徑才是信任來源。</p>
+<h3 id="每人一個-process，不代表檔案已經隔離"><a href="#每人一個-process，不代表檔案已經隔離" class="headerlink" title="每人一個 process，不代表檔案已經隔離"></a>每人一個 process，不代表檔案已經隔離</h3><p>每位使用者的對話、上下文與 process 生命週期各自分開。小明的訊息只會送進自己的 process。使用者登出或權限被撤銷時，舊 process 也要停止或重建。</p>
+<p><code>cwd</code> 讓相對路徑預設落在使用者自己的資料夾，但它不是檔案沙盒。只要 process 有任意讀檔能力，<code>../B/memory.md</code> 或完整的絕對路徑仍能離開目前目錄。</p>
+<h3 id="關掉通用工具，只留下受限功能"><a href="#關掉通用工具，只留下受限功能" class="headerlink" title="關掉通用工具，只留下受限功能"></a>關掉通用工具，只留下受限功能</h3><p>Claude CLI 原本帶有 Read、Write、Bash 等內建工具。全部保留時，模型仍能繞過記憶工具，直接讀取其他路徑。</p>
+<p>我的 bot 會關掉內建工具，只允許自己設計的 MCP 工具。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">claude -p --tools <span class="string">&quot;&quot;</span> \</span><br><span class="line">       --mcp-config mcp.json \</span><br><span class="line">       --strict-mcp-config</span><br></pre></td></tr></table></figure>
+
+<p>模型只會看到 <code>list_memory</code>、<code>propose_memory</code>、<code>delete_memory</code> 等有限功能。它沒有一般讀檔工具，也沒有命令列可以探索其他目錄。</p>
+<p>這層的代價是，每增加一項能力，都要另外設計範圍有限的工具。自訂工具本身也要限制路徑與資料範圍，不能換個名字重新提供任意讀檔能力。</p>
+<h3 id="工具使用系統注入的身份查資料"><a href="#工具使用系統注入的身份查資料" class="headerlink" title="工具使用系統注入的身份查資料"></a>工具使用系統注入的身份查資料</h3><p>我把身份從工具參數移除。Claude CLI 啟動 MCP 伺服器時，伺服器會繼承 process 的環境變數。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">USER_ID = os.environ[<span class="string">&quot;DYAD_USER_ID&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> store.get(user_id=USER_ID, memory_id=memory_id)</span><br></pre></td></tr></table></figure>
+
+<p>LLM 只提供 <code>memory_id</code>，工具自行把 <code>USER_ID</code> 加進資料查詢。即使模型知道小美的識別碼，工具定義裡也沒有位置讓它替換目前身份。</p>
+<p>四道邊界處理的範圍不同。</p>
+<table>
+<thead>
+<tr>
+<th>邊界</th>
+<th>負責處理</th>
+<th>單獨使用仍缺少</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>訊息入口</td>
+<td>驗證訊息來自哪位使用者</td>
+<td>不會自動限制工具與資料</td>
+</tr>
+<tr>
+<td>process</td>
+<td>分開對話、上下文與生命週期</td>
+<td><code>cwd</code> 擋不住任意路徑</td>
+</tr>
+<tr>
+<td>工具白名單</td>
+<td>限制模型可以使用的能力</td>
+<td>自訂工具仍可能寫錯權限</td>
+</tr>
+<tr>
+<td>資料查詢</td>
+<td>依可信身份限制實際資料</td>
+<td>上游必須先正確驗證身份</td>
+</tr>
+</tbody></table>
+<h2 id="服務更多使用者時，身份要跟著執行環境或請求走"><a href="#服務更多使用者時，身份要跟著執行環境或請求走" class="headerlink" title="服務更多使用者時，身份要跟著執行環境或請求走"></a>服務更多使用者時，身份要跟著執行環境或請求走</h2><p>環境變數可以用在更多使用者，前提是一個 process 或容器從頭到尾只代表一位使用者。每建立一個執行環境，系統只注入它代表的單一身份，不需要把所有使用者寫進環境變數。</p>
+<p>使用者變多後，可以選擇不同的執行方式。</p>
+<table>
+<thead>
+<tr>
+<th>執行方式</th>
+<th>身份放在哪裡</th>
+<th>適合的情況</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>每人一個 process 或容器</td>
+<td>啟動時由伺服器注入</td>
+<td>使用者不多，或需要較強的執行隔離</td>
+</tr>
+<tr>
+<td>多人共用 worker</td>
+<td>每次請求專用的伺服器端上下文</td>
+<td>使用者多，需要共用運算資源</td>
+</tr>
+</tbody></table>
+<p>共用 worker 不能靠修改全域 <code>CURRENT_USER</code> 切換身份。小明與小美的請求同時執行時，後寫入的值可能覆蓋前一個。</p>
+<p>身份要跟著個別請求或非同步任務傳遞。如果 agent runner 與工具伺服器分開部署，這份身份還要透過已驗證的內部連線傳遞，或綁定到伺服器管理的連線與 session。把 <code>user_id</code> 放回模型產生的 JSON，無法取代這段可信傳遞。</p>
+<p>公開的多租戶服務還需要正式的登入驗證、授權與租戶資料隔離。資料風險較高時，可以把高風險工具放進短命容器，或使用獨立的作業系統帳號。</p>
+<h2 id="Hermes-分開對話，不等於分開資料權限"><a href="#Hermes-分開對話，不等於分開資料權限" class="headerlink" title="Hermes 分開對話，不等於分開資料權限"></a>Hermes 分開對話，不等於分開資料權限</h2><p>Hermes Agent 的 <a target="_blank" rel="noopener" href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/sessions.md">Sessions 文件</a>也把使用者資訊放在模型外面。它的 gateway 會根據平台訊息中的聊天室、使用者與討論串等資料建立 session key，再把訊息送進對應的對話紀錄。</p>
+<p>私訊會依聊天室分開。平台能提供使用者識別碼時，一般群組會把使用者放進 session key。群組討論串預設讓參與者共用對話，需要逐人分開時，可以開啟 <code>thread_sessions_per_user</code>。</p>
+<p>這個設計處理「訊息應該進入哪段對話」，不會自動限制檔案或工具權限。即使小明與小美使用不同 session，兩邊仍可能呼叫接受任意 <code>user_id</code> 的工具。</p>
+<p>Hermes 可以作為身份路由的參考，資料授權仍要由工具與儲存層處理。</p>
+<h2 id="最後檢查模型能否控制身份或繞過工具"><a href="#最後檢查模型能否控制身份或繞過工具" class="headerlink" title="最後檢查模型能否控制身份或繞過工具"></a>最後檢查模型能否控制身份或繞過工具</h2><p>如果 AI bot 會服務多名使用者，可以搜尋工具定義中的 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 與 <code>requester_id</code>。</p>
+<p>這些欄位出現在參數中不一定有錯。資源或工作區識別碼可以由模型選擇，伺服器仍要用可信身份檢查目前使用者是否有權操作。真正危險的是，工具直接把模型提供的值當成已通過認證的身份。</p>
+<p>也要檢查模型是否擁有旁路能力。Read、Write、Bash、瀏覽器、資料庫查詢與自訂 MCP 工具，都可能繞過原本設計的記憶 API。</p>
+<p>我的第一版沒有漏寫那個 <code>if</code>。我把模型產生的 <code>requester_id</code> 當成通過驗證的身份，才讓檢查看似存在，實際上仍由模型控制。</p>
+<p>兩人版可以把身份固定在專屬 process，多人共用的服務可以放進每次請求專用的伺服器端上下文。實作方式會隨規模改變，模型只負責選擇操作與資源，系統負責決定它目前代表誰，以及可以操作哪些資料。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/%E7%B3%BB%E7%B5%B1%E8%A8%AD%E8%A8%88/" rel="tag"># 系統設計</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/subscription-cli-always-on-agent/" rel="prev" title="CLI 也能當 AI agent 的後端">
+                  <i class="fa fa-angle-left"></i> CLI 也能當 AI agent 的後端
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2023 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">PingChun</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="總字數">23k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="所需總閱讀時間">1:15</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"CalmKoala/blog-comments","issue_term":"pathname","theme":"preferred-color-scheme"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+</body>
+</html>

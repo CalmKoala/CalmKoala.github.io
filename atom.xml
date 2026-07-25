@@ -10,7 +10,26 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-07-23T12:56:34.332Z</updated>
+  <updated>2026-07-25T01:10:31.235Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/categories/study-notes/AI/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/tags/AI/"/>
+    <category term="系統設計" scheme="https://calmkoala.github.io/tags/%E7%B3%BB%E7%B5%B1%E8%A8%AD%E8%A8%88/"/>
+    <category term="安全" scheme="https://calmkoala.github.io/tags/%E5%AE%89%E5%85%A8/"/>
+    <content>
+      <![CDATA[<p>試著想像一個故事：小明和小美共用同一個 AI bot。兩人都會請它記住一些事情，可能是待辦、工作筆記，也可能是不想讓對方看到的私人內容。</p><p>當小明問「我上次說過什麼？」時，bot 卻把小美留下的內容回傳給他。一次錯誤回答，就變成了私人資料外洩。</p><p>這裡要先分清楚 bot 和 AI。bot 是整套應用系統，負責接收訊息，並串起身份確認、工具與資料。AI 是其中負責理解文字、選擇下一步操作的元件。</p><p>要避免拿錯資料，bot 必須在把訊息交給 AI 之前，先從聊天平台或登入系統確認訊息是誰傳的，不能讓 AI 自己判斷身分。AI 可以判斷小明想找什麼，但不能決定自己目前是代表小明還是小美。</p><pre><code class="mermaid">flowchart LR    U[&quot;小明傳來訊息&quot;] --&gt; P    subgraph B[&quot;AI bot 系統&quot;]        P[&quot;訊息入口&lt;br&#x2F;&gt;確認是小明&quot;] --&gt; A[&quot;AI&lt;br&#x2F;&gt;理解小明想做什麼&quot;]        A --&gt; T[&quot;記憶工具&lt;br&#x2F;&gt;沿用已確認的身份&quot;]    end    T --&gt; D[&quot;只讀小明的資料&quot;]</code></pre><p>圖中的 AI 位於 bot 系統裡面，只負責理解需求。訊息入口先確認現在是誰，記憶工具再沿用這個結果查詢資料。把身份也交給 AI 填，它就有機會用別人的身份讀資料。</p><p>模型可能誤解對話、受到提示注入影響，或在呼叫工具時填錯資料。身份是權限的起點，不能建立在「模型應該會填對」的假設上。</p><span id="more"></span><h2 id="工具把-AI-填的身份當成真的"><a href="#工具把-AI-填的身份當成真的" class="headerlink" title="工具把 AI 填的身份當成真的"></a>工具把 AI 填的身份當成真的</h2><p>我的 bot 只有兩名固定使用者。AI 要讀取記憶時，會呼叫我提供的工具。第一版的工具要求 AI 填入兩個值。</p><table><thead><tr><th>欄位</th><th>代表什麼</th><th>第一版由誰填</th></tr></thead><tbody><tr><td><code>memory_id</code></td><td>想讀哪則記憶</td><td>AI</td></tr><tr><td><code>requester_id</code></td><td>現在是哪位使用者</td><td>AI</td></tr></tbody></table><p>問題就在第二個值。當小明傳來訊息時，只要 AI 取得小美某則記憶的編號，再把 <code>requester_id</code> 填成小美，工具查到的「記憶主人」就會和 <code>requester_id</code> 相同。</p><p>從工具的角度看，記憶主人和提出要求的人都是小美。它沒有收到平台確認的真正身份，因此不知道原始訊息來自小明，權限檢查仍然會通過。</p><p>當時的程式碼大概長這樣。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span>, requester_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    memory = load(memory_id)</span><br><span class="line">    <span class="keyword">if</span> memory.owner != requester_id:</span><br><span class="line">        <span class="keyword">raise</span> PermissionError(<span class="string">&quot;not your memory&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> memory.content</span><br></pre></td></tr></table></figure><p>程式裡的 <code>if</code> 只確認「記憶主人」和 <code>requester_id</code> 是否相同。由於 <code>requester_id</code> 也是 AI 填的，這個檢查無法確認真正傳來訊息的人。</p><p><code>memory_id</code> 可以由模型選，工具再用可信身份檢查目前使用者是否有權讀取。<code>requester_id</code> 則是認證結果，必須來自聊天平台或登入系統，不能由模型自己聲明。</p><h2 id="主要靠-AI-寫程式，也能先檢查三件事"><a href="#主要靠-AI-寫程式，也能先檢查三件事" class="headerlink" title="主要靠 AI 寫程式，也能先檢查三件事"></a>主要靠 AI 寫程式，也能先檢查三件事</h2><p>如果你平常主要靠 vibe coding，不必先學會審查每一行程式。請 AI 回答下面三件事，就能找到需要進一步檢查的地方。</p><h3 id="追出身份從哪裡來"><a href="#追出身份從哪裡來" class="headerlink" title="追出身份從哪裡來"></a>追出身份從哪裡來</h3><p>請 AI 畫出身份從登入或訊息平台，一路傳到工具與資料庫的流程，並標出每個值由誰產生。</p><p>一張可用的圖大概會長這樣。</p><pre><code class="mermaid">flowchart LR    U[&quot;小明傳送訊息&quot;] --&gt; P[&quot;聊天平台&lt;br&#x2F;&gt;確認是小明&quot;]    P --&gt;|&quot;已驗證身份&quot;| B[&quot;bot 訊息入口&quot;]    B --&gt;|&quot;訊息內容&quot;| A[&quot;AI&lt;br&#x2F;&gt;理解想做什麼&quot;]    B --&gt; C[&quot;伺服器端上下文&lt;br&#x2F;&gt;保存小明的身份&quot;]    A --&gt;|&quot;想讀哪則記憶&quot;| T[&quot;記憶工具&quot;]    C --&gt;|&quot;小明的身份&quot;| T    T --&gt; D[&quot;只查小明的資料&quot;]</code></pre><p>這張圖有兩條路。AI 提供「想做什麼」，伺服器端上下文提供「現在是誰」，兩者最後在工具會合。</p><p>如果使用者身份改成從 AI 流向工具，就代表模型有機會替換身份。身份若來自使用者輸入、提示詞或 LLM 的工具參數，也不能直接拿來做授權。可信來源通常是通過驗證的登入狀態、平台訊息，或伺服器建立的請求上下文。</p><h3 id="假設模型能任意填寫工具參數"><a href="#假設模型能任意填寫工具參數" class="headerlink" title="假設模型能任意填寫工具參數"></a>假設模型能任意填寫工具參數</h3><p>可以直接把這段要求交給 AI。</p><blockquote><p>假設 LLM 可以任意填寫每個工具參數，找出它跨使用者讀取、修改或刪除資料的所有路徑。</p></blockquote><p>看到 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 或 <code>requester_id</code> 出現在工具參數中，可以先追查這些值的來源。欄位名稱本身不代表一定有漏洞，重點是模型能否利用它改變自己的權限。</p><h3 id="同時測兩名使用者，檢查身份是否混用"><a href="#同時測兩名使用者，檢查身份是否混用" class="headerlink" title="同時測兩名使用者，檢查身份是否混用"></a>同時測兩名使用者，檢查身份是否混用</h3><p>許多 AI 產生的範例只測試一名使用者，因此看不出身份混用。請 AI 同時模擬 A 與 B，檢查對話、暫存狀態、工作目錄與請求上下文是否互相影響。</p><p>如果實作會修改一個全域的目前使用者，兩個並行請求就可能互相覆寫身份。</p><h2 id="系統要在入口確認身份，再一路帶到資料查詢"><a href="#系統要在入口確認身份，再一路帶到資料查詢" class="headerlink" title="系統要在入口確認身份，再一路帶到資料查詢"></a>系統要在入口確認身份，再一路帶到資料查詢</h2><p>上面的圖把身份與操作分成兩條路。要讓身份這條路可信，訊息入口還得先驗證來源。</p><p>網站要先驗證登入 session 或 token，聊天平台的 webhook 也要先驗證簽章。完成驗證後，訊息入口才把身份綁進伺服器端上下文或專屬執行環境。</p><p>工具從這個位置取得身份。LLM 可以選擇操作與資源，例如「讀取這則記憶」，但工具仍會用通過驗證的身份限制資料範圍。</p><h2 id="我的兩人版，另外守住執行環境、工具與資料"><a href="#我的兩人版，另外守住執行環境、工具與資料" class="headerlink" title="我的兩人版，另外守住執行環境、工具與資料"></a>我的兩人版，另外守住執行環境、工具與資料</h2><p>我的 bot 讓每位使用者各自使用一個長駐 Claude CLI process。訊息入口驗證使用者後，會從伺服器端保存的對應關係找到該使用者的 process。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">proc = <span class="keyword">await</span> asyncio.create_subprocess_exec(</span><br><span class="line">    <span class="string">&quot;claude&quot;</span>, <span class="string">&quot;-p&quot;</span>, <span class="string">&quot;--input-format&quot;</span>, <span class="string">&quot;stream-json&quot;</span>,</span><br><span class="line">    cwd=<span class="string">f&quot;state/private/<span class="subst">&#123;user_id&#125;</span>/&quot;</span>,</span><br><span class="line">    env=&#123;**os.environ, <span class="string">&quot;DYAD_USER_ID&quot;</span>: user_id&#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>每個 process 啟動時只收到自己的 <code>DYAD_USER_ID</code>。環境變數不是使用者清單，只表示這個 process 從啟動到結束代表誰。</p><p>身份的可信度也不是來自環境變數本身。訊息入口已驗證使用者，再由伺服器啟動對應的 process 並注入身份，這條路徑才是信任來源。</p><h3 id="每人一個-process，不代表檔案已經隔離"><a href="#每人一個-process，不代表檔案已經隔離" class="headerlink" title="每人一個 process，不代表檔案已經隔離"></a>每人一個 process，不代表檔案已經隔離</h3><p>每位使用者的對話、上下文與 process 生命週期各自分開。小明的訊息只會送進自己的 process。使用者登出或權限被撤銷時，舊 process 也要停止或重建。</p><p><code>cwd</code> 讓相對路徑預設落在使用者自己的資料夾，但它不是檔案沙盒。只要 process 有任意讀檔能力，<code>../B/memory.md</code> 或完整的絕對路徑仍能離開目前目錄。</p><h3 id="關掉通用工具，只留下受限功能"><a href="#關掉通用工具，只留下受限功能" class="headerlink" title="關掉通用工具，只留下受限功能"></a>關掉通用工具，只留下受限功能</h3><p>Claude CLI 原本帶有 Read、Write、Bash 等內建工具。全部保留時，模型仍能繞過記憶工具，直接讀取其他路徑。</p><p>我的 bot 會關掉內建工具，只允許自己設計的 MCP 工具。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">claude -p --tools <span class="string">&quot;&quot;</span> \</span><br><span class="line">       --mcp-config mcp.json \</span><br><span class="line">       --strict-mcp-config</span><br></pre></td></tr></table></figure><p>模型只會看到 <code>list_memory</code>、<code>propose_memory</code>、<code>delete_memory</code> 等有限功能。它沒有一般讀檔工具，也沒有命令列可以探索其他目錄。</p><p>這層的代價是，每增加一項能力，都要另外設計範圍有限的工具。自訂工具本身也要限制路徑與資料範圍，不能換個名字重新提供任意讀檔能力。</p><h3 id="工具使用系統注入的身份查資料"><a href="#工具使用系統注入的身份查資料" class="headerlink" title="工具使用系統注入的身份查資料"></a>工具使用系統注入的身份查資料</h3><p>我把身份從工具參數移除。Claude CLI 啟動 MCP 伺服器時，伺服器會繼承 process 的環境變數。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">USER_ID = os.environ[<span class="string">&quot;DYAD_USER_ID&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> store.get(user_id=USER_ID, memory_id=memory_id)</span><br></pre></td></tr></table></figure><p>LLM 只提供 <code>memory_id</code>，工具自行把 <code>USER_ID</code> 加進資料查詢。即使模型知道小美的識別碼，工具定義裡也沒有位置讓它替換目前身份。</p><p>四道邊界處理的範圍不同。</p><table><thead><tr><th>邊界</th><th>負責處理</th><th>單獨使用仍缺少</th></tr></thead><tbody><tr><td>訊息入口</td><td>驗證訊息來自哪位使用者</td><td>不會自動限制工具與資料</td></tr><tr><td>process</td><td>分開對話、上下文與生命週期</td><td><code>cwd</code> 擋不住任意路徑</td></tr><tr><td>工具白名單</td><td>限制模型可以使用的能力</td><td>自訂工具仍可能寫錯權限</td></tr><tr><td>資料查詢</td><td>依可信身份限制實際資料</td><td>上游必須先正確驗證身份</td></tr></tbody></table><h2 id="服務更多使用者時，身份要跟著執行環境或請求走"><a href="#服務更多使用者時，身份要跟著執行環境或請求走" class="headerlink" title="服務更多使用者時，身份要跟著執行環境或請求走"></a>服務更多使用者時，身份要跟著執行環境或請求走</h2><p>環境變數可以用在更多使用者，前提是一個 process 或容器從頭到尾只代表一位使用者。每建立一個執行環境，系統只注入它代表的單一身份，不需要把所有使用者寫進環境變數。</p><p>使用者變多後，可以選擇不同的執行方式。</p><table><thead><tr><th>執行方式</th><th>身份放在哪裡</th><th>適合的情況</th></tr></thead><tbody><tr><td>每人一個 process 或容器</td><td>啟動時由伺服器注入</td><td>使用者不多，或需要較強的執行隔離</td></tr><tr><td>多人共用 worker</td><td>每次請求專用的伺服器端上下文</td><td>使用者多，需要共用運算資源</td></tr></tbody></table><p>共用 worker 不能靠修改全域 <code>CURRENT_USER</code> 切換身份。小明與小美的請求同時執行時，後寫入的值可能覆蓋前一個。</p><p>身份要跟著個別請求或非同步任務傳遞。如果 agent runner 與工具伺服器分開部署，這份身份還要透過已驗證的內部連線傳遞，或綁定到伺服器管理的連線與 session。把 <code>user_id</code> 放回模型產生的 JSON，無法取代這段可信傳遞。</p><p>公開的多租戶服務還需要正式的登入驗證、授權與租戶資料隔離。資料風險較高時，可以把高風險工具放進短命容器，或使用獨立的作業系統帳號。</p><h2 id="Hermes-分開對話，不等於分開資料權限"><a href="#Hermes-分開對話，不等於分開資料權限" class="headerlink" title="Hermes 分開對話，不等於分開資料權限"></a>Hermes 分開對話，不等於分開資料權限</h2><p>Hermes Agent 的 <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/sessions.md">Sessions 文件</a>也把使用者資訊放在模型外面。它的 gateway 會根據平台訊息中的聊天室、使用者與討論串等資料建立 session key，再把訊息送進對應的對話紀錄。</p><p>私訊會依聊天室分開。平台能提供使用者識別碼時，一般群組會把使用者放進 session key。群組討論串預設讓參與者共用對話，需要逐人分開時，可以開啟 <code>thread_sessions_per_user</code>。</p><p>這個設計處理「訊息應該進入哪段對話」，不會自動限制檔案或工具權限。即使小明與小美使用不同 session，兩邊仍可能呼叫接受任意 <code>user_id</code> 的工具。</p><p>Hermes 可以作為身份路由的參考，資料授權仍要由工具與儲存層處理。</p><h2 id="最後檢查模型能否控制身份或繞過工具"><a href="#最後檢查模型能否控制身份或繞過工具" class="headerlink" title="最後檢查模型能否控制身份或繞過工具"></a>最後檢查模型能否控制身份或繞過工具</h2><p>如果 AI bot 會服務多名使用者，可以搜尋工具定義中的 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 與 <code>requester_id</code>。</p><p>這些欄位出現在參數中不一定有錯。資源或工作區識別碼可以由模型選擇，伺服器仍要用可信身份檢查目前使用者是否有權操作。真正危險的是，工具直接把模型提供的值當成已通過認證的身份。</p><p>也要檢查模型是否擁有旁路能力。Read、Write、Bash、瀏覽器、資料庫查詢與自訂 MCP 工具，都可能繞過原本設計的記憶 API。</p><p>我的第一版沒有漏寫那個 <code>if</code>。我把模型產生的 <code>requester_id</code> 當成通過驗證的身份，才讓檢查看似存在，實際上仍由模型控制。</p><p>兩人版可以把身份固定在專屬 process，多人共用的服務可以放進每次請求專用的伺服器端上下文。實作方式會隨規模改變，模型只負責選擇操作與資源，系統負責決定它目前代表誰，以及可以操作哪些資料。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/llm-agent-isolation/</id>
+    <link href="https://calmkoala.github.io/llm-agent-isolation/"/>
+    <published>2026-07-25T00:00:00.000Z</published>
+    <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
+    <title>多人共用 AI bot，別讓它認錯使用者</title>
+    <updated>2026-07-25T01:10:31.235Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -31,7 +50,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -54,7 +73,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -78,7 +97,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -99,7 +118,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -108,8 +127,8 @@
     <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
     <category term="Python" scheme="https://calmkoala.github.io/categories/study-notes/Python/"/>
     <category term="Python" scheme="https://calmkoala.github.io/tags/Python/"/>
-    <category term="Windows" scheme="https://calmkoala.github.io/tags/Windows/"/>
     <category term="APScheduler" scheme="https://calmkoala.github.io/tags/APScheduler/"/>
+    <category term="Windows" scheme="https://calmkoala.github.io/tags/Windows/"/>
     <content>
       <![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p><p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p><span id="more"></span><h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p><p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p><p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p><p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p><h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p><p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p><hr><p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>]]>
     </content>
@@ -121,7 +140,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -145,7 +164,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -174,7 +193,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-07-23T12:56:34.332Z</updated>
+    <updated>2026-07-25T01:10:31.235Z</updated>
   </entry>
   <entry>
     <author>
@@ -195,6 +214,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-07-23T12:56:34.331Z</updated>
+    <updated>2026-07-25T01:10:31.234Z</updated>
   </entry>
 </feed>
