@@ -1,6 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
+    <url>//tessa/</url>
+    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
+<ul>
+<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
+<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
+<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
+</ul>
+<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
+<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
+<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
+<span id="more"></span>
+
+<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
+<ul>
+<li><strong>planner</strong>：拆需求、列候選方案</li>
+<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
+<li><strong>executor</strong>：照規格動手產出</li>
+<li><strong>qa</strong>：對照規格驗收</li>
+<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
+</ul>
+<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
+<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
+<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
+<p>整個流程被拆成 6 段，依序跑：</p>
+<ol>
+<li>planner 出候選結構</li>
+<li>planning_manager 審候選</li>
+<li>planner 寫完整規格書</li>
+<li>planning_manager 審規格書</li>
+<li>executor 照規格產出</li>
+<li>qa + execution_manager 驗收</li>
+</ol>
+<p>每段中間都有「審過才往下走」的閘門。</p>
+<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
+<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
+<ul>
+<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
+<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
+<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
+<li>其中 2 條是 planner 自己也沒答的開放問題</li>
+</ul>
+<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
+<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
+<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
+<ul>
+<li>對 planner 推薦的方案逐條對齊原始需求</li>
+<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
+<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
+<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
+</ul>
+<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
+<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
+<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
+<ul>
+<li>不可以寫某幾個競品名</li>
+<li>不可以提某幾個個人專案名</li>
+<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
+</ul>
+<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
+<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
+<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
+<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
+<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
+<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
+<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
+<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
+<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
+<ul>
+<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
+<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
+<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
+</ul>
+<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
+<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
+<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
+<p>這個資料夾裡裝的是：</p>
+<ul>
+<li>幾個角色的職責描述（markdown）</li>
+<li>幾個流程的步驟清單（markdown）</li>
+<li>幾條團隊共用的紀律規則（markdown）</li>
+<li>團隊共同的記憶檔（markdown）</li>
+</ul>
+<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
+<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
+<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
+<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
+<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
+<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
+<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
+<hr>
+<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
+<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
+<li><a href="https://claude.com/claude-code">Claude Code</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>個人專案</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>個人專案</tag>
+        <tag>開發工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CI/CD(Github Action)</title>
     <url>//CI-CD-Github-Action/</url>
     <content><![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
@@ -112,114 +220,6 @@
       </tags>
   </entry>
   <entry>
-    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <url>//tessa/</url>
-    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
-<ul>
-<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
-<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
-<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
-</ul>
-<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
-<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
-<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
-<span id="more"></span>
-
-<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
-<ul>
-<li><strong>planner</strong>：拆需求、列候選方案</li>
-<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
-<li><strong>executor</strong>：照規格動手產出</li>
-<li><strong>qa</strong>：對照規格驗收</li>
-<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
-</ul>
-<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
-<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
-<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
-<p>整個流程被拆成 6 段，依序跑：</p>
-<ol>
-<li>planner 出候選結構</li>
-<li>planning_manager 審候選</li>
-<li>planner 寫完整規格書</li>
-<li>planning_manager 審規格書</li>
-<li>executor 照規格產出</li>
-<li>qa + execution_manager 驗收</li>
-</ol>
-<p>每段中間都有「審過才往下走」的閘門。</p>
-<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
-<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
-<ul>
-<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
-<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
-<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
-<li>其中 2 條是 planner 自己也沒答的開放問題</li>
-</ul>
-<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
-<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
-<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
-<ul>
-<li>對 planner 推薦的方案逐條對齊原始需求</li>
-<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
-<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
-<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
-</ul>
-<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
-<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
-<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
-<ul>
-<li>不可以寫某幾個競品名</li>
-<li>不可以提某幾個個人專案名</li>
-<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
-</ul>
-<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
-<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
-<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
-<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
-<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
-<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
-<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
-<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
-<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
-<ul>
-<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
-<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
-<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
-</ul>
-<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
-<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
-<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
-<p>這個資料夾裡裝的是：</p>
-<ul>
-<li>幾個角色的職責描述（markdown）</li>
-<li>幾個流程的步驟清單（markdown）</li>
-<li>幾條團隊共用的紀律規則（markdown）</li>
-<li>團隊共同的記憶檔（markdown）</li>
-</ul>
-<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
-<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
-<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
-<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
-<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
-<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
-<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
-<hr>
-<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
-<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
-<li><a href="https://claude.com/claude-code">Claude Code</a></li>
-<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>個人專案</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>個人專案</tag>
-        <tag>開發工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
     <url>//script-first/</url>
     <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
@@ -320,46 +320,6 @@
       </tags>
   </entry>
   <entry>
-    <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <url>//ffmpeg-frames-to-data/</url>
-    <content><![CDATA[<p>前陣子要整理某個 App 裡的一份清單，但這個 App 沒有匯出功能也沒有 API 可以用，唯一的辦法就是自己把畫面一直往下滑，再把幾百筆內容手動抄出來，懶人如我，當然不可能真的一筆一筆抄，看來這裡又是 AI 該發揮作用的地方了。</p>
-<p>最後我的作法是把清單從頭到尾螢幕錄影錄起來，再用 ffmpeg 抽出少量影格並輸出成圖片，交給有視覺能力的 AI 逐張辨識。兩段影片一共輸出 105 張圖片，最後整理出 108 筆資料。</p>
-<p>這個做法的重點不是「讓 AI 看影片」，而是把一個太大、太密集的輸入，拆成可控制、可檢查的小單位。</p>
-<p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>
-<span id="more"></span>
-
-<h1 id="為什麼不直接把整段影片交給-AI"><a href="#為什麼不直接把整段影片交給-AI" class="headerlink" title="為什麼不直接把整段影片交給 AI"></a>為什麼不直接把整段影片交給 AI</h1><p>其實直接處理影片也不是完全不可行，但不適合這次的情境。</p>
-<p>先碰到的問題是檔案大小。第一段錄影超過 100 MB，已經超過當時傳輸管道的檔案限制，只能改從本機檔案處理。</p>
-<p>再來是影片裡有大量的重複影格。原始錄影是 60 fps，代表影片每秒記錄 60 個影格；但清單滑動得很慢，相鄰影格的內容幾乎一樣。全部交給 AI 辨識只會增加重複資料，白白占掉 context，也增加處理成本。</p>
-<p>用 ffmpeg 從影片取樣後，每個取樣到的影格會輸出成一張圖片。某張圖片辨識錯誤時，只要重新處理那張；取樣頻率不合適，也可以直接從原始影片重新抽取。</p>
-<h1 id="用-ffmpeg-抽出需要的影格"><a href="#用-ffmpeg-抽出需要的影格" class="headerlink" title="用 ffmpeg 抽出需要的影格"></a>用 ffmpeg 抽出需要的影格</h1><p>ffmpeg 是一套處理影音的命令列工具，常用來轉檔、剪輯與壓縮。這次只需要一行指令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ffmpeg -i recording.mp4 -vf fps=1 frame_%04d.png</span><br></pre></td></tr></table></figure>
-
-<p>這行會讀取 <code>recording.mp4</code>，每秒取樣一個影格，再輸出成 <code>frame_0001.png</code>、<code>frame_0002.png</code> 這類依序編號的圖片。</p>
-<p><code>fps=1</code> 不是每次的固定答案，還是要看錄影時滑動的速度。如果滑得很快，一秒一張可能會漏掉剛好從兩次取樣之間經過的資料，那就調成 <code>fps=2</code> 或 <code>fps=3</code>；滑得慢就不用特別調高，不然只會多切出一堆相似圖片，後面還要花時間辨識和去重。</p>
-<p>這次第一段影片約 63 秒，輸出 63 張圖片；第二段輸出 42 張。用 105 張圖片取代原始影片裡的數千個影格，後面的處理範圍就清楚很多。</p>
-<p>這裡跟我在 <a href="/script-first/">〈重複的事，別每次都讓 AI 重做一遍〉</a> 提過的想法很像。能用固定規則處理的抽影格先交給 ffmpeg，真正需要看懂圖片內容的部分，再交給 AI。</p>
-<h1 id="讓-AI-讀圖前，先固定輸出欄位"><a href="#讓-AI-讀圖前，先固定輸出欄位" class="headerlink" title="讓 AI 讀圖前，先固定輸出欄位"></a>讓 AI 讀圖前，先固定輸出欄位</h1><p>接著把輸出的圖片逐張交給有視覺能力的 AI，要求它只讀出需要的欄位，並使用固定格式輸出。</p>
-<p>如果每張圖片都讓 AI 自由描述，最後會得到一批格式不同的文字，很難合併，然後又要靠 AI 去整理每張圖片的描述，除了增加成本也容易讓最終結果歪掉。所以我們可以先把輸出欄位固定，像是日期、標題、項目與識別條件，後續才能整理成 CSV 或試算表，再做過濾與去重。</p>
-<p>逐張處理還有一個好處，圖片裡的文字被截斷或看不清楚時，可以把該筆標成低信心，留到最後人工確認。辨識結果不是一次產出就直接採用，而是保留回頭校對的入口。</p>
-<h1 id="真正的坑是重複"><a href="#真正的坑是重複" class="headerlink" title="真正的坑是重複"></a>真正的坑是重複</h1><p>滑動式錄影一定會讓相鄰圖片包含重疊內容。同一筆資料可能出現在連續兩三張圖片裡，如果把每次辨識結果都當成新資料，最後的筆數就會被灌水。</p>
-<p>所以 AI 讀完圖之後，還不能直接當成最終結果。要先用幾個相對穩定的欄位組成識別條件，例如日期加標題，再合併重複項目。如果遇到文字略有差異的結果，要回到原圖確認，不能只靠完全相同的字串去重。</p>
-<p><img src="/images/ffmpeg-frames-dedup.png" alt="相鄰圖片內容重疊：同一筆資料出現在好幾張裡，挑 key 去重"></p>
-<h1 id="這個方法適合什麼情境"><a href="#這個方法適合什麼情境" class="headerlink" title="這個方法適合什麼情境"></a>這個方法適合什麼情境</h1><p>這套流程適合結構固定、文字清楚、可以慢慢捲動的清單頁面。前提是需要的欄位確實有出現在畫面上，視覺辨識只能讀取現有內容。它比較像一次性的資料救援，用少量人工校對，換掉幾百筆手抄工作。</p>
-<p>如果同一份資料會反覆處理，應該優先找正式匯出、API 或穩定的網頁資料來源。若畫面變化很快、文字模糊，或結果要求完全正確，單靠抽影格與視覺辨識也不夠。</p>
-<p>整個流程其實就是把影片先抽成圖片，讓 AI 讀出固定欄位，最後再把重複資料合併。拆開之後，哪一步出錯就回頭檢查哪一步，至少比把整段影片丟進去再等一個結果好處理。</p>
-]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>工具</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>自動化</tag>
-        <tag>ffmpeg</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>一個人也需要 SRE</title>
     <url>//long-running-service-watchdog/</url>
     <content><![CDATA[<p>我有一個常駐的 AI 助理 bot，平常會主動推播提醒、報告工作進度，<del>偶爾覺得它有點吵</del>。某天下午我要重啟它裝新功能，才發現它消失了一陣子。log 最後一行停在前一天早上十點多，沒報錯，也沒留下半點線索，就這樣安靜地不見了 16 個小時。事後推測應該是機器重開的時候沒有一起把服務重啟。</p>
@@ -418,6 +378,46 @@
         <tag>自動化</tag>
         <tag>SRE</tag>
         <tag>系統設計</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
+    <url>//ffmpeg-frames-to-data/</url>
+    <content><![CDATA[<p>前陣子要整理某個 App 裡的一份清單，但這個 App 沒有匯出功能也沒有 API 可以用，唯一的辦法就是自己把畫面一直往下滑，再把幾百筆內容手動抄出來，懶人如我，當然不可能真的一筆一筆抄，看來這裡又是 AI 該發揮作用的地方了。</p>
+<p>最後我的作法是把清單從頭到尾螢幕錄影錄起來，再用 ffmpeg 抽出少量影格並輸出成圖片，交給有視覺能力的 AI 逐張辨識。兩段影片一共輸出 105 張圖片，最後整理出 108 筆資料。</p>
+<p>這個做法的重點不是「讓 AI 看影片」，而是把一個太大、太密集的輸入，拆成可控制、可檢查的小單位。</p>
+<p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>
+<span id="more"></span>
+
+<h1 id="為什麼不直接把整段影片交給-AI"><a href="#為什麼不直接把整段影片交給-AI" class="headerlink" title="為什麼不直接把整段影片交給 AI"></a>為什麼不直接把整段影片交給 AI</h1><p>其實直接處理影片也不是完全不可行，但不適合這次的情境。</p>
+<p>先碰到的問題是檔案大小。第一段錄影超過 100 MB，已經超過當時傳輸管道的檔案限制，只能改從本機檔案處理。</p>
+<p>再來是影片裡有大量的重複影格。原始錄影是 60 fps，代表影片每秒記錄 60 個影格；但清單滑動得很慢，相鄰影格的內容幾乎一樣。全部交給 AI 辨識只會增加重複資料，白白占掉 context，也增加處理成本。</p>
+<p>用 ffmpeg 從影片取樣後，每個取樣到的影格會輸出成一張圖片。某張圖片辨識錯誤時，只要重新處理那張；取樣頻率不合適，也可以直接從原始影片重新抽取。</p>
+<h1 id="用-ffmpeg-抽出需要的影格"><a href="#用-ffmpeg-抽出需要的影格" class="headerlink" title="用 ffmpeg 抽出需要的影格"></a>用 ffmpeg 抽出需要的影格</h1><p>ffmpeg 是一套處理影音的命令列工具，常用來轉檔、剪輯與壓縮。這次只需要一行指令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ffmpeg -i recording.mp4 -vf fps=1 frame_%04d.png</span><br></pre></td></tr></table></figure>
+
+<p>這行會讀取 <code>recording.mp4</code>，每秒取樣一個影格，再輸出成 <code>frame_0001.png</code>、<code>frame_0002.png</code> 這類依序編號的圖片。</p>
+<p><code>fps=1</code> 不是每次的固定答案，還是要看錄影時滑動的速度。如果滑得很快，一秒一張可能會漏掉剛好從兩次取樣之間經過的資料，那就調成 <code>fps=2</code> 或 <code>fps=3</code>；滑得慢就不用特別調高，不然只會多切出一堆相似圖片，後面還要花時間辨識和去重。</p>
+<p>這次第一段影片約 63 秒，輸出 63 張圖片；第二段輸出 42 張。用 105 張圖片取代原始影片裡的數千個影格，後面的處理範圍就清楚很多。</p>
+<p>這裡跟我在 <a href="/script-first/">〈重複的事，別每次都讓 AI 重做一遍〉</a> 提過的想法很像。能用固定規則處理的抽影格先交給 ffmpeg，真正需要看懂圖片內容的部分，再交給 AI。</p>
+<h1 id="讓-AI-讀圖前，先固定輸出欄位"><a href="#讓-AI-讀圖前，先固定輸出欄位" class="headerlink" title="讓 AI 讀圖前，先固定輸出欄位"></a>讓 AI 讀圖前，先固定輸出欄位</h1><p>接著把輸出的圖片逐張交給有視覺能力的 AI，要求它只讀出需要的欄位，並使用固定格式輸出。</p>
+<p>如果每張圖片都讓 AI 自由描述，最後會得到一批格式不同的文字，很難合併，然後又要靠 AI 去整理每張圖片的描述，除了增加成本也容易讓最終結果歪掉。所以我們可以先把輸出欄位固定，像是日期、標題、項目與識別條件，後續才能整理成 CSV 或試算表，再做過濾與去重。</p>
+<p>逐張處理還有一個好處，圖片裡的文字被截斷或看不清楚時，可以把該筆標成低信心，留到最後人工確認。辨識結果不是一次產出就直接採用，而是保留回頭校對的入口。</p>
+<h1 id="真正的坑是重複"><a href="#真正的坑是重複" class="headerlink" title="真正的坑是重複"></a>真正的坑是重複</h1><p>滑動式錄影一定會讓相鄰圖片包含重疊內容。同一筆資料可能出現在連續兩三張圖片裡，如果把每次辨識結果都當成新資料，最後的筆數就會被灌水。</p>
+<p>所以 AI 讀完圖之後，還不能直接當成最終結果。要先用幾個相對穩定的欄位組成識別條件，例如日期加標題，再合併重複項目。如果遇到文字略有差異的結果，要回到原圖確認，不能只靠完全相同的字串去重。</p>
+<p><img src="/images/ffmpeg-frames-dedup.png" alt="相鄰圖片內容重疊：同一筆資料出現在好幾張裡，挑 key 去重"></p>
+<h1 id="這個方法適合什麼情境"><a href="#這個方法適合什麼情境" class="headerlink" title="這個方法適合什麼情境"></a>這個方法適合什麼情境</h1><p>這套流程適合結構固定、文字清楚、可以慢慢捲動的清單頁面。前提是需要的欄位確實有出現在畫面上，視覺辨識只能讀取現有內容。它比較像一次性的資料救援，用少量人工校對，換掉幾百筆手抄工作。</p>
+<p>如果同一份資料會反覆處理，應該優先找正式匯出、API 或穩定的網頁資料來源。若畫面變化很快、文字模糊，或結果要求完全正確，單靠抽影格與視覺辨識也不夠。</p>
+<p>整個流程其實就是把影片先抽成圖片，讓 AI 讀出固定欄位，最後再把重複資料合併。拆開之後，哪一步出錯就回頭檢查哪一步，至少比把整段影片丟進去再等一個結果好處理。</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>工具</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>自動化</tag>
+        <tag>ffmpeg</tag>
       </tags>
   </entry>
   <entry>
@@ -653,6 +653,132 @@ flowchart LR
         <tag>AI</tag>
         <tag>系統設計</tag>
         <tag>安全</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
+    <url>//markdown-ai-memory/</url>
+    <content><![CDATA[<p>剛開始用 AI agent 寫程式時，我沒有特別在意記憶這件事。只要工作留在同一段對話裡，它還記得前面做過的決定，也知道我剛才否決了哪個方案，感覺一切都沒問題，直到我關掉對話，隔天開啟新的工作階段之後。昨天已經決定不用的工具又被提了一次，commit message 的格式要重新交代，做到一半的工作也得花時間說明。</p>
+<p>我最早的處理方式很直覺，把這些內容寫進 <code>MEMORY.md</code>，每次開始前讓 agent 讀取。這個方法一開始確實有用，新對話終於不必每次都從頭建立背景知識。</p>
+<p>但我把這個方法放進三個專案跑了兩個月後，一份檔案開始同時裝著長期規則、短期進度與知識整理。它們都被叫作記憶，保存期限和使用方式卻不一樣。</p>
+<p>這時我才把 LLM 與 AI agent 分開看。LLM 負責理解文字與產生回答；AI agent 則是包住 LLM、能儲存資料與呼叫工具的完整系統。跨對話記憶由外層系統保存，再於適當時機交給 LLM。</p>
+<p>Hermes 把精選資訊放進 Markdown，完整對話則存進 SQLite；Andrej Karpathy 的 LLM Wiki 讓 agent 持續整理讀過的資料。</p>
+<p>我的三層協定處理的範圍比較小，分成持久記憶、工作階段摘要與啟動讀取。第一層保存長期規則，第二層記錄近期進度，第三層規定新對話要載入哪些檔案。把這些案例放在一起，可以看出不同記憶各自需要的讀寫方式。</p>
+<span id="more"></span>
+
+<div class="note info no-icon"><p><strong>快速摘要</strong>：AI agent 的記憶要先決定資訊何時被讀取與更新，再選擇 Markdown、資料庫或 wiki。最近的工作進度屬於歷史的一部分，可以先產生工作階段摘要，需要原文時再回頭搜尋。</p>
+</div>
+
+<h2 id="先按用途分類"><a href="#先按用途分類" class="headerlink" title="先按用途分類"></a>先按用途分類</h2><p>如果使用者說「commit message 請用中文」，agent 在下一場工作開始時就要知道。這類資訊數量不多，使用頻率很高，適合放進精簡的偏好或專案記憶。</p>
+<p>「找出上星期討論過的三個名稱」屬於另一種需求。完整對話可能累積幾十萬字，沒有必要每次全部交給 LLM。系統可以保存原始內容，等使用者問起時再搜尋。</p>
+<p>最近的工作進度也屬於歷史資訊，但下一場對話很可能立即用到。系統可以在工作結束時先留下短摘要，接續時直接讀摘要；需要細節時，再回到完整對話。</p>
+<p>「把最近讀過的資料整理成一套知識」又多了一項工作。系統要比較不同來源、更新舊結論，並保留內容之間的關聯。單純找回一段原文不夠，還需要一層持續維護的整理結果。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  ASK[&quot;希望 agent 記住的內容&quot;] --&gt; ALWAYS[&quot;每次對話都要知道&quot;]
+  ASK --&gt; HISTORY[&quot;需要時找回原文&quot;]
+  ASK --&gt; KNOWLEDGE[&quot;持續整理與更新&quot;]
+
+  ALWAYS --&gt; CURATED[&quot;少量精選記憶&quot;]
+  HISTORY --&gt; SEARCH[&quot;需要原文&lt;br&#x2F;&gt;搜尋歷史紀錄&quot;]
+  HISTORY --&gt; SUMMARY[&quot;近期接續&lt;br&#x2F;&gt;讀工作階段摘要&quot;]
+  KNOWLEDGE --&gt; WIKI[&quot;agent 維護的知識 wiki&quot;]
+</code>
+</pre>
+
+<p>這張圖沒有指定一定要用哪套工具。它先處理資訊何時會被使用，再決定寫入時機、讀取方式與儲存位置。</p>
+<h2 id="兩個外部案例"><a href="#兩個外部案例" class="headerlink" title="兩個外部案例"></a>兩個外部案例</h2><h3 id="Hermes：分開存偏好與對話"><a href="#Hermes：分開存偏好與對話" class="headerlink" title="Hermes：分開存偏好與對話"></a>Hermes：分開存偏好與對話</h3><p>Hermes Agent 同時使用 Markdown 與資料庫。</p>
+<p>它把經過挑選的內容放進 <code>MEMORY.md</code> 和 <code>USER.md</code>。前者保存環境、專案慣例與 agent 學到的經驗；後者記錄使用者偏好和溝通方式。根據本文查核時的 <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory/">Persistent Memory | Hermes Agent</a>，兩份檔案的預設上限分別是 2,200 與 1,375 個字元，合計約 1,300 個模型輸入單位（tokens）。</p>
+<p>每場工作階段（session）開始時，Hermes 會把兩份內容以固定快照放進系統提示詞（system prompt）。寫滿後，agent 必須先合併或移除舊條目，不能讓常駐記憶一直增加。</p>
+<p>固定快照也帶來一項限制。Agent 在同一場工作階段中修改記憶後，資料會立即寫進檔案，但已建立的系統提示詞不會同步改變。新的內容要等下一場工作階段才會進入常駐脈絡。</p>
+<p>完整對話走另一條路。Hermes 把 CLI 與訊息平台的工作階段存進 SQLite，再透過 FTS5 做全文搜尋。使用者問起幾星期前的討論時，agent 才搜尋過去的訊息，取回資料庫裡的原文。</p>
+<p>FTS5 是全文搜尋，不是語意搜尋。歷史訊息和問題使用不同說法時，仍可能找不到結果。它的優點是能保存完整紀錄，也不會讓每次對話都負擔全部歷史的輸入成本。</p>
+<p>Hermes 的做法可以用兩句話理解。「使用者偏好簡短回答」每次都會影響結果，因此放進精選記憶；「上星期二討論過哪些名稱」只在特定問題出現時有用，因此保存原文再按需搜尋。</p>
+<h3 id="LLM-Wiki：整理跨來源知識"><a href="#LLM-Wiki：整理跨來源知識" class="headerlink" title="LLM Wiki：整理跨來源知識"></a>LLM Wiki：整理跨來源知識</h3><p>歷史搜尋能找回說過的內容，卻不會自動把幾十份資料整理成一套持續更新的知識。</p>
+<p>Karpathy 提出的 <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">llm-wiki</a> 是一份能交給 AI agent 實作的構想。它包含三層。</p>
+<ul>
+<li>原始來源由使用者提供，agent 只讀取、不修改，作為查證依據。</li>
+<li>Wiki 由 agent 建立與維護，內容包括摘要、主題頁、比較結果與交叉連結。</li>
+<li>結構規則（schema）文件規定資料結構、命名方式，以及匯入、查詢和維護流程。使用 Codex 時，可以把這些規則寫進 <code>AGENTS.md</code>。</li>
+</ul>
+<p>加入一份新資料時，agent 會讀取內容、更新相關主題頁，並記錄新資料和舊結論之間的矛盾。使用者提出的新問題若產生值得保留的分析，也能寫回 wiki，成為之後繼續使用的整理成果。</p>
+<p><code>index.md</code> 負責列出現有頁面與摘要，<code>log.md</code> 記錄每次匯入、查詢與整理的時間。Karpathy 在原始構想中提到，約 100 份來源、數百個頁面的規模仍能用索引檔導覽。這是他的使用經驗，不代表所有資料集都會得到相同結果。資料繼續增加後，Markdown 也能再搭配全文或語意搜尋。</p>
+<p>LLM Wiki 中的主題頁是 agent 根據原始資料整理的結果。重要內容仍要保留它引用了哪些原始來源。缺少來源鏈時，後續頁面可能把先前的摘要當成原始證據，錯誤也會跟著交叉引用繼續流傳。</p>
+<p>Karpathy 的做法還規定 agent 如何更新索引、修訂頁面、找出矛盾與檢查失效內容，Markdown 是承載這套流程的格式。</p>
+<h2 id="我的三層協定"><a href="#我的三層協定" class="headerlink" title="我的三層協定"></a>我的三層協定</h2><p>我的使用情境比 LLM Wiki 小很多。我想處理的是開發偏好、已拍板的專案決策，以及一場工作結束後要如何接續。</p>
+<p>每個專案只有一位使用者，記憶量大約落在幾十到幾百條。我用 Markdown 建立三層協定，並放進三個專案執行了兩個月。</p>
+<h3 id="第一層：持久記憶"><a href="#第一層：持久記憶" class="headerlink" title="第一層：持久記憶"></a>第一層：持久記憶</h3><p>第一層保存使用者偏好、架構決策、否決理由與專案慣例。一則記憶使用一個檔案，附上類型、日期與一句摘要。</p>
+<p><code>MEMORY.md</code> 只放索引，不把所有內文常駐塞進模型脈絡（context）。Agent 遇到相關工作時，再依索引讀取對應檔案。</p>
+<p>我也會保存方案被拒絕的理由。只記住最後選了 A，下一場對話仍可能再次提出 B；把當時的限制一起留下，才能減少重跑同一段討論。</p>
+<h3 id="第二層：工作階段摘要"><a href="#第二層：工作階段摘要" class="headerlink" title="第二層：工作階段摘要"></a>第二層：工作階段摘要</h3><p>「今天修改了哪些檔案」和「還有哪一項測試沒通過」通常只需要保留幾天，不適合和長期偏好共用相同生命週期。</p>
+<p>每場工作告一段落後，agent 會在 <code>memory/sessions/</code> 留下摘要，記錄這次完成的內容、已決定的選項、尚未完成的工作，以及較重要的檔案變動。</p>
+<p>這份摘要接近交接文件。它讓下一場對話知道工作停在哪裡，也避免每次重新搜尋與閱讀完整歷史。</p>
+<p>檔案不會自己出現。我把觸發條件寫進專案的 <code>AGENTS.md</code>，規定使用者準備離開、工作完成或切換主題時產生摘要。使用的工具若不會自動載入專案指引，就要在對話中另外要求。程式意外中斷時仍可能來不及留下摘要，下一場只能改從 Git diff、任務狀態或原始對話恢復進度。</p>
+<h3 id="第三層：啟動讀取"><a href="#第三層：啟動讀取" class="headerlink" title="第三層：啟動讀取"></a>第三層：啟動讀取</h3><p>檔案寫好後，還要規定讀取時機。</p>
+<p>我的做法是在新對話開始時讀取 <code>MEMORY.md</code>，再讀最近三篇工作階段摘要。索引提供長期背景，近期摘要負責恢復進度。如果最後一篇還有未完成項目，agent 會用一兩句提醒我。</p>
+<p>「最近三篇」是目前實際使用後留下的數量。全部載入會讓舊進度占用太多脈絡，只讀一篇又可能漏掉連續幾場的工作。不同專案可以依工作節奏調整。</p>
+<h2 id="記憶也需要維護"><a href="#記憶也需要維護" class="headerlink" title="記憶也需要維護"></a>記憶也需要維護</h2><h3 id="過期與衝突"><a href="#過期與衝突" class="headerlink" title="過期與衝突"></a>過期與衝突</h3><p>跑了兩個月後，最常出現的問題是重複內容與決策過期。</p>
+<p>同一項偏好可能被不同說法記錄三次。其中一份更新後，其餘兩份仍留著舊內容，agent 讀完只能重新判斷該相信哪一份。因此每次寫入前都要搜尋既有條目，找到相近內容就更新原檔。</p>
+<p>已經翻案的決策也要修改、刪除或標示為失效。日期只能說明內容何時寫入，無法證明它現在仍然成立。專案決策還需要保留目前狀態，以及取代它的新決策。</p>
+<p>這些維護規則不限定 Markdown。資料放進 SQLite 或其他資料庫後，仍要處理重複、過期與互相矛盾的內容。儲存空間增加，不會自動判斷哪一筆資訊仍然可信。</p>
+<h3 id="來源與敏感資料"><a href="#來源與敏感資料" class="headerlink" title="來源與敏感資料"></a>來源與敏感資料</h3><p>Wiki 還要多處理來源鏈。Agent 產生的摘要需要指回原始文件，新的來源推翻舊結論時，也要知道哪些頁面需要更新。</p>
+<p>保存完整對話也會留下密鑰、個人資料與內部資訊。我會把記憶目錄留在本機，不提交到公開 repository。一般專案可以先把記憶檔案與 SQLite 加進 <code>.gitignore</code>；確實需要版本紀錄時，再使用私人 repository，並在寫入前排除 API keys、access tokens 與其他敏感內容。</p>
+<h2 id="選擇記憶做法"><a href="#選擇記憶做法" class="headerlink" title="選擇記憶做法"></a>選擇記憶做法</h2><h3 id="四種做法可以並存"><a href="#四種做法可以並存" class="headerlink" title="四種做法可以並存"></a>四種做法可以並存</h3><table>
+<thead>
+<tr>
+<th>要記住的內容</th>
+<th>讀取時機</th>
+<th>適合的處理方式</th>
+<th>主要限制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>穩定偏好與重要規則</td>
+<td>每場對話開始</td>
+<td>容量受控的精選記憶</td>
+<td>每次都占用模型輸入空間，過期內容會持續影響回答</td>
+</tr>
+<tr>
+<td>完整歷史對話</td>
+<td>使用者問起舊內容時</td>
+<td>資料庫與全文搜尋</td>
+<td>問法不同時可能搜尋不到</td>
+</tr>
+<tr>
+<td>最近工作進度</td>
+<td>接續前幾場工作時</td>
+<td>工作階段摘要與索引</td>
+<td>摘要會遺失部分原始細節</td>
+</tr>
+<tr>
+<td>跨來源整理後的知識</td>
+<td>加入來源或提出新問題時</td>
+<td>agent 維護的 wiki</td>
+<td>需要保留來源並處理衝突</td>
+</tr>
+</tbody></table>
+<p>同一個專案可以同時使用四列。以我自己的協定為例，未來若工作階段數量增加，我可以保留現有的 Markdown 持久記憶，再替完整歷史加入 SQLite 搜尋，不必把所有檔案搬進資料庫。</p>
+<h3 id="先檢查現有設計"><a href="#先檢查現有設計" class="headerlink" title="先檢查現有設計"></a>先檢查現有設計</h3><p>不熟悉資料庫結構或檢索程式碼，也能先讓正在使用的 AI agent 畫出資訊從哪裡進入、保存到哪裡，以及下一場工作如何讀回來。</p>
+<p>下面這段可以直接交給它。</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">請實際檢查這個專案目前的 AI agent 記憶設計，不要只根據 README 推測，也不要先修改程式碼。</span><br><span class="line"></span><br><span class="line">1. 畫出一段資訊從對話進入系統、被保存，到下一場對話重新取用的完整流程。</span><br><span class="line">2. 把現有資訊分成四類：</span><br><span class="line">   - 每場工作都要使用的精選資訊</span><br><span class="line">   - 需要時才搜尋的原始歷史</span><br><span class="line">   - 需要持續整理與修訂的知識</span><br><span class="line">   - 只負責近期工作接續的摘要</span><br><span class="line">3. 對每一類標出儲存位置、寫入時機、讀取時機、更新方式、刪除方式與原始來源。</span><br><span class="line">4. 檢查同一項偏好重複出現、舊決策已經翻案，以及 agent 找不到過去原文時，系統目前會怎麼處理。</span><br><span class="line">5. 如果系統服務多位使用者，標出身份由哪裡取得，以及查詢如何限制只能讀取目前使用者的資料。</span><br><span class="line">6. 提出最小修改方案並規劃測試。沒有實作的部分請標示「目前缺少」，不要假設它已經存在。</span><br><span class="line"></span><br><span class="line">請先提供流程圖、分類表、風險與測試計畫，等我確認後再修改專案。</span><br></pre></td></tr></table></figure>
+
+<p>這段提示先要求 agent 檢查現有流程，再提出修改。只說「幫我做一套記憶系統」，很容易直接得到一組技術選型，卻沒有回答哪些資訊需要常駐、哪些應該搜尋。</p>
+<h3 id="多人服務要加身份隔離"><a href="#多人服務要加身份隔離" class="headerlink" title="多人服務要加身份隔離"></a>多人服務要加身份隔離</h3><p>本文的三個案例主要處理個人 agent 與知識管理。系統開始服務多位使用者後，每一筆偏好、歷史對話與 wiki 內容還要標示擁有者，並在讀取時檢查權限。</p>
+<p>資料庫能保存很多人的歷史，但每次搜尋仍要帶入經過驗證的使用者身份。這份身份不能由 LLM 自己填寫，否則仍可能讀到另一位使用者的資料。相關的身份來源與權限流程，我整理在上一篇<a href="/llm-agent-isolation/">〈多人共用 AI bot，別讓它認錯使用者〉</a>。</p>
+<p>檔案或資料庫解決的是內容放在哪裡，權限系統決定目前的人可以讀哪一部分。兩項都完成後，記憶才適合進入多人服務。</p>
+<h2 id="我目前的選擇"><a href="#我目前的選擇" class="headerlink" title="我目前的選擇"></a>我目前的選擇</h2><p>我的三個專案目前會繼續使用三層 Markdown 協定，因為現有規模仍能人工閱讀與維護。若要保留大量完整對話，我會增加資料庫搜尋；開始進行長期、多來源研究後，再獨立建立 LLM Wiki。</p>
+<p>這篇寫完後，我的協定會把這次工作記進工作階段摘要；Hermes 會把完整對話留在 SQLite；如果把資料交給 LLM Wiki，它還會更新相關主題頁。三種做法都叫記憶，保存下來的內容卻不相同。</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>系統設計</tag>
+        <tag>記憶系統</tag>
       </tags>
   </entry>
 </search>

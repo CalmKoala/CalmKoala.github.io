@@ -10,7 +10,26 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-07-31T15:59:26.801Z</updated>
+  <updated>2026-08-01T01:10:40.446Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/categories/study-notes/AI/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/tags/AI/"/>
+    <category term="系統設計" scheme="https://calmkoala.github.io/tags/%E7%B3%BB%E7%B5%B1%E8%A8%AD%E8%A8%88/"/>
+    <category term="記憶系統" scheme="https://calmkoala.github.io/tags/%E8%A8%98%E6%86%B6%E7%B3%BB%E7%B5%B1/"/>
+    <content>
+      <![CDATA[<p>剛開始用 AI agent 寫程式時，我沒有特別在意記憶這件事。只要工作留在同一段對話裡，它還記得前面做過的決定，也知道我剛才否決了哪個方案，感覺一切都沒問題，直到我關掉對話，隔天開啟新的工作階段之後。昨天已經決定不用的工具又被提了一次，commit message 的格式要重新交代，做到一半的工作也得花時間說明。</p><p>我最早的處理方式很直覺，把這些內容寫進 <code>MEMORY.md</code>，每次開始前讓 agent 讀取。這個方法一開始確實有用，新對話終於不必每次都從頭建立背景知識。</p><p>但我把這個方法放進三個專案跑了兩個月後，一份檔案開始同時裝著長期規則、短期進度與知識整理。它們都被叫作記憶，保存期限和使用方式卻不一樣。</p><p>這時我才把 LLM 與 AI agent 分開看。LLM 負責理解文字與產生回答；AI agent 則是包住 LLM、能儲存資料與呼叫工具的完整系統。跨對話記憶由外層系統保存，再於適當時機交給 LLM。</p><p>Hermes 把精選資訊放進 Markdown，完整對話則存進 SQLite；Andrej Karpathy 的 LLM Wiki 讓 agent 持續整理讀過的資料。</p><p>我的三層協定處理的範圍比較小，分成持久記憶、工作階段摘要與啟動讀取。第一層保存長期規則，第二層記錄近期進度，第三層規定新對話要載入哪些檔案。把這些案例放在一起，可以看出不同記憶各自需要的讀寫方式。</p><span id="more"></span><div class="note info no-icon"><p><strong>快速摘要</strong>：AI agent 的記憶要先決定資訊何時被讀取與更新，再選擇 Markdown、資料庫或 wiki。最近的工作進度屬於歷史的一部分，可以先產生工作階段摘要，需要原文時再回頭搜尋。</p></div><h2 id="先按用途分類"><a href="#先按用途分類" class="headerlink" title="先按用途分類"></a>先按用途分類</h2><p>如果使用者說「commit message 請用中文」，agent 在下一場工作開始時就要知道。這類資訊數量不多，使用頻率很高，適合放進精簡的偏好或專案記憶。</p><p>「找出上星期討論過的三個名稱」屬於另一種需求。完整對話可能累積幾十萬字，沒有必要每次全部交給 LLM。系統可以保存原始內容，等使用者問起時再搜尋。</p><p>最近的工作進度也屬於歷史資訊，但下一場對話很可能立即用到。系統可以在工作結束時先留下短摘要，接續時直接讀摘要；需要細節時，再回到完整對話。</p><p>「把最近讀過的資料整理成一套知識」又多了一項工作。系統要比較不同來源、更新舊結論，並保留內容之間的關聯。單純找回一段原文不夠，還需要一層持續維護的整理結果。</p><pre><code class="mermaid">flowchart LR  ASK[&quot;希望 agent 記住的內容&quot;] --&gt; ALWAYS[&quot;每次對話都要知道&quot;]  ASK --&gt; HISTORY[&quot;需要時找回原文&quot;]  ASK --&gt; KNOWLEDGE[&quot;持續整理與更新&quot;]  ALWAYS --&gt; CURATED[&quot;少量精選記憶&quot;]  HISTORY --&gt; SEARCH[&quot;需要原文&lt;br&#x2F;&gt;搜尋歷史紀錄&quot;]  HISTORY --&gt; SUMMARY[&quot;近期接續&lt;br&#x2F;&gt;讀工作階段摘要&quot;]  KNOWLEDGE --&gt; WIKI[&quot;agent 維護的知識 wiki&quot;]</code></pre><p>這張圖沒有指定一定要用哪套工具。它先處理資訊何時會被使用，再決定寫入時機、讀取方式與儲存位置。</p><h2 id="兩個外部案例"><a href="#兩個外部案例" class="headerlink" title="兩個外部案例"></a>兩個外部案例</h2><h3 id="Hermes：分開存偏好與對話"><a href="#Hermes：分開存偏好與對話" class="headerlink" title="Hermes：分開存偏好與對話"></a>Hermes：分開存偏好與對話</h3><p>Hermes Agent 同時使用 Markdown 與資料庫。</p><p>它把經過挑選的內容放進 <code>MEMORY.md</code> 和 <code>USER.md</code>。前者保存環境、專案慣例與 agent 學到的經驗；後者記錄使用者偏好和溝通方式。根據本文查核時的 <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory/">Persistent Memory | Hermes Agent</a>，兩份檔案的預設上限分別是 2,200 與 1,375 個字元，合計約 1,300 個模型輸入單位（tokens）。</p><p>每場工作階段（session）開始時，Hermes 會把兩份內容以固定快照放進系統提示詞（system prompt）。寫滿後，agent 必須先合併或移除舊條目，不能讓常駐記憶一直增加。</p><p>固定快照也帶來一項限制。Agent 在同一場工作階段中修改記憶後，資料會立即寫進檔案，但已建立的系統提示詞不會同步改變。新的內容要等下一場工作階段才會進入常駐脈絡。</p><p>完整對話走另一條路。Hermes 把 CLI 與訊息平台的工作階段存進 SQLite，再透過 FTS5 做全文搜尋。使用者問起幾星期前的討論時，agent 才搜尋過去的訊息，取回資料庫裡的原文。</p><p>FTS5 是全文搜尋，不是語意搜尋。歷史訊息和問題使用不同說法時，仍可能找不到結果。它的優點是能保存完整紀錄，也不會讓每次對話都負擔全部歷史的輸入成本。</p><p>Hermes 的做法可以用兩句話理解。「使用者偏好簡短回答」每次都會影響結果，因此放進精選記憶；「上星期二討論過哪些名稱」只在特定問題出現時有用，因此保存原文再按需搜尋。</p><h3 id="LLM-Wiki：整理跨來源知識"><a href="#LLM-Wiki：整理跨來源知識" class="headerlink" title="LLM Wiki：整理跨來源知識"></a>LLM Wiki：整理跨來源知識</h3><p>歷史搜尋能找回說過的內容，卻不會自動把幾十份資料整理成一套持續更新的知識。</p><p>Karpathy 提出的 <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">llm-wiki</a> 是一份能交給 AI agent 實作的構想。它包含三層。</p><ul><li>原始來源由使用者提供，agent 只讀取、不修改，作為查證依據。</li><li>Wiki 由 agent 建立與維護，內容包括摘要、主題頁、比較結果與交叉連結。</li><li>結構規則（schema）文件規定資料結構、命名方式，以及匯入、查詢和維護流程。使用 Codex 時，可以把這些規則寫進 <code>AGENTS.md</code>。</li></ul><p>加入一份新資料時，agent 會讀取內容、更新相關主題頁，並記錄新資料和舊結論之間的矛盾。使用者提出的新問題若產生值得保留的分析，也能寫回 wiki，成為之後繼續使用的整理成果。</p><p><code>index.md</code> 負責列出現有頁面與摘要，<code>log.md</code> 記錄每次匯入、查詢與整理的時間。Karpathy 在原始構想中提到，約 100 份來源、數百個頁面的規模仍能用索引檔導覽。這是他的使用經驗，不代表所有資料集都會得到相同結果。資料繼續增加後，Markdown 也能再搭配全文或語意搜尋。</p><p>LLM Wiki 中的主題頁是 agent 根據原始資料整理的結果。重要內容仍要保留它引用了哪些原始來源。缺少來源鏈時，後續頁面可能把先前的摘要當成原始證據，錯誤也會跟著交叉引用繼續流傳。</p><p>Karpathy 的做法還規定 agent 如何更新索引、修訂頁面、找出矛盾與檢查失效內容，Markdown 是承載這套流程的格式。</p><h2 id="我的三層協定"><a href="#我的三層協定" class="headerlink" title="我的三層協定"></a>我的三層協定</h2><p>我的使用情境比 LLM Wiki 小很多。我想處理的是開發偏好、已拍板的專案決策，以及一場工作結束後要如何接續。</p><p>每個專案只有一位使用者，記憶量大約落在幾十到幾百條。我用 Markdown 建立三層協定，並放進三個專案執行了兩個月。</p><h3 id="第一層：持久記憶"><a href="#第一層：持久記憶" class="headerlink" title="第一層：持久記憶"></a>第一層：持久記憶</h3><p>第一層保存使用者偏好、架構決策、否決理由與專案慣例。一則記憶使用一個檔案，附上類型、日期與一句摘要。</p><p><code>MEMORY.md</code> 只放索引，不把所有內文常駐塞進模型脈絡（context）。Agent 遇到相關工作時，再依索引讀取對應檔案。</p><p>我也會保存方案被拒絕的理由。只記住最後選了 A，下一場對話仍可能再次提出 B；把當時的限制一起留下，才能減少重跑同一段討論。</p><h3 id="第二層：工作階段摘要"><a href="#第二層：工作階段摘要" class="headerlink" title="第二層：工作階段摘要"></a>第二層：工作階段摘要</h3><p>「今天修改了哪些檔案」和「還有哪一項測試沒通過」通常只需要保留幾天，不適合和長期偏好共用相同生命週期。</p><p>每場工作告一段落後，agent 會在 <code>memory/sessions/</code> 留下摘要，記錄這次完成的內容、已決定的選項、尚未完成的工作，以及較重要的檔案變動。</p><p>這份摘要接近交接文件。它讓下一場對話知道工作停在哪裡，也避免每次重新搜尋與閱讀完整歷史。</p><p>檔案不會自己出現。我把觸發條件寫進專案的 <code>AGENTS.md</code>，規定使用者準備離開、工作完成或切換主題時產生摘要。使用的工具若不會自動載入專案指引，就要在對話中另外要求。程式意外中斷時仍可能來不及留下摘要，下一場只能改從 Git diff、任務狀態或原始對話恢復進度。</p><h3 id="第三層：啟動讀取"><a href="#第三層：啟動讀取" class="headerlink" title="第三層：啟動讀取"></a>第三層：啟動讀取</h3><p>檔案寫好後，還要規定讀取時機。</p><p>我的做法是在新對話開始時讀取 <code>MEMORY.md</code>，再讀最近三篇工作階段摘要。索引提供長期背景，近期摘要負責恢復進度。如果最後一篇還有未完成項目，agent 會用一兩句提醒我。</p><p>「最近三篇」是目前實際使用後留下的數量。全部載入會讓舊進度占用太多脈絡，只讀一篇又可能漏掉連續幾場的工作。不同專案可以依工作節奏調整。</p><h2 id="記憶也需要維護"><a href="#記憶也需要維護" class="headerlink" title="記憶也需要維護"></a>記憶也需要維護</h2><h3 id="過期與衝突"><a href="#過期與衝突" class="headerlink" title="過期與衝突"></a>過期與衝突</h3><p>跑了兩個月後，最常出現的問題是重複內容與決策過期。</p><p>同一項偏好可能被不同說法記錄三次。其中一份更新後，其餘兩份仍留著舊內容，agent 讀完只能重新判斷該相信哪一份。因此每次寫入前都要搜尋既有條目，找到相近內容就更新原檔。</p><p>已經翻案的決策也要修改、刪除或標示為失效。日期只能說明內容何時寫入，無法證明它現在仍然成立。專案決策還需要保留目前狀態，以及取代它的新決策。</p><p>這些維護規則不限定 Markdown。資料放進 SQLite 或其他資料庫後，仍要處理重複、過期與互相矛盾的內容。儲存空間增加，不會自動判斷哪一筆資訊仍然可信。</p><h3 id="來源與敏感資料"><a href="#來源與敏感資料" class="headerlink" title="來源與敏感資料"></a>來源與敏感資料</h3><p>Wiki 還要多處理來源鏈。Agent 產生的摘要需要指回原始文件，新的來源推翻舊結論時，也要知道哪些頁面需要更新。</p><p>保存完整對話也會留下密鑰、個人資料與內部資訊。我會把記憶目錄留在本機，不提交到公開 repository。一般專案可以先把記憶檔案與 SQLite 加進 <code>.gitignore</code>；確實需要版本紀錄時，再使用私人 repository，並在寫入前排除 API keys、access tokens 與其他敏感內容。</p><h2 id="選擇記憶做法"><a href="#選擇記憶做法" class="headerlink" title="選擇記憶做法"></a>選擇記憶做法</h2><h3 id="四種做法可以並存"><a href="#四種做法可以並存" class="headerlink" title="四種做法可以並存"></a>四種做法可以並存</h3><table><thead><tr><th>要記住的內容</th><th>讀取時機</th><th>適合的處理方式</th><th>主要限制</th></tr></thead><tbody><tr><td>穩定偏好與重要規則</td><td>每場對話開始</td><td>容量受控的精選記憶</td><td>每次都占用模型輸入空間，過期內容會持續影響回答</td></tr><tr><td>完整歷史對話</td><td>使用者問起舊內容時</td><td>資料庫與全文搜尋</td><td>問法不同時可能搜尋不到</td></tr><tr><td>最近工作進度</td><td>接續前幾場工作時</td><td>工作階段摘要與索引</td><td>摘要會遺失部分原始細節</td></tr><tr><td>跨來源整理後的知識</td><td>加入來源或提出新問題時</td><td>agent 維護的 wiki</td><td>需要保留來源並處理衝突</td></tr></tbody></table><p>同一個專案可以同時使用四列。以我自己的協定為例，未來若工作階段數量增加，我可以保留現有的 Markdown 持久記憶，再替完整歷史加入 SQLite 搜尋，不必把所有檔案搬進資料庫。</p><h3 id="先檢查現有設計"><a href="#先檢查現有設計" class="headerlink" title="先檢查現有設計"></a>先檢查現有設計</h3><p>不熟悉資料庫結構或檢索程式碼，也能先讓正在使用的 AI agent 畫出資訊從哪裡進入、保存到哪裡，以及下一場工作如何讀回來。</p><p>下面這段可以直接交給它。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">請實際檢查這個專案目前的 AI agent 記憶設計，不要只根據 README 推測，也不要先修改程式碼。</span><br><span class="line"></span><br><span class="line">1. 畫出一段資訊從對話進入系統、被保存，到下一場對話重新取用的完整流程。</span><br><span class="line">2. 把現有資訊分成四類：</span><br><span class="line">   - 每場工作都要使用的精選資訊</span><br><span class="line">   - 需要時才搜尋的原始歷史</span><br><span class="line">   - 需要持續整理與修訂的知識</span><br><span class="line">   - 只負責近期工作接續的摘要</span><br><span class="line">3. 對每一類標出儲存位置、寫入時機、讀取時機、更新方式、刪除方式與原始來源。</span><br><span class="line">4. 檢查同一項偏好重複出現、舊決策已經翻案，以及 agent 找不到過去原文時，系統目前會怎麼處理。</span><br><span class="line">5. 如果系統服務多位使用者，標出身份由哪裡取得，以及查詢如何限制只能讀取目前使用者的資料。</span><br><span class="line">6. 提出最小修改方案並規劃測試。沒有實作的部分請標示「目前缺少」，不要假設它已經存在。</span><br><span class="line"></span><br><span class="line">請先提供流程圖、分類表、風險與測試計畫，等我確認後再修改專案。</span><br></pre></td></tr></table></figure><p>這段提示先要求 agent 檢查現有流程，再提出修改。只說「幫我做一套記憶系統」，很容易直接得到一組技術選型，卻沒有回答哪些資訊需要常駐、哪些應該搜尋。</p><h3 id="多人服務要加身份隔離"><a href="#多人服務要加身份隔離" class="headerlink" title="多人服務要加身份隔離"></a>多人服務要加身份隔離</h3><p>本文的三個案例主要處理個人 agent 與知識管理。系統開始服務多位使用者後，每一筆偏好、歷史對話與 wiki 內容還要標示擁有者，並在讀取時檢查權限。</p><p>資料庫能保存很多人的歷史，但每次搜尋仍要帶入經過驗證的使用者身份。這份身份不能由 LLM 自己填寫，否則仍可能讀到另一位使用者的資料。相關的身份來源與權限流程，我整理在上一篇<a href="/llm-agent-isolation/">〈多人共用 AI bot，別讓它認錯使用者〉</a>。</p><p>檔案或資料庫解決的是內容放在哪裡，權限系統決定目前的人可以讀哪一部分。兩項都完成後，記憶才適合進入多人服務。</p><h2 id="我目前的選擇"><a href="#我目前的選擇" class="headerlink" title="我目前的選擇"></a>我目前的選擇</h2><p>我的三個專案目前會繼續使用三層 Markdown 協定，因為現有規模仍能人工閱讀與維護。若要保留大量完整對話，我會增加資料庫搜尋；開始進行長期、多來源研究後，再獨立建立 LLM Wiki。</p><p>這篇寫完後，我的協定會把這次工作記進工作階段摘要；Hermes 會把完整對話留在 SQLite；如果把資料交給 LLM Wiki，它還會更新相關主題頁。三種做法都叫記憶，保存下來的內容卻不相同。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/markdown-ai-memory/</id>
+    <link href="https://calmkoala.github.io/markdown-ai-memory/"/>
+    <published>2026-08-01T01:00:00.000Z</published>
+    <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
+    <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
+    <updated>2026-08-01T01:10:40.446Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -28,7 +47,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -50,7 +69,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -73,7 +92,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -97,7 +116,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -118,7 +137,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -140,7 +159,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -164,7 +183,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -193,7 +212,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
   <entry>
     <author>
@@ -214,6 +233,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-07-31T15:59:26.801Z</updated>
+    <updated>2026-08-01T01:10:40.446Z</updated>
   </entry>
 </feed>
