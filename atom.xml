@@ -10,7 +10,26 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-08-01T01:10:40.446Z</updated>
+  <updated>2026-08-08T06:11:11.092Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/categories/study-notes/AI/"/>
+    <category term="AI" scheme="https://calmkoala.github.io/tags/AI/"/>
+    <category term="AI agent" scheme="https://calmkoala.github.io/tags/AI-agent/"/>
+    <category term="Agent Skills" scheme="https://calmkoala.github.io/tags/Agent-Skills/"/>
+    <content>
+      <![CDATA[<p>AI agent 的 skill 很好用。網路上可以找到各式各樣的 skill，每次看到一個可能用得上的，我總會迫不及待裝起來試試看。我原本以為，skill 裝得越多，AI agent 能做的事也會越多。</p><p>有一次，我只請它改兩段文章，它卻先整理需求、列計畫、分派工作，再安排一輪審核。模型沒有突然變笨，幾個 skill 卻讓原本簡單的工作多出許多步驟。我沒有精確量過前後差了多少 token，但計畫、分工與中間輸出都需要脈絡，工作也明顯變得笨重。類似情況發生幾次後，我重新整理自己裝過的 skill，最後刪掉了幾個。我開始在意的也不再是裝了多少，而是它該在什麼時候介入。</p><span id="more"></span><h2 id="兩個讓我開始整理-skill-的例子"><a href="#兩個讓我開始整理-skill-的例子" class="headerlink" title="兩個讓我開始整理 skill 的例子"></a>兩個讓我開始整理 skill 的例子</h2><h3 id="文章開始像同一個模板"><a href="#文章開始像同一個模板" class="headerlink" title="文章開始像同一個模板"></a>文章開始像同一個模板</h3><p>第一個 skill 用來改善文章的可讀性。它會縮短段落、增加提示句，讓讀者更容易快速掃過內容。</p><p>我把它套進 calmkoala 的文章後，句子確實變短了，整體卻開始像社群貼文。段落之間少了鋪陳，原本想慢慢帶出的觀點被切成零散的結論。Skill 有完成自己的任務，但它追求的閱讀節奏不適合這個部落格。</p><p>後來我把寫作檢查縮到草稿完成之後，只處理空泛、太像 AI 的句子，不再讓它決定開頭、結構與段落節奏。範圍縮小後，它才回到編修的位置，沒有接管作者。</p><h3 id="小修改也要跑完整流程"><a href="#小修改也要跑完整流程" class="headerlink" title="小修改也要跑完整流程"></a>小修改也要跑完整流程</h3><p>另一個 skill 提供一套完整的開發流程，包含釐清需求、規劃、分工、審核與驗證。大型功能需要這些步驟，但我平常也會請 agent 改一段說明、調整日期或修一個小錯字。</p><p>當同一套流程套到所有任務，小修改也得先產生計畫，再走完每個檢查點。輸出看起來很嚴謹，實際上增加了等待時間，也讓 agent 少了依任務大小調整做法的空間。</p><p>問題出在 skill 預設每個任務都需要完整流程。這項假設只適用一部分工作，觸發範圍卻涵蓋所有工作。</p><p>這兩個 skill 都有值得保留的內容，我最後沒有把它們整份丟掉。寫作檢查被縮到草稿完成後，完整開發流程只留給大型任務；其他規則則移到更適合的位置。</p><p>整理 skill 時，我先處理的其實不是數量，而是介入範圍。每次工作都要遵守的偏好、特定任務才需要的流程，以及能由程式判定的條件，適合的承載方式不同。先把內容分流，才知道哪些真的需要留在 skill 裡。</p><h2 id="Skill-到底改變了什麼"><a href="#Skill-到底改變了什麼" class="headerlink" title="Skill 到底改變了什麼"></a>Skill 到底改變了什麼</h2><p>大型語言模型（LLM）負責理解與產生內容，也就是聊天 AI 裡讀懂問題、生成回答的核心。AI agent 再把 LLM 與檔案、工具和工作流程連在一起，讓它能實際處理任務。</p><p>Skill 則像交給 agent 的工作手冊，裡面可以放操作步驟、參考資料、範本與腳本。它不會改變模型本身的權重，卻能在執行時補入知識、程序與限制。如果 skill 內含腳本，執行環境也允許使用相關工具，它還可能讓 agent 多一種操作方式。</p><p><a href="https://agentskills.io/client-implementation/adding-skills-support">How to add skills support to your agent</a> 將載入分成三層。Agent 啟動時先看到每個 skill 的名稱與用途，這份清單中的每個 skill 約占 50 至 100 tokens；判斷任務相關後，才載入完整的 <code>SKILL.md</code>，其餘參考檔案與腳本則按需讀取。<a href="https://agentskills.io/specification">Specification - Agent Skills</a> 定義了 skill 的檔案格式與目錄慣例，不同工具仍會用自己的方式實作載入與觸發。</p><p>例如 <a href="https://learn.chatgpt.com/docs/build-skills">Build skills | ChatGPT Learn</a> 提到，Codex 會限制初始 skill 清單占用的脈絡。數量太多時，系統會先縮短用途描述，之後可能省略部分 skill。安裝很多 skill 不等於每次都會載入全部內容，但初始清單、觸發判斷，以及觸發後增加的步驟仍然有成本。</p><h2 id="規則該放哪裡"><a href="#規則該放哪裡" class="headerlink" title="規則該放哪裡"></a>規則該放哪裡</h2><p>我查資料時，發現網路上的討論其實在回答不同問題。有人在意知識能否重用，有人看觸發是否可靠，也有人只用評測結果與權限風險決定去留。這些觀點沒有替我訂出 skill 數量，卻讓我開始先問：這份規則真的該放在 skill 裡嗎？</p><p>Vercel 曾針對 Next.js 16 文件做一組評測。沒有文件的 baseline 與預設由 agent 自行觸發 skill 的通過率都是 53%，而且 56% 的案例根本沒有觸發 skill；明確要求使用後提高到 79%，把壓縮後的文件索引放進 <code>AGENTS.md</code> 則達到 100%。這是特定框架與評測的結果，不能直接套用到所有任務，但它顯示內容寫對仍不夠，資訊放在哪裡也會影響 agent 能不能在需要時取得。<a href="https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals"><code>AGENTS.md</code> outperforms skills in our agent evals</a></p><p>我目前用下面這張表做第一輪分流。這是我的設計判斷，不是 Agent Skills 規格規定的分類。</p><table><thead><tr><th>想解決的事情</th><th>適合的位置</th><th>例子</th></tr></thead><tbody><tr><td>幾乎每次工作都要遵守的簡單規則</td><td>專案指引</td><td>使用繁體中文、公開檔不加入工具署名</td></tr><tr><td>只有特定任務需要的詳細做法</td><td>Skill</td><td>處理 PDF、整理會議記錄、操作瀏覽器</td></tr><tr><td>需要另一個不受原對話影響的視角，或不同工具權限</td><td>獨立 agent</td><td>把草稿交給第一次閱讀的讀者身分審稿</td></tr><tr><td>需要存取外部服務或資料</td><td>工具與權限設定</td><td>查詢資料庫、讀取行事曆</td></tr><tr><td>有明確條件，而且不得漏驗</td><td>程式與測試</td><td>檔案格式、必填欄位、建置是否成功</td></tr></tbody></table><p>專案指引在不同工具裡可能叫 custom instructions、rules 或 <code>AGENTS.md</code>，用途是提供經常需要的背景。只有工具真的分開對話、背景或權限時，另一個 agent 才可能形成不同的審查脈絡；多開一個聊天室不等於自動得到獨立判斷。</p><p>例如「所有公開文章都用繁體中文」適合放在專案指引；「處理 PDF 後要逐頁檢查排版」可以做成 skill；「程式一定要通過測試」則應交給測試與 CI 檢查強制執行，不能只要求 agent 記得。</p><h2 id="我怎麼測一個-skill"><a href="#我怎麼測一個-skill" class="headerlink" title="我怎麼測一個 skill"></a>我怎麼測一個 skill</h2><h3 id="先確認它會在對的時候出現"><a href="#先確認它會在對的時候出現" class="headerlink" title="先確認它會在對的時候出現"></a>先確認它會在對的時候出現</h3><p>我不再因為 skill 看起來完整就安裝。一般任務中，agent 要在同一類工作反覆犯錯，而且處理方式已經穩定，才值得整理成可重用的 skill。只發生一次的問題，可以先在對話中補充；任務範圍說不明白時，skill 的用途描述也很難寫準。</p><p>低頻但後果嚴重的安全或合規問題不能等它重複發生。這類條件更適合交給權限、程式檢查或人工核准，避免把防線只寫在 skill 裡。</p><p>測試時，我會同時準備應該觸發與不該觸發的任務。後者很重要，因為一個 skill 能在 PDF 任務正確出現，不代表它不會在寫文章時插手。</p><h3 id="再比較加入前後"><a href="#再比較加入前後" class="headerlink" title="再比較加入前後"></a>再比較加入前後</h3><p>2026 年的 <a href="https://arxiv.org/abs/2603.15401">SWE-Skills-Bench: Do Agent Skills Actually Help in Real-World Software Engineering?</a> 前印本測試 49 個軟體開發 skill，其中 39 個沒有提高任務通過率，7 個帶來明顯改善，另有 3 個因版本不合而讓表現下降。這份研究一次評估一個任務與一個 skill，沒有測試大型 skill 清單的觸發問題，因此不能拿來訂出數量上限。對我真正有用的結論只有一個：看起來完整，不代表加入後真的會變好。</p><p>我會在安裝前後各跑幾個平常真的會遇到的任務，觀察有沒有少來回修改一次、是否補上原本常漏的步驟，以及處理時間增加多少。我也會放進幾個不該用到這個 skill 的任務，看看它會不會插手。</p><p>假設我想安裝一個 PDF skill，我會先確認自己是否反覆遇到文字擷取或排版漏檢，再用一份 PDF 測它能否補上問題。接著改請 agent 寫文章，確認 PDF 流程不會跑出來。兩邊都符合預期，才有留下的理由。</p><h3 id="模型更新後重跑"><a href="#模型更新後重跑" class="headerlink" title="模型更新後重跑"></a>模型更新後重跑</h3><p>有些 skill 用來補模型當時不穩定的能力。假如流程 skill 原本是為了解決長任務經常做漏，模型或工具更新後，就該重跑當初用來驗證它的任務。在這些測試中停用 skill 沒有造成可觀察的退步，就可以考慮移除。</p><p>Anthropic 在 <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps">Harness design for long-running application development</a> 中也用逐一移除流程元件的方式，檢查哪些做法仍會影響結果。保存領域知識或必要流程的 skill，則要檢查內容是否過期；低頻但高風險的流程也不能只靠少量測試決定去留。</p><h2 id="安裝前先確認能不能信任"><a href="#安裝前先確認能不能信任" class="headerlink" title="安裝前先確認能不能信任"></a>安裝前先確認能不能信任</h2><p>下載第三方 skill 時，我會先看 <code>SKILL.md</code>、參考檔案、附帶腳本，以及它宣告的相依套件。程式規模太大，不一定能逐行讀完，但至少要確認安裝腳本、外連位置、版本鎖定與權限要求。Skill 要求登入、提供 token、下載額外程式、批次讀寫或上傳檔案時，我不會只因為名稱看起來有用就授權。</p><p>即使 skill 沒有附帶腳本，風險也不會消失。<code>SKILL.md</code> 裡的文字本身就會影響 agent 的行為。<a href="https://arxiv.org/abs/2602.20156">Skill-Inject: Measuring Agent Vulnerability to Skill File Attacks</a> 用 202 組刻意設計的攻擊任務，測試透過 skill 檔案發動的提示注入，部分受測 agent 的攻擊成功率最高達 80%。這個數字只適用於刻意植入惡意指令的測試，不能推論市面上有 80% 的 skill 都是惡意內容；它提醒我，來源審查與最小權限不能交給模型能力代替。</p><p>名稱無法證明 skill 實際會做什麼，即使沒有腳本，文字指令也可能讓 agent 改變做法。看不懂內容時，我至少不會先提供 token、批量檔案存取或上傳權限。</p><h2 id="我現在留下-skill-的條件"><a href="#我現在留下-skill-的條件" class="headerlink" title="我現在留下 skill 的條件"></a>我現在留下 skill 的條件</h2><p>我現在只留下能說明任務範圍、補上重複失敗、通過前後比較，而且內容與權限值得信任的 skill。其中一項答不出來時，我會先停用。停用後結果沒有可觀察的差別，就移除；仍有局部價值，就縮小觸發範圍，或把規則移到專案指引、程式檢查與權限設定。</p><p>第五個 skill 仍可能有價值，第二個也可能是多餘的。數量沒有通用門檻，每一個都要證明自己值得留在清單裡。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/ai-agent-skills-more-is-better/</id>
+    <link href="https://calmkoala.github.io/ai-agent-skills-more-is-better/"/>
+    <published>2026-08-08T05:00:00.000Z</published>
+    <summary>Skill 裝得更多，不代表 AI agent 會持續變好。從整理與刪減 skill 的經驗，比較不同觀點，以及如何判斷規則該放在 skill、專案指引、獨立 agent 或程式檢查。</summary>
+    <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
+    <updated>2026-08-08T06:11:11.092Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -28,7 +47,7 @@
     <published>2026-08-01T01:00:00.000Z</published>
     <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
     <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -47,7 +66,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -69,7 +88,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -92,7 +111,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -116,7 +135,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -137,7 +156,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -159,7 +178,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -183,7 +202,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -212,7 +231,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
   <entry>
     <author>
@@ -233,6 +252,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-08-01T01:10:40.446Z</updated>
+    <updated>2026-08-08T06:11:11.092Z</updated>
   </entry>
 </feed>
