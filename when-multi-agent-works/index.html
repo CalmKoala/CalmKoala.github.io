@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+  <link rel="mask-icon" href="/images/koala-mono.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一個 AI agent 做不好，多開幾個就會比較好嗎？">
+<meta property="og:url" content="https://calmkoala.github.io/when-multi-agent-works/">
+<meta property="og:site_name" content="CalmKoala">
+<meta property="og:description" content="一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="article:published_time" content="2026-08-15T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-15T01:10:22.716Z">
+<meta property="article:author" content="PingChun">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="AI agent">
+<meta property="article:tag" content="Multi-agent">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+
+
+<link rel="canonical" href="https://calmkoala.github.io/when-multi-agent-works/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/when-multi-agent-works/","path":"/when-multi-agent-works/","title":"一個 AI agent 做不好，多開幾個就會比較好嗎？"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>一個 AI agent 做不好，多開幾個就會比較好嗎？ | CalmKoala</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="CalmKoala" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">CalmKoala</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">18</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">12</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E5%80%8B%E7%9C%8B%E8%B5%B7%E4%BE%86%E5%AE%8C%E6%95%B4%E7%9A%84%E8%A8%AD%E8%A8%88%EF%BC%8C%E7%82%BA%E4%BB%80%E9%BA%BC%E8%A2%AB%E6%8E%A8%E7%BF%BB"><span class="nav-number">1.</span> <span class="nav-text">一個看起來完整的設計，為什麼被推翻</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E4%B8%80%E5%80%8B-agent-%E4%BB%80%E9%BA%BC%E6%99%82%E5%80%99%E6%9C%89%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">多一個 agent 什麼時候有用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E4%BF%AE%E6%94%B9%E7%95%99%E7%B5%A6%E5%90%8C%E4%B8%80%E5%80%8B-agent"><span class="nav-number">2.1.</span> <span class="nav-text">小修改留給同一個 agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reviewer-%E8%B2%A0%E8%B2%AC%E6%89%BE%E5%8F%8D%E4%BE%8B"><span class="nav-number">2.2.</span> <span class="nav-text">reviewer 負責找反例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%BD%E5%B9%B3%E8%A1%8C%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%89%8D%E6%8B%86%E9%96%8B"><span class="nav-number">2.3.</span> <span class="nav-text">能平行的工作才拆開</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%8B%86%E9%96%8B%EF%BC%8C%E4%B8%8D%E4%BB%A3%E8%A1%A8%E8%83%BD%E5%B9%B3%E8%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">工作拆開，不代表能平行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%8F%BE%E5%9C%A8%E6%80%8E%E9%BA%BC%E6%B1%BA%E5%AE%9A%E8%A6%81%E4%B8%8D%E8%A6%81%E6%8B%86"><span class="nav-number">4.</span> <span class="nav-text">我現在怎麼決定要不要拆</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="PingChun"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">PingChun</p>
+  <div class="site-description" itemprop="description">後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml" rel="noopener me"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/when-multi-agent-works/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="一個 AI agent 做不好，多開幾個就會比較好嗎？ | CalmKoala">
+      <meta itemprop="description" content="一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一個 AI agent 做不好，多開幾個就會比較好嗎？
+        </h1>
+          <p class="post-subtitle" itemprop="alternativeHeadline">多開之前，先寫下它要獨立完成的工作</p>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-08-15 09:00:00 / 修改時間：09:10:22" itemprop="dateCreated datePublished" datetime="2026-08-15T09:00:00+08:00">2026-08-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>10 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
+<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
+<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
+<span id="more"></span>
+
+<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
+  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
+  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
+  RETRY --&gt; DELIVER
+</code>
+</pre>
+
+<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
+<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
+<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
+<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
+<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
+<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
+<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
+<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
+<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
+<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
+<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
+<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
+<p>一篇名為 <a target="_blank" rel="noopener" href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
+<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
+<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/AI-agent/" rel="tag"># AI agent</a>
+              <a href="/tags/Multi-agent/" rel="tag"># Multi-agent</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/ai-agent-skills-more-is-better/" rel="prev" title="Skill 裝得越多，AI agent 就越好用嗎？">
+                  <i class="fa fa-angle-left"></i> Skill 裝得越多，AI agent 就越好用嗎？
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2023 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">PingChun</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="總字數">34k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="所需總閱讀時間">1:55</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"CalmKoala/blog-comments","issue_term":"pathname","theme":"preferred-color-scheme"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+</body>
+</html>

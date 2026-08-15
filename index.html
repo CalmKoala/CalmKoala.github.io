@@ -114,7 +114,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">17</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">11</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">18</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">12</span></a></li>
   </ul>
 </nav>
 
@@ -153,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -164,7 +164,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -190,6 +190,114 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block post-block-subtitle">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/when-multi-agent-works/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | CalmKoala">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/when-multi-agent-works/" class="post-title-link" itemprop="url">一個 AI agent 做不好，多開幾個就會比較好嗎？</a>
+        </h2>
+          <p class="post-subtitle" itemprop="alternativeHeadline">多開之前，先寫下它要獨立完成的工作</p>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-08-15 09:00:00 / 修改時間：09:10:22" itemprop="dateCreated datePublished" datetime="2026-08-15T09:00:00+08:00">2026-08-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>10 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
+<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
+<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/when-multi-agent-works/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -236,7 +344,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -349,7 +457,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -466,7 +574,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -596,7 +704,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -711,7 +819,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -824,7 +932,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -938,7 +1046,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1049,7 +1157,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1161,7 +1269,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
+      <time title="修改時間：2026-08-15 09:10:22" itemprop="dateModified" datetime="2026-08-15T09:10:22+08:00">2026-08-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1232,125 +1340,6 @@ flowchart LR
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/tessa/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="PingChun">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CalmKoala">
-      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | CalmKoala">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/tessa/" class="post-title-link" itemprop="url">tessa：純 markdown 的 AI 多角色協作框架</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">發表於</span>
-
-      <time title="創建時間：2026-05-07 00:00:00" itemprop="dateCreated datePublished" datetime="2026-05-07T00:00:00+08:00">2026-05-07</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-15 00:57:43" itemprop="dateModified" datetime="2026-08-15T00:57:43+08:00">2026-08-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分類於</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">個人專案</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="文章字數">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">文章字數：</span>
-      <span>3.2k</span>
-    </span>
-    <span class="post-meta-item" title="所需閱讀時間">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
-      <span>11 分鐘</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
-<ul>
-<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
-<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
-<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
-</ul>
-<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
-<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
-<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/tessa/#more" rel="contents">
-                閱讀全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" title="下一頁" aria-label="下一頁" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -1374,13 +1363,13 @@ flowchart LR
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="總字數">31k</span>
+    <span title="總字數">34k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="所需總閱讀時間">1:45</span>
+    <span title="所需總閱讀時間">1:55</span>
   </span>
 </div>
 
