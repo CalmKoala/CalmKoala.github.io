@@ -10,7 +10,7 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-08-15T01:10:22.716Z</updated>
+  <updated>2026-08-21T16:24:04.739Z</updated>
   <entry>
     <author>
       <name>PingChun</name>
@@ -28,7 +28,7 @@
     <published>2026-08-15T01:00:00.000Z</published>
     <summary>一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。</summary>
     <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -47,7 +47,7 @@
     <published>2026-08-08T05:00:00.000Z</published>
     <summary>Skill 裝得更多，不代表 AI agent 會持續變好。從整理與刪減 skill 的經驗，比較不同觀點，以及如何判斷規則該放在 skill、專案指引、獨立 agent 或程式檢查。</summary>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -66,7 +66,7 @@
     <published>2026-08-01T01:00:00.000Z</published>
     <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
     <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -85,7 +85,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -107,7 +107,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -130,7 +130,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -154,7 +154,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -175,7 +175,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -197,7 +197,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -221,7 +221,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -250,7 +250,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
   <entry>
     <author>
@@ -271,6 +271,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-08-15T01:10:22.716Z</updated>
+    <updated>2026-08-21T16:24:04.739Z</updated>
   </entry>
 </feed>
