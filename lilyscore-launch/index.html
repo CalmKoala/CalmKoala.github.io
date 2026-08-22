@@ -20,31 +20,31 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 UnicodeDecodeError。">
+    <meta name="description" content="LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="subprocess 在 Windows 的 cp950 編碼坑">
-<meta property="og:url" content="https://calmkoala.github.io/subprocess-cp950/">
+<meta property="og:title" content="LilyScore：我把 PDF 樂譜和伴奏放進同一個 App">
+<meta property="og:url" content="https://calmkoala.github.io/lilyscore-launch/">
 <meta property="og:site_name" content="CalmKoala">
-<meta property="og:description" content="最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 UnicodeDecodeError。">
+<meta property="og:description" content="LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
-<meta property="article:published_time" content="2026-06-28T00:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-22T01:10:24.699Z">
+<meta property="article:published_time" content="2026-08-22T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-22T01:10:24.700Z">
 <meta property="article:author" content="PingChun">
-<meta property="article:tag" content="AI">
-<meta property="article:tag" content="Python">
-<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="個人專案">
+<meta property="article:tag" content="LilyScore">
+<meta property="article:tag" content="音樂">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
 
 
-<link rel="canonical" href="https://calmkoala.github.io/subprocess-cp950/">
+<link rel="canonical" href="https://calmkoala.github.io/lilyscore-launch/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/subprocess-cp950/","path":"/subprocess-cp950/","title":"subprocess 在 Windows 的 cp950 編碼坑"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/lilyscore-launch/","path":"/lilyscore-launch/","title":"LilyScore：我把 PDF 樂譜和伴奏放進同一個 App"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>subprocess 在 Windows 的 cp950 編碼坑 | CalmKoala</title>
+<title>LilyScore：我把 PDF 樂譜和伴奏放進同一個 App | CalmKoala</title>
   
 
 
@@ -137,7 +137,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E6%9C%83%E9%81%87%E5%88%B0%E5%95%8F%E9%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">為什麼會遇到問題</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%88%A5%E8%AE%93-Python-%E8%87%AA%E5%B7%B1%E7%8C%9C"><span class="nav-number">2.</span> <span class="nav-text">解法：別讓 Python 自己猜</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%8C%E4%B8%80%E4%BB%BD%E8%AD%9C%EF%BC%8C%E5%88%87%E6%8F%9B%E4%B8%8D%E5%90%8C%E7%9A%84%E4%BC%B4%E5%A5%8F%E7%89%88%E6%9C%AC"><span class="nav-number">1.</span> <span class="nav-text">同一份譜，切換不同的伴奏版本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%A1%E4%BD%8F%E7%9A%84%E5%85%AB%E5%B0%8F%E7%AF%80%EF%BC%8C%E4%B8%8D%E7%94%A8%E4%B8%80%E7%9B%B4%E9%87%8D%E6%8A%93%E9%80%B2%E5%BA%A6"><span class="nav-number">2.</span> <span class="nav-text">卡住的八小節，不用一直重抓進度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%83%B3%E8%A8%98%E7%9A%84%E4%BA%8B%EF%BC%8C%E7%9B%B4%E6%8E%A5%E7%95%99%E5%9C%A8%E8%AD%9C%E4%B8%8A"><span class="nav-number">3.</span> <span class="nav-text">想記的事，直接留在譜上</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B7%B4%E7%BF%92%E4%B9%8B%E5%A4%96%EF%BC%8C%E4%B9%9F%E5%BE%97%E6%89%BE%E5%BE%97%E5%88%B0%E8%AD%9C"><span class="nav-number">4.</span> <span class="nav-text">練習之外，也得找得到譜</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%83%E9%81%A9%E5%90%88%E8%AA%B0"><span class="nav-number">5.</span> <span class="nav-text">它適合誰</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8B%E8%BC%89-LilyScore"><span class="nav-number">6.</span> <span class="nav-text">下載 LilyScore</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -199,7 +199,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/subprocess-cp950/">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/lilyscore-launch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -212,12 +212,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="subprocess 在 Windows 的 cp950 編碼坑 | CalmKoala">
-      <meta itemprop="description" content="">
+      <meta itemprop="name" content="LilyScore：我把 PDF 樂譜和伴奏放進同一個 App | CalmKoala">
+      <meta itemprop="description" content="LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          subprocess 在 Windows 的 cp950 編碼坑
+          LilyScore：我把 PDF 樂譜和伴奏放進同一個 App
         </h1>
 
         <div class="post-meta-container">
@@ -227,15 +227,9 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">發表於</span>
+      
 
-      <time title="創建時間：2026-06-28 08:00:00" itemprop="dateCreated datePublished" datetime="2026-06-28T08:00:00+08:00">2026-06-28</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-08-22 09:10:24" itemprop="dateModified" datetime="2026-08-22T09:10:24+08:00">2026-08-22</time>
+      <time title="創建時間：2026-08-22 08:00:00 / 修改時間：09:10:24" itemprop="dateCreated datePublished" datetime="2026-08-22T08:00:00+08:00">2026-08-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -243,11 +237,11 @@
       </span>
       <span class="post-meta-item-text">分類於</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">個人專案</span></a>
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+          <a href="/categories/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/LilyScore/" itemprop="url" rel="index"><span itemprop="name">LilyScore</span></a>
         </span>
     </span>
 
@@ -258,14 +252,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
-      <span>608</span>
+      <span>1.6k</span>
     </span>
     <span class="post-meta-item" title="所需閱讀時間">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
-      <span>2 分鐘</span>
+      <span>5 分鐘</span>
     </span>
 </div>
 
@@ -275,16 +269,29 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
+    <div class="post-body" itemprop="articleBody"><p>用 Android 手機或平板看 PDF 樂譜時，同一份譜可能要搭配原調、降半音等不同調性的伴奏，另外還有慢速示範，你會怎麼整理？我以前只能把它們丟在音樂資料夾。今天想換一個調練，就先離開 PDF、打開播放器，再從一串檔名裡找版本；有時還得播放幾秒，才知道自己有沒有選對。</p>
+<p>所以我做了 LilyScore，先把同一份 PDF 樂譜和不同版本的伴奏收在一起，打開譜就能直接切換。不過找到伴奏只是開始，想練中間八小節，要切回播放器重抓進度；老師剛提醒的指法，又得另外找地方記。從紙本換成平板之後，譜是變輕了，練習流程卻還散在好幾個地方，於是後來又補進循環播放、註記與錄音。</p>
+<p>現在 LilyScore 樂譜練習已經在 Google Play 正式上架。我平常打開一份譜，會先選今天要用的伴奏，再開始練習那幾個一直彈不順的小節。</p>
 <span id="more"></span>
 
-<h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
-<p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p>
-<p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p>
-<h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h1 id="同一份譜，切換不同的伴奏版本"><a href="#同一份譜，切換不同的伴奏版本" class="headerlink" title="同一份譜，切換不同的伴奏版本"></a>同一份譜，切換不同的伴奏版本</h1><p>我最先想處理的，就是那些明明屬於同一份譜，卻各自躺在資料夾裡的音檔。同一首曲子可能有原調、不同調性的伴奏，也可能有示範演奏、慢速版本或純伴奏。練習內容不同，看的仍是同一份譜，但在一般的檔案管理器裡，它們只是幾個彼此不認識的檔案。</p>
+<p>在 LilyScore 裡，可以把這些音檔關聯到同一份樂譜。綁定一次，以後打開這份譜就能看到各個版本，直接選擇今天要用的伴奏，不必跳到另一個 App 找檔案。不同調性的音檔要先準備好，LilyScore 不會自動替音訊變調；它做的事，是把這些版本收在同一份譜下面，讓切換時不用重新找路。</p>
+<h1 id="卡住的八小節，不用一直重抓進度"><a href="#卡住的八小節，不用一直重抓進度" class="headerlink" title="卡住的八小節，不用一直重抓進度"></a>卡住的八小節，不用一直重抓進度</h1><p>選好今天要用的伴奏，練習才真的開始。某一段反覆出錯時，通常得放慢、重聽，再彈一次。LilyScore 的播放器可以調整速度，也能設定 A 點與 B 點；音檔播到 B 點後會回到 A 點，讓同一段持續循環。眼睛留在譜上，手也不用每次演奏完再去拖那條細細的進度列。這就是我最想省掉的動作，A、B 點設好後，「再來一次」不用再碰進度列。</p>
+<img src="/images/lilyscore-ab-loop.png" alt="在 LilyScore 的樂譜畫面直接播放伴奏與設定 A-B 循環" style="display: block; width: 100%; max-width: 480px; margin: 1.5rem auto;">
 
-<p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>
+<h1 id="想記的事，直接留在譜上"><a href="#想記的事，直接留在譜上" class="headerlink" title="想記的事，直接留在譜上"></a>想記的事，直接留在譜上</h1><p>有些提醒只在當下有意義。哪裡要換氣、哪顆音老是按錯、老師要我注意什麼，寫在另一個筆記 App 裡，下次打開譜時很容易忘記一起看。LilyScore 可以直接在譜面上使用筆、螢光筆與橡皮擦，也能加入直線與文字註記。這些標記獨立保存，不會修改原本的 PDF；備份時則會跟樂譜和其他練習資料一起打包。</p>
+<p>也可以直接錄下這次練習，錄音檔會跟目前這份譜放在一起。下次回來時，看得到上次圈了什麼，也能聽自己上次彈成什麼樣子。<del>有時候這個功能提供的勇氣比技術更重要</del></p>
+<img src="/images/lilyscore-annotation.png" alt="在原始 PDF 之外保存手寫與螢光筆註記" style="display: block; width: 100%; max-width: 480px; margin: 1.5rem auto;">
+
+<h1 id="練習之外，也得找得到譜"><a href="#練習之外，也得找得到譜" class="headerlink" title="練習之外，也得找得到譜"></a>練習之外，也得找得到譜</h1><p>樂譜少的時候，裝置裡放十幾份 PDF 還算好找。數量開始增加，檔名與資料夾很快就會變成另一項練習。LilyScore 有自己的樂譜庫，可以用資料夾整理、搜尋檔名，也會在首頁保留最近打開的樂譜。準備演出時，還能把要用的曲目排成演出清單，不用在台上臨時回檔案管理器翻資料夾。節拍器與調音器也在 App 裡，練習時不用再另外開一個工具。</p>
+<img src="/images/lilyscore-library.png" alt="LilyScore 首頁的樂譜庫與最近樂譜" style="display: block; width: 100%; max-width: 480px; margin: 1.5rem auto;">
+
+<h1 id="它適合誰"><a href="#它適合誰" class="headerlink" title="它適合誰"></a>它適合誰</h1><p>如果你已經用 Android 手機或平板看 PDF 樂譜，也習慣搭配示範、伴奏或自己的錄音練習，LilyScore 會比較對位。樂譜、音訊與註記都保存在裝置上，不需要帳號，日常練習也能離線使用。換手機時，可以先匯出備份，再到新裝置匯入。第一次使用也不用先整理完整個樂譜庫，挑一兩份常練的譜放進去就好。</p>
+<h1 id="下載-LilyScore"><a href="#下載-LilyScore" class="headerlink" title="下載 LilyScore"></a>下載 LilyScore</h1><p>LilyScore 已開放 Android 版下載。已經用手機或平板看譜，也常在幾個伴奏版本之間切換的人，可以先匯入一份常練的 PDF，再把示範或伴奏音檔放進去試試：</p>
+<p><a target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=com.CalmKoala.LilyScore">在 Google Play 下載 LilyScore 樂譜練習</a></p>
+<p>我已經用自己的譜測過一輪，但每個人的樂器、譜面與練習方式都不一樣。如果你碰到不好用、看不懂或缺了一步的地方，歡迎直接留言告訴我。比起猜下一個功能，真實練習時卡住的位置更值得先處理。</p>
+<hr>
+<p>原本只想少切一次 App，最後多寫了一整個 App。至少以後再練同一段八次時，可以把力氣留給手指，不用分一半去瞄播放進度了(？</p>
 
     </div>
 
@@ -294,23 +301,20 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/AI/" rel="tag"># AI</a>
-              <a href="/tags/Python/" rel="tag"># Python</a>
-              <a href="/tags/Windows/" rel="tag"># Windows</a>
+              <a href="/tags/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" rel="tag"># 個人專案</a>
+              <a href="/tags/LilyScore/" rel="tag"># LilyScore</a>
+              <a href="/tags/%E9%9F%B3%E6%A8%82/" rel="tag"># 音樂</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/apscheduler-windows-misfire/" rel="prev" title="排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑">
-                  <i class="fa fa-angle-left"></i> 排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑
+                <a href="/when-multi-agent-works/" rel="prev" title="一個 AI agent 做不好，多開幾個就會比較好嗎？">
+                  <i class="fa fa-angle-left"></i> 一個 AI agent 做不好，多開幾個就會比較好嗎？
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/ffmpeg-frames-to-data/" rel="next" title="把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識">
-                  把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
