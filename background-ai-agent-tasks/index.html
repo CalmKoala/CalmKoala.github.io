@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+  <link rel="mask-icon" href="/images/koala-mono.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="哪些工作該交給背景 AI agent？">
+<meta property="og:url" content="https://calmkoala.github.io/background-ai-agent-tasks/">
+<meta property="og:site_name" content="CalmKoala">
+<meta property="og:description" content="讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="article:published_time" content="2026-09-05T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-05T01:10:21.894Z">
+<meta property="article:author" content="PingChun">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="AI agent">
+<meta property="article:tag" content="工作流程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+
+
+<link rel="canonical" href="https://calmkoala.github.io/background-ai-agent-tasks/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/background-ai-agent-tasks/","path":"/background-ai-agent-tasks/","title":"哪些工作該交給背景 AI agent？"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>哪些工作該交給背景 AI agent？ | CalmKoala</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="CalmKoala" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">CalmKoala</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">24</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">11</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">15</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%B7%E6%99%82%E9%96%93%E4%B8%8D%E7%AD%89%E6%96%BC%E9%81%A9%E5%90%88%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">長時間不等於適合背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E5%AF%AB%E5%A5%BD%E5%AE%8C%E6%88%90%E8%88%87%E5%81%9C%E6%AD%A2%E6%A2%9D%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">先寫好完成與停止條件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E9%80%94%E8%A6%81%E9%81%B8%E6%96%B9%E5%90%91%EF%BC%8C%E5%B0%B1%E7%95%99%E5%9C%A8%E5%B0%8D%E8%A9%B1"><span class="nav-number">3.</span> <span class="nav-text">中途要選方向，就留在對話</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%8B%E5%BE%97%E5%88%B0%E7%8B%80%E6%85%8B%EF%BC%8C%E6%89%8D%E6%95%A2%E9%9B%A2%E9%96%8B"><span class="nav-number">4.</span> <span class="nav-text">看得到狀態，才敢離開</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E5%8B%95%E4%BD%9C%E4%B8%8D%E8%A6%81%E7%9B%B4%E6%8E%A5%E9%87%8D%E8%B7%91"><span class="nav-number">5.</span> <span class="nav-text">外部動作不要直接重跑</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="PingChun"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">PingChun</p>
+  <div class="site-description" itemprop="description">後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml" rel="noopener me"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/background-ai-agent-tasks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="哪些工作該交給背景 AI agent？ | CalmKoala">
+      <meta itemprop="description" content="讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          哪些工作該交給背景 AI agent？
+        </h1>
+          <p class="post-subtitle" itemprop="alternativeHeadline">任務跑得久，不代表適合丟到背景</p>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-09-05 08:00:00 / 修改時間：09:10:21" itemprop="dateCreated datePublished" datetime="2026-09-05T08:00:00+08:00">2026-09-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>2.9k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>10 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>最近我在做一套能讓 AI agent 留在背景工作、完成後再把結果送回來的系統。最先拿來測試的，是一場多角色討論：先由一個角色找資料，其他角色從不同角度提出意見，最後再整理成結論。整個流程大約要跑 5 到 10 分鐘，中間也不需要我逐句回覆，看起來很適合丟到背景，<del>終於可以假裝自己有員工了</del>。</p>
+<p>做到一半，我卻開始卡在一些和答案聰不聰明無關的問題。資料不足時，它要直接停下來，還是自己換個題目？其中一個角色失敗後，前面完成的步驟要不要重跑？我關掉對話之後，它跑完或卡住，又要用什麼方式告訴我？</p>
+<p>本文所說的背景 AI agent，指的是工作開始後不再佔住目前的對話；我可以先去做別的事，等它完成、失敗或需要幫忙時再回來處理。那麼，一個任務預計要跑 10 分鐘，直接丟到背景就好了嗎？我實際做完才發現，執行時間只回答了我要等多久，還沒有回答它能不能在沒有人看著時繼續工作。</p>
+<span id="more"></span>
+
+<h2 id="長時間不等於適合背景"><a href="#長時間不等於適合背景" class="headerlink" title="長時間不等於適合背景"></a>長時間不等於適合背景</h2><p>背景執行可以省下等待時間，判斷仍得由人處理。Agent 跑測試、整理資料或查文件時，我可以回到原本的工作，不必盯著畫面等它交付。不過它也少了對話裡的即時往返；需求有一點模糊、途中出現新線索，或下一步牽涉取捨時，就不適合每次都停下來等我即時決定。</p>
+<p>我現在會先用四個問題判斷：執行中還可能改需求嗎？完成與停止條件能不能核對？中途需不需要人選方向？失敗後能不能查到狀態並安全處理？只看「會跑多久」，很容易把一件仍需要來回討論的工作提早丟出去。</p>
+<pre>
+<code class="mermaid">
+
+flowchart TD
+  START[&quot;準備交給背景 agent&quot;] --&gt; SCOPE{&quot;執行中還可能改需求嗎？&quot;}
+  SCOPE -- &quot;會&quot; --&gt; CHAT[&quot;留在對話裡&quot;]
+  SCOPE -- &quot;不會&quot; --&gt; DONE{&quot;完成與停止條件能核對嗎？&quot;}
+  DONE -- &quot;不能&quot; --&gt; CHAT
+  DONE -- &quot;能&quot; --&gt; CHOICE{&quot;中途需要人選方向嗎？&quot;}
+  CHOICE -- &quot;需要&quot; --&gt; CHAT
+  CHOICE -- &quot;不需要&quot; --&gt; FAILURE{&quot;失敗後能查到狀態並安全處理嗎？&quot;}
+  FAILURE -- &quot;還不能&quot; --&gt; GUARD[&quot;先補狀態、通知或人工確認&quot;]
+  FAILURE -- &quot;能&quot; --&gt; BACKGROUND[&quot;適合背景執行&quot;]
+</code>
+</pre>
+
+<h2 id="先寫好完成與停止條件"><a href="#先寫好完成與停止條件" class="headerlink" title="先寫好完成與停止條件"></a>先寫好完成與停止條件</h2><p>前面的四個問題用來判斷任務要不要交到背景；決定交出去後，我才用下面幾項把工作內容寫完整。「幫我看看最近系統有沒有問題」很難直接交給背景，AI agent 不知道該看哪些資料、查到什麼程度才算完成，也不知道找不到證據時能不能停下來。最後即使交回一份看似合理的觀察，我也很難核對它漏了什麼。</p>
+<p>如果改成「讀最近七天的錯誤紀錄與任務失敗統計，找出重複出現的問題；沒有足夠證據就回報資料不足；有的話整理成一頁摘要並附上來源，不要修改任何設定」，任務就多了幾個可以檢查的部分：要讀哪些資料、交回什麼、何時可以停止，以及哪些動作不能做。完成後再要求它回報結果或失敗原因，背景 agent 才知道自己要走到哪裡。</p>
+<p>我現在交代背景工作時，至少會寫下五件事：資料範圍、交付內容、停止條件、不能執行的動作，以及完成或失敗後的回報方式。就算不懂複雜的 agent 架構，也能先把原本藏在對話來回裡的判斷寫出來。</p>
+<div class="note info no-icon"><p>背景任務可以停下來等人。資料不足時回報缺了什麼，比自己猜完再交一份完整答案更有用。</p>
+</div>
+
+<h2 id="中途要選方向，就留在對話"><a href="#中途要選方向，就留在對話" class="headerlink" title="中途要選方向，就留在對話"></a>中途要選方向，就留在對話</h2><p>同一種工作，有時適合背景執行，有時仍要留在眼前，差別通常在於下一步能不能事先決定。修 bug 就是常見的灰色地帶：如果錯誤已經可以重現、修改範圍固定，也有一組測試能判斷修好沒有，agent 可以在背景完成；如果連原因都還不知道，查到新線索後可能要跨服務修改，甚至牽涉產品行為，對話裡的即時判斷會比較省事。</p>
+<table>
+<thead>
+<tr>
+<th>工作</th>
+<th>適合放到背景的情況</th>
+<th>適合留在對話的情況</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>修 bug</td>
+<td>已能重現，範圍固定，有測試可核對</td>
+<td>原因未知，途中可能擴大修改範圍</td>
+</tr>
+<tr>
+<td>查資料</td>
+<td>資料來源與比較項目已指定</td>
+<td>還在找問題，結果會改變研究方向</td>
+</tr>
+<tr>
+<td>批次改檔</td>
+<td>改法一致，可用檢查或測試驗收</td>
+<td>每個檔案都可能需要不同取捨</td>
+</tr>
+<tr>
+<td>寫文章</td>
+<td>格式、錯字與既定規則檢查</td>
+<td>主題、例子與語氣還在來回調整</td>
+</tr>
+</tbody></table>
+<p>這也不必硬分成「全程背景」或「全程對話」。一份探索工作可以先在背景蒐集證據，遇到岔路時停下來請人選方向，再把選定的部分交回背景執行。把人的判斷點切出來，可以分開處理探索與執行，也比較好管理。</p>
+<h2 id="看得到狀態，才敢離開"><a href="#看得到狀態，才敢離開" class="headerlink" title="看得到狀態，才敢離開"></a>看得到狀態，才敢離開</h2><p>我的第一版會保存已完成的調查與各輪討論，遇到部分預料內的成功或失敗情況，也會更新紀錄並嘗試通知。不過我回頭檢查程式才發現，如果整場討論撞到最外層的 10 分鐘上限，內部雖然會產生失敗結果，背景入口目前沒有把它轉成通知，先前建立的討論紀錄也可能還停在「執行中」。工作已經停了，畫面看起來卻像它還在跑。</p>
+<p>這個落差在同步對話裡很快就會被看到，放到背景後卻可能隔很久才發現。通知只能提醒我回來，系統還要留一個能查詢的地方，至少分得出「等待執行、執行中、已完成、失敗或逾時、等待人處理」。理想情況下，就算訊息沒有送達，我仍能靠任務編號回來確認；程式重新啟動後，也能找出上一次沒有收尾的工作。</p>
+<p>如果你主要用現成的 AI 工具，不需要先做一套狀態系統，但可以留意三件事：離開頁面後任務會不會繼續、失敗時能不能查到原因，以及它需要你做決定時會停在哪裡。少了其中一項，背景執行很容易變成「晚一點回來看看有沒有結果」。</p>
+<h2 id="外部動作不要直接重跑"><a href="#外部動作不要直接重跑" class="headerlink" title="外部動作不要直接重跑"></a>外部動作不要直接重跑</h2><p>背景工作遇到網路中斷、工具逾時或使用額度限制，重跑看起來是最直接的處理方式。讀檔、查資料、跑測試通常可以再做一次；寄信、建立排程、發版或修改正式環境就要小心，因為第一次可能已經成功，只是結果來不及傳回來。</p>
+<p>重跑前，我會先確認前一次是否完成外部動作。單靠本機留下一筆「做過了」的紀錄仍有空隙，外部動作可能已經成功，程式卻在存好紀錄前中斷。如果一定要自動重跑，外部服務還得能用固定的請求編號辨識同一筆操作；工程上常把這種重複執行不影響結果的設計稱為「冪等」。做不到時，我會讓背景 agent 只準備資料或草稿，寄出、部署或寫入仍交回人確認。這和我在<a href="/when-multi-agent-works/">上一篇談多 agent 的文章</a>遇到的重複執行問題相同，只是沒有人盯著時更難察覺。</p>
+<p>回到一開始的多角色討論，我願意把它放到背景，10 分鐘的執行時間只是次要理由。它要讀的資料、討論輪數與輸出格式都已經固定，找不到合適的題目也可以停下來；最後交回的是建議，不會直接替我改資料或發布內容。至於最外層逾時後的狀態與通知，我還得補完，否則它只能算「會自己跑」，還不到我能放心離開的程度。</p>
+<p>我現在準備把工作交給背景 agent 前，會先寫出它要讀什麼、在哪裡停、怎麼回報，以及做過的動作能不能再來一次。這幾件事寫不出來，我就繼續留在對話裡。等待久一點有點煩，回來後才發現它卡在一個沒人知道的地方，顯然更煩（？）</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/AI-agent/" rel="tag"># AI agent</a>
+              <a href="/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B/" rel="tag"># 工作流程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/google-play-first-release/" rel="prev" title="第一次上 Google Play，最麻煩的不是寫 App">
+                  <i class="fa fa-angle-left"></i> 第一次上 Google Play，最麻煩的不是寫 App
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2023 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">PingChun</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="總字數">51k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="所需總閱讀時間">2:50</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"CalmKoala/blog-comments","issue_term":"pathname","theme":"preferred-color-scheme"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+</body>
+</html>
