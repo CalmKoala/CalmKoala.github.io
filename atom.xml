@@ -10,7 +10,26 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-09-09T14:05:51.558Z</updated>
+  <updated>2026-09-12T01:10:26.761Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="開發筆記" scheme="https://calmkoala.github.io/categories/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/"/>
+    <category term="工具" scheme="https://calmkoala.github.io/categories/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/%E5%B7%A5%E5%85%B7/"/>
+    <category term="CI/CD" scheme="https://calmkoala.github.io/tags/CI-CD/"/>
+    <category term="開發筆記" scheme="https://calmkoala.github.io/tags/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/"/>
+    <category term="Git" scheme="https://calmkoala.github.io/tags/Git/"/>
+    <content>
+      <![CDATA[<p>最近替自己的樂譜練習 App LilyScore 準備發版，功能做完、測試也跑過，最後卻卡在一個很普通的問題：這版到底更新了什麼？</p><p>過程中加過播放器功能、修過樂譜庫，還順手調了幾個小地方。每個當下我都知道自己在做什麼，隔了幾天再回頭看，腦袋卻只剩下「好像改了播放器」、「還有一個 bug」。接著又開始翻 commit、issue 和對話紀錄，把剛做完的事情重新整理一次。</p><p>LilyScore 第一次走完整個上架流程時，我才發現每一版都會遇到同一件事。商店要一份讓練習的人看得懂的更新說明，GitHub Release 又要保留完整紀錄；兩份都靠發版前臨時回想，很像考前一天才開始整理筆記。<del>而且還是自己出的題目。</del></p><p>後來我沒有再多維護一份版本說明文件，而是把平常留下的修改紀錄，直接拿來當發版時的原料。</p><span id="more"></span><h2 id="先留下可讀的修改紀錄"><a href="#先留下可讀的修改紀錄" class="headerlink" title="先留下可讀的修改紀錄"></a>先留下可讀的修改紀錄</h2><p>Git 是程式專案常用的版本管理工具；commit 則是每次保存一小段修改時，替那次變更留下的紀錄。tag（版本標記）是替某個版本做的記號，從上一個發版 tag 往後看，就能找出這一版新增了哪些修改。</p><p>如果目前還沒有發版腳本，先手動做一次就夠了：</p><ol><li>找到上一個發版的 tag。</li><li>列出那個 tag 到現在的 commit。</li><li>挑出使用者會在意的功能與修正，改寫成幾行版本說明。</li></ol><p>例如上一版是 <code>v2.2.0</code>，可以先用下面這行列出後續的 commit 標題：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> v2.2.0..HEAD --pretty=%s</span><br></pre></td></tr></table></figure><p>這裡還不用急著自動化。先讓每次修改都留下一句能看懂的紀錄，發版時就不必從聊天紀錄裡考古。如果你還沒用 Git，同樣可以把紀錄放在待辦清單或更新筆記裡，只要它能回答「上次發布後，我做了什麼」就行。</p><h2 id="兩份版本說明"><a href="#兩份版本說明" class="headerlink" title="兩份版本說明"></a>兩份版本說明</h2><p>同一批 commit，我會整理成兩份內容。短版給實際使用 App 的人看，只留下多了什麼、修了什麼；完整版留給以後的我，連文件、測試與發版過程都保留。以 LilyScore 為例，短版放到 Google Play，完整版放到 GitHub Release，也就是 GitHub 上每個版本的發布頁。</p><p>為了讓腳本分得出哪些修改值得對外說，我在新增功能的標題前加上 <code>feat:</code>，修正問題則用 <code>fix:</code>。這只是平常寫紀錄時採用的分類，先有一致的寫法，發版時才有規則可以篩選。</p><table><thead><tr><th>去哪裡</th><th>取哪些內容</th><th>用來做什麼</th></tr></thead><tbody><tr><td>Google Play</td><td>新增功能與問題修正，篩選後再確認文字</td><td>讓使用者知道這版增加與修正了什麼</td></tr><tr><td>GitHub Release</td><td>版本範圍內的所有 commit 標題與短編號</td><td>讓自己日後追查每一筆修改</td></tr></tbody></table><p>不過，拿掉前綴還不一定能直接放上商店。LilyScore 真的有過下面兩筆 commit，自動整理只會做到中間那欄；右邊是我把同一件事改寫給使用者看的示例，並非腳本會自動產出的文字。</p><table><thead><tr><th>原始 commit</th><th>自動整理的候選文字</th><th>人工改寫示例</th></tr></thead><tbody><tr><td><code>feat(player): A-B 循環在進度條上可視化</code></td><td>A-B 循環在進度條上可視化</td><td>在播放進度條上顯示 A-B 循環範圍，方便查看反覆播放的起點與終點。</td></tr><tr><td><code>fix(home): 空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</code></td><td>空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</td><td>修正尚未匯入樂譜時，畫面重複出現「匯入樂譜」按鈕的問題。</td></tr></tbody></table><p>「空狀態」對寫程式的人很直覺，使用者卻要先猜它指的是哪個畫面。腳本能幫我找出這筆修正，換成對方看得懂的說法，仍然要由我決定。GitHub Release 則保留原本的標題、前綴與短編號，連文件、雜項維護和發版本身的 commit 都列出；要看實際改了哪些程式，再點進 commit。</p><p>這張圖把人工確認也列進流程，這一步目前仍要在發版指令前手動完成。</p><pre><code class="mermaid">flowchart TD    A[留下可讀的修改紀錄] --&gt; B[選定本次更新範圍]    B --&gt; C[挑出新功能與問題修正]    C --&gt; D[人工確認與改寫]    D --&gt; E[Google Play 短版]    B --&gt; F[保留所有修改標題]    F --&gt; G[GitHub Release 完整版]</code></pre><h2 id="Commit-標題要寫給人看"><a href="#Commit-標題要寫給人看" class="headerlink" title="Commit 標題要寫給人看"></a>Commit 標題要寫給人看</h2><p>當 commit 標題有可能出現在商店裡，我就不能再寫「fix bug」、「調整一下」或「final final 真的 final」。以前這種標題只會讓幾週後的我看不懂，現在還可能直接變成使用者看到的版本說明，丟臉範圍變大了。</p><p>這也是我最喜歡的副作用。版本說明的品質，早在每次保存小改動時就決定了一部分。如果你讓 AI 幫忙寫 commit，也要看一眼「這個改動要怎麼講給人聽」。否則只會得到一串文法很完整，卻不知道做了什麼的句子。</p><p>當然，不是所有 commit 都適合對外說。重構、調整測試、修 CI，可能對維護很重要，卻不一定是練習的人需要知道的更新。所以我只把 <code>feat:</code> 和 <code>fix:</code> 當成商店候選內容；你也可以使用自己的分類，先決定哪些變更值得出現在使用者面前即可。</p><h2 id="LilyScore-的發版流程"><a href="#LilyScore-的發版流程" class="headerlink" title="LilyScore 的發版流程"></a>LilyScore 的發版流程</h2><p>我後來把固定步驟放進 <code>scripts/release.ps1</code>。它會檢查目前是不是在主分支 <code>main</code>、有沒有已追蹤但尚未提交的修改、本機是否落後遠端、tag 是否重複，再檢查程式是否有靜態分析能找出的錯誤。通過後，腳本更新版號與建置編號、整理 Play 說明，接著建立 release commit、tag 並推上 GitHub。後續測試、簽章建置與上傳，交給 GitHub Actions 自動執行，這就是下面提到的 CI。</p><h3 id="發版前先確認文字"><a href="#發版前先確認文字" class="headerlink" title="發版前先確認文字"></a>發版前先確認文字</h3><p>這裡還有個目前腳本沒補上的步驟。它會在終端印出版本說明，接著直接 commit、打 tag 並 push，沒有停下來等我確認。因此，要先檢查文字，就得在執行發版指令之前，用前面的 <code>git log</code> 列出修改、整理好內容，再用 <code>-Notes</code> 傳入已確認的版本說明。例如只要說明這次循環範圍的更新，可以在 LilyScore 專案裡執行：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\scripts\release.ps1 <span class="literal">-Version</span> <span class="number">2.3</span>.<span class="number">0</span> <span class="literal">-Notes</span> <span class="string">&#x27;在播放進度條上顯示 A-B 循環範圍。&#x27;</span></span><br></pre></td></tr></table></figure><p>這樣會覆寫自動彙整的文字，並繼續完成發版；它是一條會提交和推送的指令。腳本也有 <code>-NoPush</code> 參數，但那仍會建立 commit 與 tag，只省略推送，不能當成單純預覽。想把「產生候選文字、人工確認、正式送出」接成不中斷的流程，還需要替腳本補上預覽與確認步驟。</p><h3 id="測試版的更新範圍"><a href="#測試版的更新範圍" class="headerlink" title="測試版的更新範圍"></a>測試版的更新範圍</h3><p>兩份紀錄還有個小差別，從哪個版本開始算。假設上次送到 Play 的版本是 <code>v2.2.0</code>，中間做過 <code>v2.3.0-alpha.1</code> 與 <code>v2.3.0-beta.1</code>，現在準備送出 <code>v2.3.0</code>，商店說明應該包含整段測試期間累積的功能。GitHub Release 則每個測試版都有紀錄，可以分開追查這幾次修改。</p><p>LilyScore 因此把名稱含 <code>-</code> 的 tag 視為測試版，只建立 GitHub Release；不含 <code>-</code> 才送進 Play 封閉測試軌道，讓加入測試的人收到更新，這不代表已經發布到正式軌道。Play 說明從上一個不含 <code>-</code> 的 tag 開始，GitHub Release 則取排除本次 tag 後、依版本號排序的第一個 <code>v*</code> tag 作為起點。這是我目前專案的分流規則，其他專案可以按自己的發布方式調整。</p><h2 id="自動彙整的四個邊界"><a href="#自動彙整的四個邊界" class="headerlink" title="自動彙整的四個邊界"></a>自動彙整的四個邊界</h2><h3 id="沒有-feat-或-fix"><a href="#沒有-feat-或-fix" class="headerlink" title="沒有 feat: 或 fix:"></a>沒有 <code>feat:</code> 或 <code>fix:</code></h3><p>這版若找不到 <code>feat:</code> 或 <code>fix:</code>，腳本目前會放入「穩定性與效能改善。」這句備用文字，避免產生空白說明。但這句話未必有 commit 可以證明；更保守的做法是中止發版，要求人工補上內容。目前腳本還沒這樣做，需要在執行前確認這版改了什麼，再用前面的 <code>-Notes</code> 傳入合適的文字。</p><h3 id="內容超過商店上限"><a href="#內容超過商店上限" class="headerlink" title="內容超過商店上限"></a>內容超過商店上限</h3><p>Google Play 的 <a href="https://support.google.com/googleplay/android-developer/answer/9859348?hl=en">Prepare and roll out a release</a> 說明目前允許每種語言最多 500 個 Unicode 字元。我的腳本依新到舊逐條放入，快滿時就停止。它用 PowerShell 的字串長度做較保守的檢查，純中文通常不受影響，emoji 可能提早碰到限制；大改版仍會改用手寫說明。</p><h3 id="tag-畫錯版本範圍"><a href="#tag-畫錯版本範圍" class="headerlink" title="tag 畫錯版本範圍"></a>tag 畫錯版本範圍</h3><p>目前的腳本依版本號排序找上一個 tag，前提是 release tag 都在同一條主線，版號也一直往上增加。如果專案同時維護多條版本分支或做 backport，就該限制為目前 <code>HEAD</code> 的祖先 tag，否則 <code>git log A..HEAD</code> 可能抓錯版本。重寫 Git 歷史、壓縮 commit 或把 tag 打錯位置，也會改變輸出。</p><h3 id="CI-讀不到舊紀錄"><a href="#CI-讀不到舊紀錄" class="headerlink" title="CI 讀不到舊紀錄"></a>CI 讀不到舊紀錄</h3><p><code>actions/checkout</code> 預設只抓觸發 workflow 的一個 commit，runner 可能根本沒有舊 tag。本來要列整段變更的 <code>git log</code>，最後就只剩本次 commit；LilyScore 因此把 <code>fetch-depth</code> 設為 <code>0</code>，讓 CI 取得完整歷史。這類問題平常不容易出現，通常會挑發版那天才突然讓人想把電腦闔起來。</p><hr><p>版本說明最後還是得由我看過，因為讀者不是 CI，也不會因為內容由腳本產生就突然看得懂。有了平常留下的紀錄，發版時可以從這份清單挑選、改寫，不必再從空白頁開始回想。</p><p>把已經寫在 commit 裡的資訊再整理一次，聽起來很勤勞，實際上只是我以前還沒想到要偷懶而已。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/release-notes-from-commits/</id>
+    <link href="https://calmkoala.github.io/release-notes-from-commits/"/>
+    <published>2026-09-12T00:00:00.000Z</published>
+    <summary>把平常的修改紀錄整理成商店更新與開發紀錄，發版時少一次重新回想。</summary>
+    <title>版本說明，別再發版時才重寫</title>
+    <updated>2026-09-12T01:10:26.761Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -28,7 +47,7 @@
     <published>2026-09-05T00:00:00.000Z</published>
     <summary>讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。</summary>
     <title>哪些工作該交給背景 AI agent？</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -47,7 +66,7 @@
     <published>2026-08-29T00:00:00.000Z</published>
     <summary>LilyScore 上架後，我把第一次發布會碰到的簽章、商店資料、測試軌與自動發版照順序整理，留一份下一個 App 能直接跟著做的操作筆記。</summary>
     <title>第一次上 Google Play，最麻煩的不是寫 App</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -66,7 +85,7 @@
     <published>2026-08-22T00:00:00.000Z</published>
     <summary>LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。</summary>
     <title>LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -85,7 +104,7 @@
     <published>2026-08-15T01:00:00.000Z</published>
     <summary>一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。</summary>
     <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -104,7 +123,7 @@
     <published>2026-08-08T05:00:00.000Z</published>
     <summary>Skill 裝得更多，不代表 AI agent 會持續變好。從整理與刪減 skill 的經驗，比較不同觀點，以及如何判斷規則該放在 skill、專案指引、獨立 agent 或程式檢查。</summary>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -123,7 +142,7 @@
     <published>2026-08-01T01:00:00.000Z</published>
     <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
     <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -142,7 +161,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -164,7 +183,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -187,7 +206,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -211,7 +230,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -232,7 +251,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -254,7 +273,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -278,7 +297,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -307,7 +326,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-09-09T14:05:51.558Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
   <entry>
     <author>
@@ -328,6 +347,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-09-09T14:05:51.557Z</updated>
+    <updated>2026-09-12T01:10:26.761Z</updated>
   </entry>
 </feed>
