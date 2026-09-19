@@ -220,35 +220,6 @@
       </tags>
   </entry>
   <entry>
-    <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <url>//apscheduler-windows-misfire/</url>
-    <content><![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
-<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
-<span id="more"></span>
-
-<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
-<p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
-<p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
-<p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
-<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
-<p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p>
-<hr>
-<p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>
-]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>APScheduler</tag>
-        <tag>Windows</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
     <url>//script-first/</url>
     <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
@@ -293,6 +264,35 @@
       <tags>
         <tag>AI</tag>
         <tag>工作流</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
+    <url>//apscheduler-windows-misfire/</url>
+    <content><![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
+<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
+<span id="more"></span>
+
+<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
+<p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
+<p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
+<p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
+<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
+<p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p>
+<hr>
+<p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>APScheduler</tag>
+        <tag>Windows</tag>
       </tags>
   </entry>
   <entry>
@@ -482,6 +482,132 @@ flowchart LR
       </tags>
   </entry>
   <entry>
+    <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
+    <url>//markdown-ai-memory/</url>
+    <content><![CDATA[<p>剛開始用 AI agent 寫程式時，我沒有特別在意記憶這件事。只要工作留在同一段對話裡，它還記得前面做過的決定，也知道我剛才否決了哪個方案，感覺一切都沒問題，直到我關掉對話，隔天開啟新的工作階段之後。昨天已經決定不用的工具又被提了一次，commit message 的格式要重新交代，做到一半的工作也得花時間說明。</p>
+<p>我最早的處理方式很直覺，把這些內容寫進 <code>MEMORY.md</code>，每次開始前讓 agent 讀取。這個方法一開始確實有用，新對話終於不必每次都從頭建立背景知識。</p>
+<p>但我把這個方法放進三個專案跑了兩個月後，一份檔案開始同時裝著長期規則、短期進度與知識整理。它們都被叫作記憶，保存期限和使用方式卻不一樣。</p>
+<p>這時我才把 LLM 與 AI agent 分開看。LLM 負責理解文字與產生回答；AI agent 則是包住 LLM、能儲存資料與呼叫工具的完整系統。跨對話記憶由外層系統保存，再於適當時機交給 LLM。</p>
+<p>Hermes 把精選資訊放進 Markdown，完整對話則存進 SQLite；Andrej Karpathy 的 LLM Wiki 讓 agent 持續整理讀過的資料。</p>
+<p>我的三層協定處理的範圍比較小，分成持久記憶、工作階段摘要與啟動讀取。第一層保存長期規則，第二層記錄近期進度，第三層規定新對話要載入哪些檔案。把這些案例放在一起，可以看出不同記憶各自需要的讀寫方式。</p>
+<span id="more"></span>
+
+<div class="note info no-icon"><p><strong>快速摘要</strong>：AI agent 的記憶要先決定資訊何時被讀取與更新，再選擇 Markdown、資料庫或 wiki。最近的工作進度屬於歷史的一部分，可以先產生工作階段摘要，需要原文時再回頭搜尋。</p>
+</div>
+
+<h2 id="先按用途分類"><a href="#先按用途分類" class="headerlink" title="先按用途分類"></a>先按用途分類</h2><p>如果使用者說「commit message 請用中文」，agent 在下一場工作開始時就要知道。這類資訊數量不多，使用頻率很高，適合放進精簡的偏好或專案記憶。</p>
+<p>「找出上星期討論過的三個名稱」屬於另一種需求。完整對話可能累積幾十萬字，沒有必要每次全部交給 LLM。系統可以保存原始內容，等使用者問起時再搜尋。</p>
+<p>最近的工作進度也屬於歷史資訊，但下一場對話很可能立即用到。系統可以在工作結束時先留下短摘要，接續時直接讀摘要；需要細節時，再回到完整對話。</p>
+<p>「把最近讀過的資料整理成一套知識」又多了一項工作。系統要比較不同來源、更新舊結論，並保留內容之間的關聯。單純找回一段原文不夠，還需要一層持續維護的整理結果。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  ASK[&quot;希望 agent 記住的內容&quot;] --&gt; ALWAYS[&quot;每次對話都要知道&quot;]
+  ASK --&gt; HISTORY[&quot;需要時找回原文&quot;]
+  ASK --&gt; KNOWLEDGE[&quot;持續整理與更新&quot;]
+
+  ALWAYS --&gt; CURATED[&quot;少量精選記憶&quot;]
+  HISTORY --&gt; SEARCH[&quot;需要原文&lt;br&#x2F;&gt;搜尋歷史紀錄&quot;]
+  HISTORY --&gt; SUMMARY[&quot;近期接續&lt;br&#x2F;&gt;讀工作階段摘要&quot;]
+  KNOWLEDGE --&gt; WIKI[&quot;agent 維護的知識 wiki&quot;]
+</code>
+</pre>
+
+<p>這張圖沒有指定一定要用哪套工具。它先處理資訊何時會被使用，再決定寫入時機、讀取方式與儲存位置。</p>
+<h2 id="兩個外部案例"><a href="#兩個外部案例" class="headerlink" title="兩個外部案例"></a>兩個外部案例</h2><h3 id="Hermes：分開存偏好與對話"><a href="#Hermes：分開存偏好與對話" class="headerlink" title="Hermes：分開存偏好與對話"></a>Hermes：分開存偏好與對話</h3><p>Hermes Agent 同時使用 Markdown 與資料庫。</p>
+<p>它把經過挑選的內容放進 <code>MEMORY.md</code> 和 <code>USER.md</code>。前者保存環境、專案慣例與 agent 學到的經驗；後者記錄使用者偏好和溝通方式。根據本文查核時的 <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory/">Persistent Memory | Hermes Agent</a>，兩份檔案的預設上限分別是 2,200 與 1,375 個字元，合計約 1,300 個模型輸入單位（tokens）。</p>
+<p>每場工作階段（session）開始時，Hermes 會把兩份內容以固定快照放進系統提示詞（system prompt）。寫滿後，agent 必須先合併或移除舊條目，不能讓常駐記憶一直增加。</p>
+<p>固定快照也帶來一項限制。Agent 在同一場工作階段中修改記憶後，資料會立即寫進檔案，但已建立的系統提示詞不會同步改變。新的內容要等下一場工作階段才會進入常駐脈絡。</p>
+<p>完整對話走另一條路。Hermes 把 CLI 與訊息平台的工作階段存進 SQLite，再透過 FTS5 做全文搜尋。使用者問起幾星期前的討論時，agent 才搜尋過去的訊息，取回資料庫裡的原文。</p>
+<p>FTS5 是全文搜尋，不是語意搜尋。歷史訊息和問題使用不同說法時，仍可能找不到結果。它的優點是能保存完整紀錄，也不會讓每次對話都負擔全部歷史的輸入成本。</p>
+<p>Hermes 的做法可以用兩句話理解。「使用者偏好簡短回答」每次都會影響結果，因此放進精選記憶；「上星期二討論過哪些名稱」只在特定問題出現時有用，因此保存原文再按需搜尋。</p>
+<h3 id="LLM-Wiki：整理跨來源知識"><a href="#LLM-Wiki：整理跨來源知識" class="headerlink" title="LLM Wiki：整理跨來源知識"></a>LLM Wiki：整理跨來源知識</h3><p>歷史搜尋能找回說過的內容，卻不會自動把幾十份資料整理成一套持續更新的知識。</p>
+<p>Karpathy 提出的 <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">llm-wiki</a> 是一份能交給 AI agent 實作的構想。它包含三層。</p>
+<ul>
+<li>原始來源由使用者提供，agent 只讀取、不修改，作為查證依據。</li>
+<li>Wiki 由 agent 建立與維護，內容包括摘要、主題頁、比較結果與交叉連結。</li>
+<li>結構規則（schema）文件規定資料結構、命名方式，以及匯入、查詢和維護流程。使用 Codex 時，可以把這些規則寫進 <code>AGENTS.md</code>。</li>
+</ul>
+<p>加入一份新資料時，agent 會讀取內容、更新相關主題頁，並記錄新資料和舊結論之間的矛盾。使用者提出的新問題若產生值得保留的分析，也能寫回 wiki，成為之後繼續使用的整理成果。</p>
+<p><code>index.md</code> 負責列出現有頁面與摘要，<code>log.md</code> 記錄每次匯入、查詢與整理的時間。Karpathy 在原始構想中提到，約 100 份來源、數百個頁面的規模仍能用索引檔導覽。這是他的使用經驗，不代表所有資料集都會得到相同結果。資料繼續增加後，Markdown 也能再搭配全文或語意搜尋。</p>
+<p>LLM Wiki 中的主題頁是 agent 根據原始資料整理的結果。重要內容仍要保留它引用了哪些原始來源。缺少來源鏈時，後續頁面可能把先前的摘要當成原始證據，錯誤也會跟著交叉引用繼續流傳。</p>
+<p>Karpathy 的做法還規定 agent 如何更新索引、修訂頁面、找出矛盾與檢查失效內容，Markdown 是承載這套流程的格式。</p>
+<h2 id="我的三層協定"><a href="#我的三層協定" class="headerlink" title="我的三層協定"></a>我的三層協定</h2><p>我的使用情境比 LLM Wiki 小很多。我想處理的是開發偏好、已拍板的專案決策，以及一場工作結束後要如何接續。</p>
+<p>每個專案只有一位使用者，記憶量大約落在幾十到幾百條。我用 Markdown 建立三層協定，並放進三個專案執行了兩個月。</p>
+<h3 id="第一層：持久記憶"><a href="#第一層：持久記憶" class="headerlink" title="第一層：持久記憶"></a>第一層：持久記憶</h3><p>第一層保存使用者偏好、架構決策、否決理由與專案慣例。一則記憶使用一個檔案，附上類型、日期與一句摘要。</p>
+<p><code>MEMORY.md</code> 只放索引，不把所有內文常駐塞進模型脈絡（context）。Agent 遇到相關工作時，再依索引讀取對應檔案。</p>
+<p>我也會保存方案被拒絕的理由。只記住最後選了 A，下一場對話仍可能再次提出 B；把當時的限制一起留下，才能減少重跑同一段討論。</p>
+<h3 id="第二層：工作階段摘要"><a href="#第二層：工作階段摘要" class="headerlink" title="第二層：工作階段摘要"></a>第二層：工作階段摘要</h3><p>「今天修改了哪些檔案」和「還有哪一項測試沒通過」通常只需要保留幾天，不適合和長期偏好共用相同生命週期。</p>
+<p>每場工作告一段落後，agent 會在 <code>memory/sessions/</code> 留下摘要，記錄這次完成的內容、已決定的選項、尚未完成的工作，以及較重要的檔案變動。</p>
+<p>這份摘要接近交接文件。它讓下一場對話知道工作停在哪裡，也避免每次重新搜尋與閱讀完整歷史。</p>
+<p>檔案不會自己出現。我把觸發條件寫進專案的 <code>AGENTS.md</code>，規定使用者準備離開、工作完成或切換主題時產生摘要。使用的工具若不會自動載入專案指引，就要在對話中另外要求。程式意外中斷時仍可能來不及留下摘要，下一場只能改從 Git diff、任務狀態或原始對話恢復進度。</p>
+<h3 id="第三層：啟動讀取"><a href="#第三層：啟動讀取" class="headerlink" title="第三層：啟動讀取"></a>第三層：啟動讀取</h3><p>檔案寫好後，還要規定讀取時機。</p>
+<p>我的做法是在新對話開始時讀取 <code>MEMORY.md</code>，再讀最近三篇工作階段摘要。索引提供長期背景，近期摘要負責恢復進度。如果最後一篇還有未完成項目，agent 會用一兩句提醒我。</p>
+<p>「最近三篇」是目前實際使用後留下的數量。全部載入會讓舊進度占用太多脈絡，只讀一篇又可能漏掉連續幾場的工作。不同專案可以依工作節奏調整。</p>
+<h2 id="記憶也需要維護"><a href="#記憶也需要維護" class="headerlink" title="記憶也需要維護"></a>記憶也需要維護</h2><h3 id="過期與衝突"><a href="#過期與衝突" class="headerlink" title="過期與衝突"></a>過期與衝突</h3><p>跑了兩個月後，最常出現的問題是重複內容與決策過期。</p>
+<p>同一項偏好可能被不同說法記錄三次。其中一份更新後，其餘兩份仍留著舊內容，agent 讀完只能重新判斷該相信哪一份。因此每次寫入前都要搜尋既有條目，找到相近內容就更新原檔。</p>
+<p>已經翻案的決策也要修改、刪除或標示為失效。日期只能說明內容何時寫入，無法證明它現在仍然成立。專案決策還需要保留目前狀態，以及取代它的新決策。</p>
+<p>這些維護規則不限定 Markdown。資料放進 SQLite 或其他資料庫後，仍要處理重複、過期與互相矛盾的內容。儲存空間增加，不會自動判斷哪一筆資訊仍然可信。</p>
+<h3 id="來源與敏感資料"><a href="#來源與敏感資料" class="headerlink" title="來源與敏感資料"></a>來源與敏感資料</h3><p>Wiki 還要多處理來源鏈。Agent 產生的摘要需要指回原始文件，新的來源推翻舊結論時，也要知道哪些頁面需要更新。</p>
+<p>保存完整對話也會留下密鑰、個人資料與內部資訊。我會把記憶目錄留在本機，不提交到公開 repository。一般專案可以先把記憶檔案與 SQLite 加進 <code>.gitignore</code>；確實需要版本紀錄時，再使用私人 repository，並在寫入前排除 API keys、access tokens 與其他敏感內容。</p>
+<h2 id="選擇記憶做法"><a href="#選擇記憶做法" class="headerlink" title="選擇記憶做法"></a>選擇記憶做法</h2><h3 id="四種做法可以並存"><a href="#四種做法可以並存" class="headerlink" title="四種做法可以並存"></a>四種做法可以並存</h3><table>
+<thead>
+<tr>
+<th>要記住的內容</th>
+<th>讀取時機</th>
+<th>適合的處理方式</th>
+<th>主要限制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>穩定偏好與重要規則</td>
+<td>每場對話開始</td>
+<td>容量受控的精選記憶</td>
+<td>每次都占用模型輸入空間，過期內容會持續影響回答</td>
+</tr>
+<tr>
+<td>完整歷史對話</td>
+<td>使用者問起舊內容時</td>
+<td>資料庫與全文搜尋</td>
+<td>問法不同時可能搜尋不到</td>
+</tr>
+<tr>
+<td>最近工作進度</td>
+<td>接續前幾場工作時</td>
+<td>工作階段摘要與索引</td>
+<td>摘要會遺失部分原始細節</td>
+</tr>
+<tr>
+<td>跨來源整理後的知識</td>
+<td>加入來源或提出新問題時</td>
+<td>agent 維護的 wiki</td>
+<td>需要保留來源並處理衝突</td>
+</tr>
+</tbody></table>
+<p>同一個專案可以同時使用四列。以我自己的協定為例，未來若工作階段數量增加，我可以保留現有的 Markdown 持久記憶，再替完整歷史加入 SQLite 搜尋，不必把所有檔案搬進資料庫。</p>
+<h3 id="先檢查現有設計"><a href="#先檢查現有設計" class="headerlink" title="先檢查現有設計"></a>先檢查現有設計</h3><p>不熟悉資料庫結構或檢索程式碼，也能先讓正在使用的 AI agent 畫出資訊從哪裡進入、保存到哪裡，以及下一場工作如何讀回來。</p>
+<p>下面這段可以直接交給它。</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">請實際檢查這個專案目前的 AI agent 記憶設計，不要只根據 README 推測，也不要先修改程式碼。</span><br><span class="line"></span><br><span class="line">1. 畫出一段資訊從對話進入系統、被保存，到下一場對話重新取用的完整流程。</span><br><span class="line">2. 把現有資訊分成四類：</span><br><span class="line">   - 每場工作都要使用的精選資訊</span><br><span class="line">   - 需要時才搜尋的原始歷史</span><br><span class="line">   - 需要持續整理與修訂的知識</span><br><span class="line">   - 只負責近期工作接續的摘要</span><br><span class="line">3. 對每一類標出儲存位置、寫入時機、讀取時機、更新方式、刪除方式與原始來源。</span><br><span class="line">4. 檢查同一項偏好重複出現、舊決策已經翻案，以及 agent 找不到過去原文時，系統目前會怎麼處理。</span><br><span class="line">5. 如果系統服務多位使用者，標出身份由哪裡取得，以及查詢如何限制只能讀取目前使用者的資料。</span><br><span class="line">6. 提出最小修改方案並規劃測試。沒有實作的部分請標示「目前缺少」，不要假設它已經存在。</span><br><span class="line"></span><br><span class="line">請先提供流程圖、分類表、風險與測試計畫，等我確認後再修改專案。</span><br></pre></td></tr></table></figure>
+
+<p>這段提示先要求 agent 檢查現有流程，再提出修改。只說「幫我做一套記憶系統」，很容易直接得到一組技術選型，卻沒有回答哪些資訊需要常駐、哪些應該搜尋。</p>
+<h3 id="多人服務要加身份隔離"><a href="#多人服務要加身份隔離" class="headerlink" title="多人服務要加身份隔離"></a>多人服務要加身份隔離</h3><p>本文的三個案例主要處理個人 agent 與知識管理。系統開始服務多位使用者後，每一筆偏好、歷史對話與 wiki 內容還要標示擁有者，並在讀取時檢查權限。</p>
+<p>資料庫能保存很多人的歷史，但每次搜尋仍要帶入經過驗證的使用者身份。這份身份不能由 LLM 自己填寫，否則仍可能讀到另一位使用者的資料。相關的身份來源與權限流程，我整理在上一篇<a href="/llm-agent-isolation/">〈多人共用 AI bot，別讓它認錯使用者〉</a>。</p>
+<p>檔案或資料庫解決的是內容放在哪裡，權限系統決定目前的人可以讀哪一部分。兩項都完成後，記憶才適合進入多人服務。</p>
+<h2 id="我目前的選擇"><a href="#我目前的選擇" class="headerlink" title="我目前的選擇"></a>我目前的選擇</h2><p>我的三個專案目前會繼續使用三層 Markdown 協定，因為現有規模仍能人工閱讀與維護。若要保留大量完整對話，我會增加資料庫搜尋；開始進行長期、多來源研究後，再獨立建立 LLM Wiki。</p>
+<p>這篇寫完後，我的協定會把這次工作記進工作階段摘要；Hermes 會把完整對話留在 SQLite；如果把資料交給 LLM Wiki，它還會更新相關主題頁。三種做法都叫記憶，保存下來的內容卻不相同。</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>系統設計</tag>
+        <tag>記憶系統</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
     <url>//llm-agent-isolation/</url>
     <content><![CDATA[<p>試著想像一個故事：小明和小美共用同一個 AI bot。兩人都會請它記住一些事情，可能是待辦、工作筆記，也可能是不想讓對方看到的私人內容。</p>
@@ -653,132 +779,6 @@ flowchart LR
         <tag>AI</tag>
         <tag>系統設計</tag>
         <tag>安全</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <url>//markdown-ai-memory/</url>
-    <content><![CDATA[<p>剛開始用 AI agent 寫程式時，我沒有特別在意記憶這件事。只要工作留在同一段對話裡，它還記得前面做過的決定，也知道我剛才否決了哪個方案，感覺一切都沒問題，直到我關掉對話，隔天開啟新的工作階段之後。昨天已經決定不用的工具又被提了一次，commit message 的格式要重新交代，做到一半的工作也得花時間說明。</p>
-<p>我最早的處理方式很直覺，把這些內容寫進 <code>MEMORY.md</code>，每次開始前讓 agent 讀取。這個方法一開始確實有用，新對話終於不必每次都從頭建立背景知識。</p>
-<p>但我把這個方法放進三個專案跑了兩個月後，一份檔案開始同時裝著長期規則、短期進度與知識整理。它們都被叫作記憶，保存期限和使用方式卻不一樣。</p>
-<p>這時我才把 LLM 與 AI agent 分開看。LLM 負責理解文字與產生回答；AI agent 則是包住 LLM、能儲存資料與呼叫工具的完整系統。跨對話記憶由外層系統保存，再於適當時機交給 LLM。</p>
-<p>Hermes 把精選資訊放進 Markdown，完整對話則存進 SQLite；Andrej Karpathy 的 LLM Wiki 讓 agent 持續整理讀過的資料。</p>
-<p>我的三層協定處理的範圍比較小，分成持久記憶、工作階段摘要與啟動讀取。第一層保存長期規則，第二層記錄近期進度，第三層規定新對話要載入哪些檔案。把這些案例放在一起，可以看出不同記憶各自需要的讀寫方式。</p>
-<span id="more"></span>
-
-<div class="note info no-icon"><p><strong>快速摘要</strong>：AI agent 的記憶要先決定資訊何時被讀取與更新，再選擇 Markdown、資料庫或 wiki。最近的工作進度屬於歷史的一部分，可以先產生工作階段摘要，需要原文時再回頭搜尋。</p>
-</div>
-
-<h2 id="先按用途分類"><a href="#先按用途分類" class="headerlink" title="先按用途分類"></a>先按用途分類</h2><p>如果使用者說「commit message 請用中文」，agent 在下一場工作開始時就要知道。這類資訊數量不多，使用頻率很高，適合放進精簡的偏好或專案記憶。</p>
-<p>「找出上星期討論過的三個名稱」屬於另一種需求。完整對話可能累積幾十萬字，沒有必要每次全部交給 LLM。系統可以保存原始內容，等使用者問起時再搜尋。</p>
-<p>最近的工作進度也屬於歷史資訊，但下一場對話很可能立即用到。系統可以在工作結束時先留下短摘要，接續時直接讀摘要；需要細節時，再回到完整對話。</p>
-<p>「把最近讀過的資料整理成一套知識」又多了一項工作。系統要比較不同來源、更新舊結論，並保留內容之間的關聯。單純找回一段原文不夠，還需要一層持續維護的整理結果。</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  ASK[&quot;希望 agent 記住的內容&quot;] --&gt; ALWAYS[&quot;每次對話都要知道&quot;]
-  ASK --&gt; HISTORY[&quot;需要時找回原文&quot;]
-  ASK --&gt; KNOWLEDGE[&quot;持續整理與更新&quot;]
-
-  ALWAYS --&gt; CURATED[&quot;少量精選記憶&quot;]
-  HISTORY --&gt; SEARCH[&quot;需要原文&lt;br&#x2F;&gt;搜尋歷史紀錄&quot;]
-  HISTORY --&gt; SUMMARY[&quot;近期接續&lt;br&#x2F;&gt;讀工作階段摘要&quot;]
-  KNOWLEDGE --&gt; WIKI[&quot;agent 維護的知識 wiki&quot;]
-</code>
-</pre>
-
-<p>這張圖沒有指定一定要用哪套工具。它先處理資訊何時會被使用，再決定寫入時機、讀取方式與儲存位置。</p>
-<h2 id="兩個外部案例"><a href="#兩個外部案例" class="headerlink" title="兩個外部案例"></a>兩個外部案例</h2><h3 id="Hermes：分開存偏好與對話"><a href="#Hermes：分開存偏好與對話" class="headerlink" title="Hermes：分開存偏好與對話"></a>Hermes：分開存偏好與對話</h3><p>Hermes Agent 同時使用 Markdown 與資料庫。</p>
-<p>它把經過挑選的內容放進 <code>MEMORY.md</code> 和 <code>USER.md</code>。前者保存環境、專案慣例與 agent 學到的經驗；後者記錄使用者偏好和溝通方式。根據本文查核時的 <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory/">Persistent Memory | Hermes Agent</a>，兩份檔案的預設上限分別是 2,200 與 1,375 個字元，合計約 1,300 個模型輸入單位（tokens）。</p>
-<p>每場工作階段（session）開始時，Hermes 會把兩份內容以固定快照放進系統提示詞（system prompt）。寫滿後，agent 必須先合併或移除舊條目，不能讓常駐記憶一直增加。</p>
-<p>固定快照也帶來一項限制。Agent 在同一場工作階段中修改記憶後，資料會立即寫進檔案，但已建立的系統提示詞不會同步改變。新的內容要等下一場工作階段才會進入常駐脈絡。</p>
-<p>完整對話走另一條路。Hermes 把 CLI 與訊息平台的工作階段存進 SQLite，再透過 FTS5 做全文搜尋。使用者問起幾星期前的討論時，agent 才搜尋過去的訊息，取回資料庫裡的原文。</p>
-<p>FTS5 是全文搜尋，不是語意搜尋。歷史訊息和問題使用不同說法時，仍可能找不到結果。它的優點是能保存完整紀錄，也不會讓每次對話都負擔全部歷史的輸入成本。</p>
-<p>Hermes 的做法可以用兩句話理解。「使用者偏好簡短回答」每次都會影響結果，因此放進精選記憶；「上星期二討論過哪些名稱」只在特定問題出現時有用，因此保存原文再按需搜尋。</p>
-<h3 id="LLM-Wiki：整理跨來源知識"><a href="#LLM-Wiki：整理跨來源知識" class="headerlink" title="LLM Wiki：整理跨來源知識"></a>LLM Wiki：整理跨來源知識</h3><p>歷史搜尋能找回說過的內容，卻不會自動把幾十份資料整理成一套持續更新的知識。</p>
-<p>Karpathy 提出的 <a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">llm-wiki</a> 是一份能交給 AI agent 實作的構想。它包含三層。</p>
-<ul>
-<li>原始來源由使用者提供，agent 只讀取、不修改，作為查證依據。</li>
-<li>Wiki 由 agent 建立與維護，內容包括摘要、主題頁、比較結果與交叉連結。</li>
-<li>結構規則（schema）文件規定資料結構、命名方式，以及匯入、查詢和維護流程。使用 Codex 時，可以把這些規則寫進 <code>AGENTS.md</code>。</li>
-</ul>
-<p>加入一份新資料時，agent 會讀取內容、更新相關主題頁，並記錄新資料和舊結論之間的矛盾。使用者提出的新問題若產生值得保留的分析，也能寫回 wiki，成為之後繼續使用的整理成果。</p>
-<p><code>index.md</code> 負責列出現有頁面與摘要，<code>log.md</code> 記錄每次匯入、查詢與整理的時間。Karpathy 在原始構想中提到，約 100 份來源、數百個頁面的規模仍能用索引檔導覽。這是他的使用經驗，不代表所有資料集都會得到相同結果。資料繼續增加後，Markdown 也能再搭配全文或語意搜尋。</p>
-<p>LLM Wiki 中的主題頁是 agent 根據原始資料整理的結果。重要內容仍要保留它引用了哪些原始來源。缺少來源鏈時，後續頁面可能把先前的摘要當成原始證據，錯誤也會跟著交叉引用繼續流傳。</p>
-<p>Karpathy 的做法還規定 agent 如何更新索引、修訂頁面、找出矛盾與檢查失效內容，Markdown 是承載這套流程的格式。</p>
-<h2 id="我的三層協定"><a href="#我的三層協定" class="headerlink" title="我的三層協定"></a>我的三層協定</h2><p>我的使用情境比 LLM Wiki 小很多。我想處理的是開發偏好、已拍板的專案決策，以及一場工作結束後要如何接續。</p>
-<p>每個專案只有一位使用者，記憶量大約落在幾十到幾百條。我用 Markdown 建立三層協定，並放進三個專案執行了兩個月。</p>
-<h3 id="第一層：持久記憶"><a href="#第一層：持久記憶" class="headerlink" title="第一層：持久記憶"></a>第一層：持久記憶</h3><p>第一層保存使用者偏好、架構決策、否決理由與專案慣例。一則記憶使用一個檔案，附上類型、日期與一句摘要。</p>
-<p><code>MEMORY.md</code> 只放索引，不把所有內文常駐塞進模型脈絡（context）。Agent 遇到相關工作時，再依索引讀取對應檔案。</p>
-<p>我也會保存方案被拒絕的理由。只記住最後選了 A，下一場對話仍可能再次提出 B；把當時的限制一起留下，才能減少重跑同一段討論。</p>
-<h3 id="第二層：工作階段摘要"><a href="#第二層：工作階段摘要" class="headerlink" title="第二層：工作階段摘要"></a>第二層：工作階段摘要</h3><p>「今天修改了哪些檔案」和「還有哪一項測試沒通過」通常只需要保留幾天，不適合和長期偏好共用相同生命週期。</p>
-<p>每場工作告一段落後，agent 會在 <code>memory/sessions/</code> 留下摘要，記錄這次完成的內容、已決定的選項、尚未完成的工作，以及較重要的檔案變動。</p>
-<p>這份摘要接近交接文件。它讓下一場對話知道工作停在哪裡，也避免每次重新搜尋與閱讀完整歷史。</p>
-<p>檔案不會自己出現。我把觸發條件寫進專案的 <code>AGENTS.md</code>，規定使用者準備離開、工作完成或切換主題時產生摘要。使用的工具若不會自動載入專案指引，就要在對話中另外要求。程式意外中斷時仍可能來不及留下摘要，下一場只能改從 Git diff、任務狀態或原始對話恢復進度。</p>
-<h3 id="第三層：啟動讀取"><a href="#第三層：啟動讀取" class="headerlink" title="第三層：啟動讀取"></a>第三層：啟動讀取</h3><p>檔案寫好後，還要規定讀取時機。</p>
-<p>我的做法是在新對話開始時讀取 <code>MEMORY.md</code>，再讀最近三篇工作階段摘要。索引提供長期背景，近期摘要負責恢復進度。如果最後一篇還有未完成項目，agent 會用一兩句提醒我。</p>
-<p>「最近三篇」是目前實際使用後留下的數量。全部載入會讓舊進度占用太多脈絡，只讀一篇又可能漏掉連續幾場的工作。不同專案可以依工作節奏調整。</p>
-<h2 id="記憶也需要維護"><a href="#記憶也需要維護" class="headerlink" title="記憶也需要維護"></a>記憶也需要維護</h2><h3 id="過期與衝突"><a href="#過期與衝突" class="headerlink" title="過期與衝突"></a>過期與衝突</h3><p>跑了兩個月後，最常出現的問題是重複內容與決策過期。</p>
-<p>同一項偏好可能被不同說法記錄三次。其中一份更新後，其餘兩份仍留著舊內容，agent 讀完只能重新判斷該相信哪一份。因此每次寫入前都要搜尋既有條目，找到相近內容就更新原檔。</p>
-<p>已經翻案的決策也要修改、刪除或標示為失效。日期只能說明內容何時寫入，無法證明它現在仍然成立。專案決策還需要保留目前狀態，以及取代它的新決策。</p>
-<p>這些維護規則不限定 Markdown。資料放進 SQLite 或其他資料庫後，仍要處理重複、過期與互相矛盾的內容。儲存空間增加，不會自動判斷哪一筆資訊仍然可信。</p>
-<h3 id="來源與敏感資料"><a href="#來源與敏感資料" class="headerlink" title="來源與敏感資料"></a>來源與敏感資料</h3><p>Wiki 還要多處理來源鏈。Agent 產生的摘要需要指回原始文件，新的來源推翻舊結論時，也要知道哪些頁面需要更新。</p>
-<p>保存完整對話也會留下密鑰、個人資料與內部資訊。我會把記憶目錄留在本機，不提交到公開 repository。一般專案可以先把記憶檔案與 SQLite 加進 <code>.gitignore</code>；確實需要版本紀錄時，再使用私人 repository，並在寫入前排除 API keys、access tokens 與其他敏感內容。</p>
-<h2 id="選擇記憶做法"><a href="#選擇記憶做法" class="headerlink" title="選擇記憶做法"></a>選擇記憶做法</h2><h3 id="四種做法可以並存"><a href="#四種做法可以並存" class="headerlink" title="四種做法可以並存"></a>四種做法可以並存</h3><table>
-<thead>
-<tr>
-<th>要記住的內容</th>
-<th>讀取時機</th>
-<th>適合的處理方式</th>
-<th>主要限制</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>穩定偏好與重要規則</td>
-<td>每場對話開始</td>
-<td>容量受控的精選記憶</td>
-<td>每次都占用模型輸入空間，過期內容會持續影響回答</td>
-</tr>
-<tr>
-<td>完整歷史對話</td>
-<td>使用者問起舊內容時</td>
-<td>資料庫與全文搜尋</td>
-<td>問法不同時可能搜尋不到</td>
-</tr>
-<tr>
-<td>最近工作進度</td>
-<td>接續前幾場工作時</td>
-<td>工作階段摘要與索引</td>
-<td>摘要會遺失部分原始細節</td>
-</tr>
-<tr>
-<td>跨來源整理後的知識</td>
-<td>加入來源或提出新問題時</td>
-<td>agent 維護的 wiki</td>
-<td>需要保留來源並處理衝突</td>
-</tr>
-</tbody></table>
-<p>同一個專案可以同時使用四列。以我自己的協定為例，未來若工作階段數量增加，我可以保留現有的 Markdown 持久記憶，再替完整歷史加入 SQLite 搜尋，不必把所有檔案搬進資料庫。</p>
-<h3 id="先檢查現有設計"><a href="#先檢查現有設計" class="headerlink" title="先檢查現有設計"></a>先檢查現有設計</h3><p>不熟悉資料庫結構或檢索程式碼，也能先讓正在使用的 AI agent 畫出資訊從哪裡進入、保存到哪裡，以及下一場工作如何讀回來。</p>
-<p>下面這段可以直接交給它。</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">請實際檢查這個專案目前的 AI agent 記憶設計，不要只根據 README 推測，也不要先修改程式碼。</span><br><span class="line"></span><br><span class="line">1. 畫出一段資訊從對話進入系統、被保存，到下一場對話重新取用的完整流程。</span><br><span class="line">2. 把現有資訊分成四類：</span><br><span class="line">   - 每場工作都要使用的精選資訊</span><br><span class="line">   - 需要時才搜尋的原始歷史</span><br><span class="line">   - 需要持續整理與修訂的知識</span><br><span class="line">   - 只負責近期工作接續的摘要</span><br><span class="line">3. 對每一類標出儲存位置、寫入時機、讀取時機、更新方式、刪除方式與原始來源。</span><br><span class="line">4. 檢查同一項偏好重複出現、舊決策已經翻案，以及 agent 找不到過去原文時，系統目前會怎麼處理。</span><br><span class="line">5. 如果系統服務多位使用者，標出身份由哪裡取得，以及查詢如何限制只能讀取目前使用者的資料。</span><br><span class="line">6. 提出最小修改方案並規劃測試。沒有實作的部分請標示「目前缺少」，不要假設它已經存在。</span><br><span class="line"></span><br><span class="line">請先提供流程圖、分類表、風險與測試計畫，等我確認後再修改專案。</span><br></pre></td></tr></table></figure>
-
-<p>這段提示先要求 agent 檢查現有流程，再提出修改。只說「幫我做一套記憶系統」，很容易直接得到一組技術選型，卻沒有回答哪些資訊需要常駐、哪些應該搜尋。</p>
-<h3 id="多人服務要加身份隔離"><a href="#多人服務要加身份隔離" class="headerlink" title="多人服務要加身份隔離"></a>多人服務要加身份隔離</h3><p>本文的三個案例主要處理個人 agent 與知識管理。系統開始服務多位使用者後，每一筆偏好、歷史對話與 wiki 內容還要標示擁有者，並在讀取時檢查權限。</p>
-<p>資料庫能保存很多人的歷史，但每次搜尋仍要帶入經過驗證的使用者身份。這份身份不能由 LLM 自己填寫，否則仍可能讀到另一位使用者的資料。相關的身份來源與權限流程，我整理在上一篇<a href="/llm-agent-isolation/">〈多人共用 AI bot，別讓它認錯使用者〉</a>。</p>
-<p>檔案或資料庫解決的是內容放在哪裡，權限系統決定目前的人可以讀哪一部分。兩項都完成後，記憶才適合進入多人服務。</p>
-<h2 id="我目前的選擇"><a href="#我目前的選擇" class="headerlink" title="我目前的選擇"></a>我目前的選擇</h2><p>我的三個專案目前會繼續使用三層 Markdown 協定，因為現有規模仍能人工閱讀與維護。若要保留大量完整對話，我會增加資料庫搜尋；開始進行長期、多來源研究後，再獨立建立 LLM Wiki。</p>
-<p>這篇寫完後，我的協定會把這次工作記進工作階段摘要；Hermes 會把完整對話留在 SQLite；如果把資料交給 LLM Wiki，它還會更新相關主題頁。三種做法都叫記憶，保存下來的內容卻不相同。</p>
-]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>系統設計</tag>
-        <tag>記憶系統</tag>
       </tags>
   </entry>
   <entry>
@@ -1499,6 +1499,83 @@ flowchart TD
         <tag>CI/CD</tag>
         <tag>開發筆記</tag>
         <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一個人的開源專案，文件要寫多少？</title>
+    <url>//solo-project-jit-governance/</url>
+    <content><![CDATA[<p>你有沒有做完一個小工具，準備公開時，就順手請 AI 幫忙把文件也補齊？現在用 AI 整理使用說明很方便，原本懶得從空白頁寫起的安裝步驟、操作範例，都能先有個草稿。既然都請它寫了，再補一份貢獻指南、行為準則，好像也不費什麼力氣，專案看起來還更完整。</p>
+<p>我之前準備公開一套 AI 協作框架時，也整理出了一整套文件。它用 Markdown 和 YAML 這類文字檔，描述不同 AI 角色該做什麼，以及工作要怎麼交接，讓我不用每次重新交代同一套分工。原本想分享的是這個做法，整理到後來，專案裡卻已經有貢獻流程、社群規範和一大份內部架構說明。</p>
+<p>只是文件生出來之後，裡面的流程還是得有人照著做、隨著專案更新。當時我仍打算以一人維護的方式經營專案，並沒有要照那套完整制度運作，後來便把其中幾份文件從對外版本移除，保留自己查閱需要的內容。我開始想的是，第一次看到這個專案的人，到底缺哪一份說明；如果他連怎麼開始用都不知道，我先寫完分支命名規則，好像也幫不上忙。</p>
+<span id="more"></span>
+
+<h2 id="我刪掉的是哪一種文件"><a href="#我刪掉的是哪一種文件" class="headerlink" title="我刪掉的是哪一種文件"></a>我刪掉的是哪一種文件</h2><p>GitHub 上的專案通常會有一份 README，直接顯示在專案首頁，讓人知道這是什麼、如何使用。想協助修改的人，則可能需要 CONTRIBUTING，也就是貢獻指南，裡面交代怎麼準備開發環境、檢查修改結果，以及把變更交給維護者。兩份文件的讀者可能是同一個人，卻是在不同時候找答案。</p>
+<p>我那次移除的是 CONTRIBUTING、Code of Conduct（行為準則），以及 ARCHITECTURE（內部架構說明）。授權條款和安全回報說明仍然保留，使用者需要的安裝方式也沒有一起拿掉。這是在調整當下對外維護的文件範圍，並不是刪光說明、只留下程式碼。</p>
+<p>其中最需要分開看的是架構文件。未來協作者可能需要知道檔案怎麼組合，第一次使用的人卻未必需要讀完每個設計決策。後來我又把安裝、基本概念、自訂方式等使用說明拆進文件目錄，從首頁連過去。內部筆記可以先留給自己，但別人操作時缺的說明，還是得補回公開文件裡。</p>
+<p>對我來說，成本主要在寫完之後。測試指令換了，貢獻指南得跟著改；工作方式調整了，審查流程也得更新。AI 可以協助更新內容，但裡面的指令是否真的能跑、承諾的流程是否做得到，仍得自己確認。文件寫得越完整，需要核對的地方也越多。</p>
+<h2 id="公開前先交代什麼"><a href="#公開前先交代什麼" class="headerlink" title="公開前先交代什麼"></a>公開前先交代什麼</h2><h3 id="讓第一個使用者能開始"><a href="#讓第一個使用者能開始" class="headerlink" title="讓第一個使用者能開始"></a>讓第一個使用者能開始</h3><p>我現在會先從使用者的第一個動作往回看。對這套 AI 協作框架來說，他需要知道哪些工具能用、怎麼安裝，再用一個小任務確認角色有正常運作。至於我當初比較過哪些設計、為什麼淘汰某種分工方式，可以放在後面，不必擋在開始使用之前。</p>
+<p>換成一般的小工具也一樣。README 至少要說明它解決什麼問題、需要先準備什麼，以及照著做完會看到什麼結果。如果還有尚未支援的平台、可能改動的功能，或只在自己的環境測過，也要讓人事先知道。只寫「安裝後即可使用」，卻沒交代安裝成功長什麼樣子，讀者卡住時還是只能猜。</p>
+<p>這些資訊不一定要各自拆成一份檔案。我會先按用途分配，再決定要放在哪裡。</p>
+<table>
+<thead>
+<tr>
+<th>讀者現在需要知道的事</th>
+<th>起步時可以怎麼放</th>
+<th>什麼時候再擴充</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>這是什麼、如何開始、有哪些限制</td>
+<td>README，加一個能照做的例子</td>
+<td>首頁太長時，把安裝與進階用法拆出去並留下連結</td>
+</tr>
+<tr>
+<td>可以如何使用、修改與散布</td>
+<td>放好適用的授權條款</td>
+<td>授權需求改變時重新評估，不等有人提問才處理</td>
+</tr>
+<tr>
+<td>一般問題、安全問題要去哪裡回報</td>
+<td>README 留一般入口，安全回報另給非公開管道</td>
+<td>回報需要的資訊反覆缺漏時，再補範本</td>
+</tr>
+<tr>
+<td>想協助修改，該先做什麼</td>
+<td>先說是否接受修改，並留下討論想法的入口</td>
+<td>開始邀請貢獻時，補開發與檢查步驟</td>
+</tr>
+<tr>
+<td>多人一起討論或維護，要遵守什麼</td>
+<td>準備招募貢獻或經營討論時，先交代行為邊界與處理方式</td>
+<td>有固定協作者時，再補審查分工與發布權責</td>
+</tr>
+</tbody></table>
+<p>這張表是我整理一人專案時的取捨，沒有規定 CONTRIBUTING 一定得晚寫。如果現在就需要請別人協助，先用幾行交代怎麼參與，會比讓對方來回問更省事。</p>
+<h3 id="安全回報不能等"><a href="#安全回報不能等" class="headerlink" title="安全回報不能等"></a>安全回報不能等</h3><p>一般操作問題，可以請使用者建立 GitHub issue；它是專案用來追蹤問題與建議的討論頁。安全漏洞則要有私下回報的方法，不能等第一個人把敏感內容貼到公開留言區，才開始決定該寄到哪裡。我當時保留的 SECURITY 文件，就把一般問題和安全回報分開處理。</p>
+<p>GitHub 提供私人漏洞回報功能，但在文件裡寫「請使用私人回報」不等於功能已經開啟。依 <a href="https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository">Configuring private vulnerability reporting for a repository</a> 的說明，維護者需要啟用功能，對方才會看到回報按鈕；通知設定也會影響維護者能否收到提醒。如果選擇用這個管道，公開前就要確認入口真的可用，而不只是把網址貼上去。</p>
+<div class="note warning no-icon"><p>可以延後的是尚未用到的協作流程。授權條款、API 金鑰與個人資料的檢查、非公開的安全回報入口，都不適合等有人出事才補。把已提交過的文件從目前版本刪掉，也不會自動清除 Git 保留的過去版本紀錄；整理文件和處理資料外洩，是兩件不同的工作。</p>
+</div>
+
+<h2 id="有人想幫忙時怎麼補"><a href="#有人想幫忙時怎麼補" class="headerlink" title="有人想幫忙時怎麼補"></a>有人想幫忙時怎麼補</h2><p>假設有人試用後，在 issue 問：「我照著安裝說明做，但不知道設定檔要放哪裡。」這時先回覆位置，再把答案補到 README 對應的步驟旁邊就好。對方卡在使用說明，新增一份貢獻指南並不能幫他完成安裝。</p>
+<p>接著，假設他說願意幫忙補一個安裝範例，事情才進到協作。我會先說明範例應放在哪裡、要涵蓋哪種環境，以及送出前怎麼確認步驟可用。不能等他全部做完，才告訴他我其實還要求另一組檢查；如果檢查方式只有我知道，我就得先補出來，或明講哪些部分會由我協助驗證。</p>
+<p>對方把修改送成一筆變更提案，請我審查是否合併；GitHub 把這種提案稱為 pull request，簡稱 PR。第一輪合作結束後，可以把剛才那段說明整理進 CONTRIBUTING。內容不用突然長成一套制度，先讓下一位貢獻者知道「動手前先討論範圍、修改放哪裡、完成後如何檢查」就有用。之後發現每次都漏掉相同資訊，再把那一項加進 PR 範本。</p>
+<p>若改的是功能，檢查方式可能是執行測試；若改的是安裝說明，就應實際照步驟走過。主要靠 AI 做修改的人，可以先請它列出能重做的檢查步驟，自己跑一次並保留結果，再決定文件要記哪些操作。AI 產出的「所有測試均已通過」，仍要有實際執行結果可以核對，不能直接拿這句話當驗收。</p>
+<p>拆出 CONTRIBUTING 也有檔名以外的好處。GitHub 的 <a href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors">Setting guidelines for repository contributors</a> 說明，放在支援位置的貢獻指南，會在建立 issue 或 PR 時提供連結。協作開始固定發生後，把規則放到對方準備送出修改的位置，比一直藏在 README 中段更好找。</p>
+<p>我把這種安排理解成「需要時再補規則」。時間點可以是第一次回饋，也可以是自己決定開始找人幫忙；不必硬等到第一個 PR 已經送來，更不用等同一個人踩兩次坑，才承認文件缺了一段。</p>
+<h2 id="什麼時候該提早寫"><a href="#什麼時候該提早寫" class="headerlink" title="什麼時候該提早寫"></a>什麼時候該提早寫</h2><p>查資料時，我也看到跟我當時選擇不同的建議。<a href="https://opensource.guide/starting-a-project/">Starting an Open Source Project</a> 把授權、README、貢獻指南與行為準則都列為起步文件，也提到早期的貢獻指南可以很簡單。這個建議有道理，清楚的參與方式本來就能降低別人第一次幫忙的門檻，不能只看「現在沒人提修改」，就推論永遠不需要寫。</p>
+<p>如果公開的目的就是招募協作者，或已經準備經營討論區，我會在邀請之前補好參與方式與行為準則，包括不當行為要向誰回報、維護者如何處理。人少也可能發生衝突，不能把「等有需要」解讀成等第一次爭執後再想規則。同樣地，多個人開始審查與發布時，誰可以合併、誰可以發版，也應該事先談好。</p>
+<p>我的起點比較小，先把自己做的工具分享出去，由自己維護，沒有打算一開始就建立共同決策的社群。在這個前提下，我願意承擔第一次有人想幫忙時，多花一點時間說明和補文件的成本。所以我會先在 README 留下求助入口與是否接受貢獻，其他制度等實際互動再補。</p>
+<hr>
+<p>下次整理自己的專案，我會先挑一個已經能用的功能，從 README 開始照著做一次，看看哪一步還得靠腦中的記憶補完。那就是現在該寫的地方。至於暫時用不到的審查層級和完整提案範本，先留下需要時再補的空間，至少不用一邊改功能，一邊通知只有自己一個人的委員會。（當然，最好的習慣還是在製作過程中，就順手把需要的文件補好，省得最後再靠記憶補作業。）</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>開發</category>
+      </categories>
+      <tags>
+        <tag>工作流程</tag>
+        <tag>開源</tag>
+        <tag>Side Project</tag>
       </tags>
   </entry>
 </search>

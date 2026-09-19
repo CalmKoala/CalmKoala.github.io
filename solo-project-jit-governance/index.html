@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+  <link rel="mask-icon" href="/images/koala-mono.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="先讓別人用得起來，再補實際需要的協作流程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一個人的開源專案，文件要寫多少？">
+<meta property="og:url" content="https://calmkoala.github.io/solo-project-jit-governance/">
+<meta property="og:site_name" content="CalmKoala">
+<meta property="og:description" content="先讓別人用得起來，再補實際需要的協作流程。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="article:published_time" content="2026-09-19T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-19T01:10:26.977Z">
+<meta property="article:author" content="PingChun">
+<meta property="article:tag" content="工作流程">
+<meta property="article:tag" content="開源">
+<meta property="article:tag" content="Side Project">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+
+
+<link rel="canonical" href="https://calmkoala.github.io/solo-project-jit-governance/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/solo-project-jit-governance/","path":"/solo-project-jit-governance/","title":"一個人的開源專案，文件要寫多少？"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>一個人的開源專案，文件要寫多少？ | CalmKoala</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="CalmKoala" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">CalmKoala</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">28</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">17</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E5%88%AA%E6%8E%89%E7%9A%84%E6%98%AF%E5%93%AA%E4%B8%80%E7%A8%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">我刪掉的是哪一種文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AC%E9%96%8B%E5%89%8D%E5%85%88%E4%BA%A4%E4%BB%A3%E4%BB%80%E9%BA%BC"><span class="nav-number">2.</span> <span class="nav-text">公開前先交代什麼</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%93%E7%AC%AC%E4%B8%80%E5%80%8B%E4%BD%BF%E7%94%A8%E8%80%85%E8%83%BD%E9%96%8B%E5%A7%8B"><span class="nav-number">2.1.</span> <span class="nav-text">讓第一個使用者能開始</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E5%9B%9E%E5%A0%B1%E4%B8%8D%E8%83%BD%E7%AD%89"><span class="nav-number">2.2.</span> <span class="nav-text">安全回報不能等</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E4%BA%BA%E6%83%B3%E5%B9%AB%E5%BF%99%E6%99%82%E6%80%8E%E9%BA%BC%E8%A3%9C"><span class="nav-number">3.</span> <span class="nav-text">有人想幫忙時怎麼補</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%99%82%E5%80%99%E8%A9%B2%E6%8F%90%E6%97%A9%E5%AF%AB"><span class="nav-number">4.</span> <span class="nav-text">什麼時候該提早寫</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="PingChun"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">PingChun</p>
+  <div class="site-description" itemprop="description">後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml" rel="noopener me"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/solo-project-jit-governance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="一個人的開源專案，文件要寫多少？ | CalmKoala">
+      <meta itemprop="description" content="先讓別人用得起來，再補實際需要的協作流程。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一個人的開源專案，文件要寫多少？
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-09-19 08:00:00 / 修改時間：09:10:26" itemprop="dateCreated datePublished" datetime="2026-09-19T08:00:00+08:00">2026-09-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/%E9%96%8B%E7%99%BC/" itemprop="url" rel="index"><span itemprop="name">開發</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>3.3k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>11 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>你有沒有做完一個小工具，準備公開時，就順手請 AI 幫忙把文件也補齊？現在用 AI 整理使用說明很方便，原本懶得從空白頁寫起的安裝步驟、操作範例，都能先有個草稿。既然都請它寫了，再補一份貢獻指南、行為準則，好像也不費什麼力氣，專案看起來還更完整。</p>
+<p>我之前準備公開一套 AI 協作框架時，也整理出了一整套文件。它用 Markdown 和 YAML 這類文字檔，描述不同 AI 角色該做什麼，以及工作要怎麼交接，讓我不用每次重新交代同一套分工。原本想分享的是這個做法，整理到後來，專案裡卻已經有貢獻流程、社群規範和一大份內部架構說明。</p>
+<p>只是文件生出來之後，裡面的流程還是得有人照著做、隨著專案更新。當時我仍打算以一人維護的方式經營專案，並沒有要照那套完整制度運作，後來便把其中幾份文件從對外版本移除，保留自己查閱需要的內容。我開始想的是，第一次看到這個專案的人，到底缺哪一份說明；如果他連怎麼開始用都不知道，我先寫完分支命名規則，好像也幫不上忙。</p>
+<span id="more"></span>
+
+<h2 id="我刪掉的是哪一種文件"><a href="#我刪掉的是哪一種文件" class="headerlink" title="我刪掉的是哪一種文件"></a>我刪掉的是哪一種文件</h2><p>GitHub 上的專案通常會有一份 README，直接顯示在專案首頁，讓人知道這是什麼、如何使用。想協助修改的人，則可能需要 CONTRIBUTING，也就是貢獻指南，裡面交代怎麼準備開發環境、檢查修改結果，以及把變更交給維護者。兩份文件的讀者可能是同一個人，卻是在不同時候找答案。</p>
+<p>我那次移除的是 CONTRIBUTING、Code of Conduct（行為準則），以及 ARCHITECTURE（內部架構說明）。授權條款和安全回報說明仍然保留，使用者需要的安裝方式也沒有一起拿掉。這是在調整當下對外維護的文件範圍，並不是刪光說明、只留下程式碼。</p>
+<p>其中最需要分開看的是架構文件。未來協作者可能需要知道檔案怎麼組合，第一次使用的人卻未必需要讀完每個設計決策。後來我又把安裝、基本概念、自訂方式等使用說明拆進文件目錄，從首頁連過去。內部筆記可以先留給自己，但別人操作時缺的說明，還是得補回公開文件裡。</p>
+<p>對我來說，成本主要在寫完之後。測試指令換了，貢獻指南得跟著改；工作方式調整了，審查流程也得更新。AI 可以協助更新內容，但裡面的指令是否真的能跑、承諾的流程是否做得到，仍得自己確認。文件寫得越完整，需要核對的地方也越多。</p>
+<h2 id="公開前先交代什麼"><a href="#公開前先交代什麼" class="headerlink" title="公開前先交代什麼"></a>公開前先交代什麼</h2><h3 id="讓第一個使用者能開始"><a href="#讓第一個使用者能開始" class="headerlink" title="讓第一個使用者能開始"></a>讓第一個使用者能開始</h3><p>我現在會先從使用者的第一個動作往回看。對這套 AI 協作框架來說，他需要知道哪些工具能用、怎麼安裝，再用一個小任務確認角色有正常運作。至於我當初比較過哪些設計、為什麼淘汰某種分工方式，可以放在後面，不必擋在開始使用之前。</p>
+<p>換成一般的小工具也一樣。README 至少要說明它解決什麼問題、需要先準備什麼，以及照著做完會看到什麼結果。如果還有尚未支援的平台、可能改動的功能，或只在自己的環境測過，也要讓人事先知道。只寫「安裝後即可使用」，卻沒交代安裝成功長什麼樣子，讀者卡住時還是只能猜。</p>
+<p>這些資訊不一定要各自拆成一份檔案。我會先按用途分配，再決定要放在哪裡。</p>
+<table>
+<thead>
+<tr>
+<th>讀者現在需要知道的事</th>
+<th>起步時可以怎麼放</th>
+<th>什麼時候再擴充</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>這是什麼、如何開始、有哪些限制</td>
+<td>README，加一個能照做的例子</td>
+<td>首頁太長時，把安裝與進階用法拆出去並留下連結</td>
+</tr>
+<tr>
+<td>可以如何使用、修改與散布</td>
+<td>放好適用的授權條款</td>
+<td>授權需求改變時重新評估，不等有人提問才處理</td>
+</tr>
+<tr>
+<td>一般問題、安全問題要去哪裡回報</td>
+<td>README 留一般入口，安全回報另給非公開管道</td>
+<td>回報需要的資訊反覆缺漏時，再補範本</td>
+</tr>
+<tr>
+<td>想協助修改，該先做什麼</td>
+<td>先說是否接受修改，並留下討論想法的入口</td>
+<td>開始邀請貢獻時，補開發與檢查步驟</td>
+</tr>
+<tr>
+<td>多人一起討論或維護，要遵守什麼</td>
+<td>準備招募貢獻或經營討論時，先交代行為邊界與處理方式</td>
+<td>有固定協作者時，再補審查分工與發布權責</td>
+</tr>
+</tbody></table>
+<p>這張表是我整理一人專案時的取捨，沒有規定 CONTRIBUTING 一定得晚寫。如果現在就需要請別人協助，先用幾行交代怎麼參與，會比讓對方來回問更省事。</p>
+<h3 id="安全回報不能等"><a href="#安全回報不能等" class="headerlink" title="安全回報不能等"></a>安全回報不能等</h3><p>一般操作問題，可以請使用者建立 GitHub issue；它是專案用來追蹤問題與建議的討論頁。安全漏洞則要有私下回報的方法，不能等第一個人把敏感內容貼到公開留言區，才開始決定該寄到哪裡。我當時保留的 SECURITY 文件，就把一般問題和安全回報分開處理。</p>
+<p>GitHub 提供私人漏洞回報功能，但在文件裡寫「請使用私人回報」不等於功能已經開啟。依 <a target="_blank" rel="noopener" href="https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository">Configuring private vulnerability reporting for a repository</a> 的說明，維護者需要啟用功能，對方才會看到回報按鈕；通知設定也會影響維護者能否收到提醒。如果選擇用這個管道，公開前就要確認入口真的可用，而不只是把網址貼上去。</p>
+<div class="note warning no-icon"><p>可以延後的是尚未用到的協作流程。授權條款、API 金鑰與個人資料的檢查、非公開的安全回報入口，都不適合等有人出事才補。把已提交過的文件從目前版本刪掉，也不會自動清除 Git 保留的過去版本紀錄；整理文件和處理資料外洩，是兩件不同的工作。</p>
+</div>
+
+<h2 id="有人想幫忙時怎麼補"><a href="#有人想幫忙時怎麼補" class="headerlink" title="有人想幫忙時怎麼補"></a>有人想幫忙時怎麼補</h2><p>假設有人試用後，在 issue 問：「我照著安裝說明做，但不知道設定檔要放哪裡。」這時先回覆位置，再把答案補到 README 對應的步驟旁邊就好。對方卡在使用說明，新增一份貢獻指南並不能幫他完成安裝。</p>
+<p>接著，假設他說願意幫忙補一個安裝範例，事情才進到協作。我會先說明範例應放在哪裡、要涵蓋哪種環境，以及送出前怎麼確認步驟可用。不能等他全部做完，才告訴他我其實還要求另一組檢查；如果檢查方式只有我知道，我就得先補出來，或明講哪些部分會由我協助驗證。</p>
+<p>對方把修改送成一筆變更提案，請我審查是否合併；GitHub 把這種提案稱為 pull request，簡稱 PR。第一輪合作結束後，可以把剛才那段說明整理進 CONTRIBUTING。內容不用突然長成一套制度，先讓下一位貢獻者知道「動手前先討論範圍、修改放哪裡、完成後如何檢查」就有用。之後發現每次都漏掉相同資訊，再把那一項加進 PR 範本。</p>
+<p>若改的是功能，檢查方式可能是執行測試；若改的是安裝說明，就應實際照步驟走過。主要靠 AI 做修改的人，可以先請它列出能重做的檢查步驟，自己跑一次並保留結果，再決定文件要記哪些操作。AI 產出的「所有測試均已通過」，仍要有實際執行結果可以核對，不能直接拿這句話當驗收。</p>
+<p>拆出 CONTRIBUTING 也有檔名以外的好處。GitHub 的 <a target="_blank" rel="noopener" href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors">Setting guidelines for repository contributors</a> 說明，放在支援位置的貢獻指南，會在建立 issue 或 PR 時提供連結。協作開始固定發生後，把規則放到對方準備送出修改的位置，比一直藏在 README 中段更好找。</p>
+<p>我把這種安排理解成「需要時再補規則」。時間點可以是第一次回饋，也可以是自己決定開始找人幫忙；不必硬等到第一個 PR 已經送來，更不用等同一個人踩兩次坑，才承認文件缺了一段。</p>
+<h2 id="什麼時候該提早寫"><a href="#什麼時候該提早寫" class="headerlink" title="什麼時候該提早寫"></a>什麼時候該提早寫</h2><p>查資料時，我也看到跟我當時選擇不同的建議。<a target="_blank" rel="noopener" href="https://opensource.guide/starting-a-project/">Starting an Open Source Project</a> 把授權、README、貢獻指南與行為準則都列為起步文件，也提到早期的貢獻指南可以很簡單。這個建議有道理，清楚的參與方式本來就能降低別人第一次幫忙的門檻，不能只看「現在沒人提修改」，就推論永遠不需要寫。</p>
+<p>如果公開的目的就是招募協作者，或已經準備經營討論區，我會在邀請之前補好參與方式與行為準則，包括不當行為要向誰回報、維護者如何處理。人少也可能發生衝突，不能把「等有需要」解讀成等第一次爭執後再想規則。同樣地，多個人開始審查與發布時，誰可以合併、誰可以發版，也應該事先談好。</p>
+<p>我的起點比較小，先把自己做的工具分享出去，由自己維護，沒有打算一開始就建立共同決策的社群。在這個前提下，我願意承擔第一次有人想幫忙時，多花一點時間說明和補文件的成本。所以我會先在 README 留下求助入口與是否接受貢獻，其他制度等實際互動再補。</p>
+<hr>
+<p>下次整理自己的專案，我會先挑一個已經能用的功能，從 README 開始照著做一次，看看哪一步還得靠腦中的記憶補完。那就是現在該寫的地方。至於暫時用不到的審查層級和完整提案範本，先留下需要時再補的空間，至少不用一邊改功能，一邊通知只有自己一個人的委員會。（當然，最好的習慣還是在製作過程中，就順手把需要的文件補好，省得最後再靠記憶補作業。）</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B/" rel="tag"># 工作流程</a>
+              <a href="/tags/%E9%96%8B%E6%BA%90/" rel="tag"># 開源</a>
+              <a href="/tags/Side-Project/" rel="tag"># Side Project</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/release-notes-from-commits/" rel="prev" title="版本說明，別再發版時才重寫">
+                  <i class="fa fa-angle-left"></i> 版本說明，別再發版時才重寫
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2023 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">PingChun</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="總字數">58k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="所需總閱讀時間">3:13</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"CalmKoala/blog-comments","issue_term":"pathname","theme":"preferred-color-scheme"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+</body>
+</html>
