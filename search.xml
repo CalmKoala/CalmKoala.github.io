@@ -267,6 +267,35 @@
       </tags>
   </entry>
   <entry>
+    <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
+    <url>//apscheduler-windows-misfire/</url>
+    <content><![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
+<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
+<span id="more"></span>
+
+<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
+<p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
+<p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
+<p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
+<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
+<p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p>
+<hr>
+<p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>APScheduler</tag>
+        <tag>Windows</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
     <url>//subprocess-cp950/</url>
     <content><![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
@@ -878,35 +907,6 @@ flowchart LR
         <tag>AI</tag>
         <tag>AI agent</tag>
         <tag>Multi-agent</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <url>//apscheduler-windows-misfire/</url>
-    <content><![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
-<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
-<span id="more"></span>
-
-<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
-<p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
-<p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
-<p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
-<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
-<p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p>
-<hr>
-<p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>
-]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>Windows</tag>
-        <tag>APScheduler</tag>
       </tags>
   </entry>
   <entry>
@@ -1574,8 +1574,78 @@ flowchart TD
       </categories>
       <tags>
         <tag>工作流程</tag>
-        <tag>Side Project</tag>
         <tag>開源</tag>
+        <tag>Side Project</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>小工具一定要用資料庫嗎？</title>
+    <url>//google-sheets-as-database/</url>
+    <content><![CDATA[<p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p>
+<p>我之前設計過一個 Telegram 記帳 bot 的原型，當時選的是 Google Sheets。預計讓使用者從聊天視窗記錄支出，由 bot 把帳目存進試算表，需要整理時再直接打開來看。這個想法很直覺，既然平常就會用表格記帳，讓程式幫忙填進去，似乎也不用為了看幾筆資料，另外做一個管理介面。</p>
+<p>選儲存方式時，我會先看資料要怎麼使用。同樣是一張帳目表，單純記下每天花多少錢，和要處理多人分帳、個別還款，需要照顧的事情就差很多。能直接打開表格整理，是選 Google Sheets 的理由，但也要一起考慮程式會怎麼讀取、修改這些資料。</p>
+<span id="more"></span>
+
+<h2 id="先看資料怎麼用"><a href="#先看資料怎麼用" class="headerlink" title="先看資料怎麼用"></a>先看資料怎麼用</h2><p>資料需要留下來，不代表一定要用資料庫。程式可以把設定寫進檔案，把報名資料放進試算表，也可以把帳目存進資料庫。幾種方式都能保存資料，選擇時要多看一步，想想以後會怎麼讀取、修改，以及修改到一半出錯時，能不能接受留下不完整的結果。</p>
+<p>例如，一個自己使用的工具，只要記住上次選的資料夾，下次開啟時再讀出來，檔案就很適合。活動名單需要主辦人隨時打開補註記，試算表的現成介面很方便。換成預約系統，兩個人可能同時搶最後一個名額，程式就得處理誰先成功，不能讓兩邊都收到預約完成的通知。資料量還很少，操作方式卻已經影響選擇了。</p>
+<p>我會先把這些使用情境寫下來，再比較工具。這時不用急著研究資料庫語法，先想想誰會改資料、會不會同時修改，以及弄錯一筆會怎樣。這比一開始就找「最好的資料庫」更有用，也比較不會選了一套功能齊全、自己卻用不上的架構。</p>
+<h2 id="不用資料庫的選擇"><a href="#不用資料庫的選擇" class="headerlink" title="不用資料庫的選擇"></a>不用資料庫的選擇</h2><h3 id="設定與簡單紀錄，用檔案"><a href="#設定與簡單紀錄，用檔案" class="headerlink" title="設定與簡單紀錄，用檔案"></a>設定與簡單紀錄，用檔案</h3><p>設定、單機工具的少量狀態，或每次執行後產生的一份報表，都可以先考慮檔案。常見的 JSON 適合表達有層次的資料，例如設定裡同時包含資料夾位置與通知偏好；CSV 則把內容存成一列一列，方便用試算表開啟。它們是檔案格式，讀取哪一筆、怎麼更新，以及哪些值才算合法，都要由程式處理。</p>
+<p>這種做法容易開始，但「存進檔案」仍有一些工作。我會先確認檔案放在哪裡，程式重啟或更新後重新上線，也就是重新部署時，資料會不會消失，再考慮怎麼備份。如果兩個操作同時讀取舊內容，改完各自存回，後存的那份可能蓋掉前一份修改；寫到一半中斷，也得有辦法避免原本的資料跟著壞掉。只由同一個程式依序處理簡單設定時，這些事情比較容易掌握；當自己開始補上大量防止覆寫、查找與更新的邏輯，就值得比較資料庫了。</p>
+<h3 id="需要人工整理，用試算表"><a href="#需要人工整理，用試算表" class="headerlink" title="需要人工整理，用試算表"></a>需要人工整理，用試算表</h3><p>Google Sheets 適合的情況，是你本來就需要一個能直接查看、修改資料的介面。例如活動名單由程式新增，主辦人再手動補註記；或像我的記帳 bot 原型，預計從 Telegram 記帳，需要整理時再打開試算表。Google 提供 API，也就是讓程式透過網路讀寫資料的入口，bot 可以藉此新增一列或讀取帳目，相關做法可參考 <a href="https://developers.google.com/workspace/sheets/api/guides/values">Read and write cell values</a>。</p>
+<p>這裡省下的是自己做資料管理介面的工作，bot 本身仍要有地方執行，也得處理連線與權限。原型還沒有完成 Google Sheets 與 Telegram 的完整串接驗證，所以這是當時的設計考量，不能當成已經長期使用、證明可靠的成果。</p>
+<p>人能直接改表格，也代表程式依賴的格式可能被改掉。例如把「金額」欄改名，或刪除程式需要的編號，bot 就可能找不到資料。分享權限也要分開看，讓 bot 有權限開啟試算表，不代表任何傳訊息給 bot 的人都有權限查帳。因此，我會把供程式使用的原始紀錄和人工整理的報表分開，並限制誰能透過 bot 讀寫。若資料幾乎只由程式維護，這些現成介面的好處就少了，未必需要特地繞一圈用試算表。</p>
+<h2 id="資料庫能幫上什麼忙"><a href="#資料庫能幫上什麼忙" class="headerlink" title="資料庫能幫上什麼忙"></a>資料庫能幫上什麼忙</h2><p>如果工具要處理還款與撤銷操作，我會特別留意修改失敗後，帳目能不能對得起來。查找未還款紀錄、擋下重複記帳，以及把必須一起完成的修改放在一起處理，都可以用到資料庫的能力。即使只有少數人使用，這些需求也可能從第一天就存在，不必等到資料變多才考慮。</p>
+<p>假設記帳工具同時保存還款紀錄和欠款餘額。小美還了 300 元，程式要新增還款紀錄，也要把餘額減掉 300；如果只完成前半段就中斷，兩邊會對不起來。資料庫的「交易」可以把這些修改包成一組，成功時一起保留，失敗時撤回這一組修改。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">3.4. Transactions</a> 用轉帳說明這個概念。程式仍要正確劃定這一組操作並處理失敗，裝好資料庫不會自動替你決定哪些事情要一起完成。</p>
+<p>分帳規則也會影響要存的資料。假設小明先付了 900 元晚餐，三個人平均分攤，小美還了 300 元，小華還沒還。如果資料只留一個「是否結清」欄位，無論放在試算表還是資料庫，都沒辦法完整表達這個狀態。必須先把每個人應付、已付多少分開記錄，程式才有資料可以算。換工具能省掉部分儲存與查詢工作，分帳規則還是得自己想好。</p>
+<p>重複記帳也是類似的情況。使用者沒收到回覆，再送一次訊息，資料庫不會憑空知道兩次是不是同一筆。程式需要識別這次操作，再配合資料庫的唯一性規則，拒絕重複寫入；如果只是新增兩筆編號不同的紀錄，資料庫仍可能照單全收。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/ddl-constraints.html">5.5. Constraints</a> 整理了這類可由資料庫檢查的條件。這些能力有用，但要和工具本身的規則配合。</p>
+<h2 id="資料庫不一定很重"><a href="#資料庫不一定很重" class="headerlink" title="資料庫不一定很重"></a>資料庫不一定很重</h2><h3 id="SQLite，不必另外架服務"><a href="#SQLite，不必另外架服務" class="headerlink" title="SQLite，不必另外架服務"></a>SQLite，不必另外架服務</h3><p>如果資料主要由程式讀寫，又不想另外管理一套資料庫服務，SQLite 很值得放進候選。它本身就是資料庫，只是由程式直接使用本機的資料庫檔案，不需要另開一個資料庫伺服器。官方的 <a href="https://www.sqlite.org/serverless.html">SQLite Is Serverless</a> 說明了這個差異，所以「不用架資料庫服務」和「不用資料庫」是兩件事。</p>
+<p>SQLite 也有查詢與交易能力，可以拿來保存互有關聯的支出、成員與還款紀錄，不必自己在 JSON 或 CSV 裡重做整套查找和更新。它可以同時讓多個連線讀取，但每個資料庫檔案同一時間只容許一個寫入交易，細節見 <a href="https://www.sqlite.org/lang_transaction.html">Transaction</a>。也就是有兩組修改同時要存入時，程式得安排等待或重試，讓它們依序完成。短時間的修改若能這樣處理，仍然可以支援多人透過同一個 bot 使用；「多人使用」不等於「每個人都直接開啟資料庫檔案」。</p>
+<p>需要注意的是，資料庫檔案仍要放在能長期保存的位置，備份也要使用適合資料庫的方式。SQLite 不會讓沒有持久儲存空間的部署環境，自動變成適合保管帳目的地方。選它之前，我會一起確認程式跑在哪裡、資料放在哪裡，以及換一台主機時怎麼還原。</p>
+<h3 id="獨立服務，讓多個程式共用"><a href="#獨立服務，讓多個程式共用" class="headerlink" title="獨立服務，讓多個程式共用"></a>獨立服務，讓多個程式共用</h3><p>當多台主機上的程式需要共同修改資料，或同時寫入的工作多到不適合依序等待，就值得評估 PostgreSQL 這類獨立的資料庫服務。程式透過網路連線，把讀寫請求交給資料庫處理，而不必讓每台主機直接操作同一個檔案。SQLite 官方的 <a href="https://www.sqlite.org/whentouse.html">Appropriate Uses For SQLite</a> 也把寫入需求和資料的位置列為選擇依據，沒有用「幾個使用者」畫出固定分界。</p>
+<p>獨立服務可以自己架，也可以使用供應商代管的方案，例如雲端平台提供、開通後就能連線的資料庫。自己架要負責安裝、更新與備份，代管則能省下一部分工作，但還是要確認費用、連線方式、備份範圍，以及資料能不能匯出。不想自己架服務，不代表一定要退回檔案；如果程式原本就部署在雲端，而且平台已有合適的方案，一開始使用它也合理，沒有必要把所有選項照順序用過一次。</p>
+<h2 id="替自己的工具做選擇"><a href="#替自己的工具做選擇" class="headerlink" title="替自己的工具做選擇"></a>替自己的工具做選擇</h2><p>我把前面的使用情境和需要自己照顧的部分整理成下面這張表，可以拿自己的需求做第一輪比較。</p>
+<table>
+<thead>
+<tr>
+<th>使用情境</th>
+<th>可以先考慮</th>
+<th>要留意的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>簡單設定、依序處理的少量狀態、匯出報表</td>
+<td>JSON、CSV 等檔案</td>
+<td>更新方式、寫入中斷、存放位置與備份</td>
+</tr>
+<tr>
+<td>人需要經常開啟、整理，程式協助新增資料</td>
+<td>Google Sheets</td>
+<td>欄位變動、存取權限、網路與 API 使用限制</td>
+</tr>
+<tr>
+<td>資料主要由程式讀寫，集中在同一台主機</td>
+<td>SQLite</td>
+<td>寫入是否能排隊、資料檔保存與還原</td>
+</tr>
+<tr>
+<td>多台主機共用資料，或寫入需求較高</td>
+<td>獨立或代管資料庫服務</td>
+<td>連線權限、維運或方案費用、備份與匯出</td>
+</tr>
+</tbody></table>
+<p>以記帳 bot 為例，如果需求是記下支出，並且需要經常手動整理表格，Google Sheets 有它方便的地方。但若需要多人分帳、個別還款和撤銷操作，平常又幾乎不會打開表格，我會先評估 SQLite，前提是 bot 集中在同一台能長期保存資料的主機，寫入也能依序處理。這些都是設計時就能比較的條件，不需要等到試算表塞不下，才開始考慮資料庫。</p>
+<p>如果你是用 AI 做小工具，可以先告訴它程式預計跑在哪裡，再拿自己的兩三個實際操作，請它比較用檔案、試算表或資料庫時，資料會存在哪裡、一次修改會動到什麼。接著追問，兩個操作同時送出、寫到一半中斷、重新部署時，原本的資料會怎樣，並請它指出不建議採用的選項和原因。回答若只剩「這個比較簡單」「以後比較好擴充」，還不足以決定；把情境放進測試環境實際跑一次，才知道程式有沒有做到它說的事。</p>
+<hr>
+<p>我當時選 Google Sheets，是因為打開就能看帳，不想再做一個介面。換成只存設定或整理名單的工具，也可以先不用資料庫；要處理還款，SQLite 則可能比自己補齊檔案讀寫規則省事。做小工具時，我會先想清楚要存什麼、怎麼修改，再選資料放哪裡，免得連午餐都還沒記到，先多了一套要照顧的系統。</p>
+]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>開發</category>
+      </categories>
+      <tags>
+        <tag>Side Project</tag>
+        <tag>Google Sheets</tag>
+        <tag>資料庫</tag>
       </tags>
   </entry>
 </search>

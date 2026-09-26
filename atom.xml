@@ -10,7 +10,26 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-09-25T07:39:10.488Z</updated>
+  <updated>2026-09-26T01:10:26.839Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="開發" scheme="https://calmkoala.github.io/categories/study-notes/%E9%96%8B%E7%99%BC/"/>
+    <category term="Side Project" scheme="https://calmkoala.github.io/tags/Side-Project/"/>
+    <category term="Google Sheets" scheme="https://calmkoala.github.io/tags/Google-Sheets/"/>
+    <category term="資料庫" scheme="https://calmkoala.github.io/tags/%E8%B3%87%E6%96%99%E5%BA%AB/"/>
+    <content>
+      <![CDATA[<p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p><p>我之前設計過一個 Telegram 記帳 bot 的原型，當時選的是 Google Sheets。預計讓使用者從聊天視窗記錄支出，由 bot 把帳目存進試算表，需要整理時再直接打開來看。這個想法很直覺，既然平常就會用表格記帳，讓程式幫忙填進去，似乎也不用為了看幾筆資料，另外做一個管理介面。</p><p>選儲存方式時，我會先看資料要怎麼使用。同樣是一張帳目表，單純記下每天花多少錢，和要處理多人分帳、個別還款，需要照顧的事情就差很多。能直接打開表格整理，是選 Google Sheets 的理由，但也要一起考慮程式會怎麼讀取、修改這些資料。</p><span id="more"></span><h2 id="先看資料怎麼用"><a href="#先看資料怎麼用" class="headerlink" title="先看資料怎麼用"></a>先看資料怎麼用</h2><p>資料需要留下來，不代表一定要用資料庫。程式可以把設定寫進檔案，把報名資料放進試算表，也可以把帳目存進資料庫。幾種方式都能保存資料，選擇時要多看一步，想想以後會怎麼讀取、修改，以及修改到一半出錯時，能不能接受留下不完整的結果。</p><p>例如，一個自己使用的工具，只要記住上次選的資料夾，下次開啟時再讀出來，檔案就很適合。活動名單需要主辦人隨時打開補註記，試算表的現成介面很方便。換成預約系統，兩個人可能同時搶最後一個名額，程式就得處理誰先成功，不能讓兩邊都收到預約完成的通知。資料量還很少，操作方式卻已經影響選擇了。</p><p>我會先把這些使用情境寫下來，再比較工具。這時不用急著研究資料庫語法，先想想誰會改資料、會不會同時修改，以及弄錯一筆會怎樣。這比一開始就找「最好的資料庫」更有用，也比較不會選了一套功能齊全、自己卻用不上的架構。</p><h2 id="不用資料庫的選擇"><a href="#不用資料庫的選擇" class="headerlink" title="不用資料庫的選擇"></a>不用資料庫的選擇</h2><h3 id="設定與簡單紀錄，用檔案"><a href="#設定與簡單紀錄，用檔案" class="headerlink" title="設定與簡單紀錄，用檔案"></a>設定與簡單紀錄，用檔案</h3><p>設定、單機工具的少量狀態，或每次執行後產生的一份報表，都可以先考慮檔案。常見的 JSON 適合表達有層次的資料，例如設定裡同時包含資料夾位置與通知偏好；CSV 則把內容存成一列一列，方便用試算表開啟。它們是檔案格式，讀取哪一筆、怎麼更新，以及哪些值才算合法，都要由程式處理。</p><p>這種做法容易開始，但「存進檔案」仍有一些工作。我會先確認檔案放在哪裡，程式重啟或更新後重新上線，也就是重新部署時，資料會不會消失，再考慮怎麼備份。如果兩個操作同時讀取舊內容，改完各自存回，後存的那份可能蓋掉前一份修改；寫到一半中斷，也得有辦法避免原本的資料跟著壞掉。只由同一個程式依序處理簡單設定時，這些事情比較容易掌握；當自己開始補上大量防止覆寫、查找與更新的邏輯，就值得比較資料庫了。</p><h3 id="需要人工整理，用試算表"><a href="#需要人工整理，用試算表" class="headerlink" title="需要人工整理，用試算表"></a>需要人工整理，用試算表</h3><p>Google Sheets 適合的情況，是你本來就需要一個能直接查看、修改資料的介面。例如活動名單由程式新增，主辦人再手動補註記；或像我的記帳 bot 原型，預計從 Telegram 記帳，需要整理時再打開試算表。Google 提供 API，也就是讓程式透過網路讀寫資料的入口，bot 可以藉此新增一列或讀取帳目，相關做法可參考 <a href="https://developers.google.com/workspace/sheets/api/guides/values">Read and write cell values</a>。</p><p>這裡省下的是自己做資料管理介面的工作，bot 本身仍要有地方執行，也得處理連線與權限。原型還沒有完成 Google Sheets 與 Telegram 的完整串接驗證，所以這是當時的設計考量，不能當成已經長期使用、證明可靠的成果。</p><p>人能直接改表格，也代表程式依賴的格式可能被改掉。例如把「金額」欄改名，或刪除程式需要的編號，bot 就可能找不到資料。分享權限也要分開看，讓 bot 有權限開啟試算表，不代表任何傳訊息給 bot 的人都有權限查帳。因此，我會把供程式使用的原始紀錄和人工整理的報表分開，並限制誰能透過 bot 讀寫。若資料幾乎只由程式維護，這些現成介面的好處就少了，未必需要特地繞一圈用試算表。</p><h2 id="資料庫能幫上什麼忙"><a href="#資料庫能幫上什麼忙" class="headerlink" title="資料庫能幫上什麼忙"></a>資料庫能幫上什麼忙</h2><p>如果工具要處理還款與撤銷操作，我會特別留意修改失敗後，帳目能不能對得起來。查找未還款紀錄、擋下重複記帳，以及把必須一起完成的修改放在一起處理，都可以用到資料庫的能力。即使只有少數人使用，這些需求也可能從第一天就存在，不必等到資料變多才考慮。</p><p>假設記帳工具同時保存還款紀錄和欠款餘額。小美還了 300 元，程式要新增還款紀錄，也要把餘額減掉 300；如果只完成前半段就中斷，兩邊會對不起來。資料庫的「交易」可以把這些修改包成一組，成功時一起保留，失敗時撤回這一組修改。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">3.4. Transactions</a> 用轉帳說明這個概念。程式仍要正確劃定這一組操作並處理失敗，裝好資料庫不會自動替你決定哪些事情要一起完成。</p><p>分帳規則也會影響要存的資料。假設小明先付了 900 元晚餐，三個人平均分攤，小美還了 300 元，小華還沒還。如果資料只留一個「是否結清」欄位，無論放在試算表還是資料庫，都沒辦法完整表達這個狀態。必須先把每個人應付、已付多少分開記錄，程式才有資料可以算。換工具能省掉部分儲存與查詢工作，分帳規則還是得自己想好。</p><p>重複記帳也是類似的情況。使用者沒收到回覆，再送一次訊息，資料庫不會憑空知道兩次是不是同一筆。程式需要識別這次操作，再配合資料庫的唯一性規則，拒絕重複寫入；如果只是新增兩筆編號不同的紀錄，資料庫仍可能照單全收。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/ddl-constraints.html">5.5. Constraints</a> 整理了這類可由資料庫檢查的條件。這些能力有用，但要和工具本身的規則配合。</p><h2 id="資料庫不一定很重"><a href="#資料庫不一定很重" class="headerlink" title="資料庫不一定很重"></a>資料庫不一定很重</h2><h3 id="SQLite，不必另外架服務"><a href="#SQLite，不必另外架服務" class="headerlink" title="SQLite，不必另外架服務"></a>SQLite，不必另外架服務</h3><p>如果資料主要由程式讀寫，又不想另外管理一套資料庫服務，SQLite 很值得放進候選。它本身就是資料庫，只是由程式直接使用本機的資料庫檔案，不需要另開一個資料庫伺服器。官方的 <a href="https://www.sqlite.org/serverless.html">SQLite Is Serverless</a> 說明了這個差異，所以「不用架資料庫服務」和「不用資料庫」是兩件事。</p><p>SQLite 也有查詢與交易能力，可以拿來保存互有關聯的支出、成員與還款紀錄，不必自己在 JSON 或 CSV 裡重做整套查找和更新。它可以同時讓多個連線讀取，但每個資料庫檔案同一時間只容許一個寫入交易，細節見 <a href="https://www.sqlite.org/lang_transaction.html">Transaction</a>。也就是有兩組修改同時要存入時，程式得安排等待或重試，讓它們依序完成。短時間的修改若能這樣處理，仍然可以支援多人透過同一個 bot 使用；「多人使用」不等於「每個人都直接開啟資料庫檔案」。</p><p>需要注意的是，資料庫檔案仍要放在能長期保存的位置，備份也要使用適合資料庫的方式。SQLite 不會讓沒有持久儲存空間的部署環境，自動變成適合保管帳目的地方。選它之前，我會一起確認程式跑在哪裡、資料放在哪裡，以及換一台主機時怎麼還原。</p><h3 id="獨立服務，讓多個程式共用"><a href="#獨立服務，讓多個程式共用" class="headerlink" title="獨立服務，讓多個程式共用"></a>獨立服務，讓多個程式共用</h3><p>當多台主機上的程式需要共同修改資料，或同時寫入的工作多到不適合依序等待，就值得評估 PostgreSQL 這類獨立的資料庫服務。程式透過網路連線，把讀寫請求交給資料庫處理，而不必讓每台主機直接操作同一個檔案。SQLite 官方的 <a href="https://www.sqlite.org/whentouse.html">Appropriate Uses For SQLite</a> 也把寫入需求和資料的位置列為選擇依據，沒有用「幾個使用者」畫出固定分界。</p><p>獨立服務可以自己架，也可以使用供應商代管的方案，例如雲端平台提供、開通後就能連線的資料庫。自己架要負責安裝、更新與備份，代管則能省下一部分工作，但還是要確認費用、連線方式、備份範圍，以及資料能不能匯出。不想自己架服務，不代表一定要退回檔案；如果程式原本就部署在雲端，而且平台已有合適的方案，一開始使用它也合理，沒有必要把所有選項照順序用過一次。</p><h2 id="替自己的工具做選擇"><a href="#替自己的工具做選擇" class="headerlink" title="替自己的工具做選擇"></a>替自己的工具做選擇</h2><p>我把前面的使用情境和需要自己照顧的部分整理成下面這張表，可以拿自己的需求做第一輪比較。</p><table><thead><tr><th>使用情境</th><th>可以先考慮</th><th>要留意的事</th></tr></thead><tbody><tr><td>簡單設定、依序處理的少量狀態、匯出報表</td><td>JSON、CSV 等檔案</td><td>更新方式、寫入中斷、存放位置與備份</td></tr><tr><td>人需要經常開啟、整理，程式協助新增資料</td><td>Google Sheets</td><td>欄位變動、存取權限、網路與 API 使用限制</td></tr><tr><td>資料主要由程式讀寫，集中在同一台主機</td><td>SQLite</td><td>寫入是否能排隊、資料檔保存與還原</td></tr><tr><td>多台主機共用資料，或寫入需求較高</td><td>獨立或代管資料庫服務</td><td>連線權限、維運或方案費用、備份與匯出</td></tr></tbody></table><p>以記帳 bot 為例，如果需求是記下支出，並且需要經常手動整理表格，Google Sheets 有它方便的地方。但若需要多人分帳、個別還款和撤銷操作，平常又幾乎不會打開表格，我會先評估 SQLite，前提是 bot 集中在同一台能長期保存資料的主機，寫入也能依序處理。這些都是設計時就能比較的條件，不需要等到試算表塞不下，才開始考慮資料庫。</p><p>如果你是用 AI 做小工具，可以先告訴它程式預計跑在哪裡，再拿自己的兩三個實際操作，請它比較用檔案、試算表或資料庫時，資料會存在哪裡、一次修改會動到什麼。接著追問，兩個操作同時送出、寫到一半中斷、重新部署時，原本的資料會怎樣，並請它指出不建議採用的選項和原因。回答若只剩「這個比較簡單」「以後比較好擴充」，還不足以決定；把情境放進測試環境實際跑一次，才知道程式有沒有做到它說的事。</p><hr><p>我當時選 Google Sheets，是因為打開就能看帳，不想再做一個介面。換成只存設定或整理名單的工具，也可以先不用資料庫；要處理還款，SQLite 則可能比自己補齊檔案讀寫規則省事。做小工具時，我會先想清楚要存什麼、怎麼修改，再選資料放哪裡，免得連午餐都還沒記到，先多了一套要照顧的系統。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/google-sheets-as-database/</id>
+    <link href="https://calmkoala.github.io/google-sheets-as-database/"/>
+    <published>2026-09-26T00:00:00.000Z</published>
+    <summary>從檔案、試算表到資料庫，替自己的小工具選個合適的存法。</summary>
+    <title>小工具一定要用資料庫嗎？</title>
+    <updated>2026-09-26T01:10:26.839Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -18,8 +37,8 @@
     <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
     <category term="開發" scheme="https://calmkoala.github.io/categories/study-notes/%E9%96%8B%E7%99%BC/"/>
     <category term="工作流程" scheme="https://calmkoala.github.io/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B/"/>
-    <category term="Side Project" scheme="https://calmkoala.github.io/tags/Side-Project/"/>
     <category term="開源" scheme="https://calmkoala.github.io/tags/%E9%96%8B%E6%BA%90/"/>
+    <category term="Side Project" scheme="https://calmkoala.github.io/tags/Side-Project/"/>
     <content>
       <![CDATA[<p>你有沒有做完一個小工具，準備公開時，就順手請 AI 幫忙把文件也補齊？現在用 AI 整理使用說明很方便，原本懶得從空白頁寫起的安裝步驟、操作範例，都能先有個草稿。既然都請它寫了，再補一份貢獻指南、行為準則，好像也不費什麼力氣，專案看起來還更完整。</p><p>我之前準備公開一套 AI 協作框架時，也整理出了一整套文件。它用 Markdown 和 YAML 這類文字檔，描述不同 AI 角色該做什麼，以及工作要怎麼交接，讓我不用每次重新交代同一套分工。原本想分享的是這個做法，整理到後來，專案裡卻已經有貢獻流程、社群規範和一大份內部架構說明。</p><p>只是文件生出來之後，裡面的流程還是得有人照著做、隨著專案更新。當時我仍打算以一人維護的方式經營專案，並沒有要照那套完整制度運作，後來便把其中幾份文件從對外版本移除，保留自己查閱需要的內容。我開始想的是，第一次看到這個專案的人，到底缺哪一份說明；如果他連怎麼開始用都不知道，我先寫完分支命名規則，好像也幫不上忙。</p><span id="more"></span><h2 id="我刪掉的是哪一種文件"><a href="#我刪掉的是哪一種文件" class="headerlink" title="我刪掉的是哪一種文件"></a>我刪掉的是哪一種文件</h2><p>GitHub 上的專案通常會有一份 README，直接顯示在專案首頁，讓人知道這是什麼、如何使用。想協助修改的人，則可能需要 CONTRIBUTING，也就是貢獻指南，裡面交代怎麼準備開發環境、檢查修改結果，以及把變更交給維護者。兩份文件的讀者可能是同一個人，卻是在不同時候找答案。</p><p>我那次移除的是 CONTRIBUTING、Code of Conduct（行為準則），以及 ARCHITECTURE（內部架構說明）。授權條款和安全回報說明仍然保留，使用者需要的安裝方式也沒有一起拿掉。這是在調整當下對外維護的文件範圍，並不是刪光說明、只留下程式碼。</p><p>其中最需要分開看的是架構文件。未來協作者可能需要知道檔案怎麼組合，第一次使用的人卻未必需要讀完每個設計決策。後來我又把安裝、基本概念、自訂方式等使用說明拆進文件目錄，從首頁連過去。內部筆記可以先留給自己，但別人操作時缺的說明，還是得補回公開文件裡。</p><p>對我來說，成本主要在寫完之後。測試指令換了，貢獻指南得跟著改；工作方式調整了，審查流程也得更新。AI 可以協助更新內容，但裡面的指令是否真的能跑、承諾的流程是否做得到，仍得自己確認。文件寫得越完整，需要核對的地方也越多。</p><h2 id="公開前先交代什麼"><a href="#公開前先交代什麼" class="headerlink" title="公開前先交代什麼"></a>公開前先交代什麼</h2><h3 id="讓第一個使用者能開始"><a href="#讓第一個使用者能開始" class="headerlink" title="讓第一個使用者能開始"></a>讓第一個使用者能開始</h3><p>我現在會先從使用者的第一個動作往回看。對這套 AI 協作框架來說，他需要知道哪些工具能用、怎麼安裝，再用一個小任務確認角色有正常運作。至於我當初比較過哪些設計、為什麼淘汰某種分工方式，可以放在後面，不必擋在開始使用之前。</p><p>換成一般的小工具也一樣。README 至少要說明它解決什麼問題、需要先準備什麼，以及照著做完會看到什麼結果。如果還有尚未支援的平台、可能改動的功能，或只在自己的環境測過，也要讓人事先知道。只寫「安裝後即可使用」，卻沒交代安裝成功長什麼樣子，讀者卡住時還是只能猜。</p><p>這些資訊不一定要各自拆成一份檔案。我會先按用途分配，再決定要放在哪裡。</p><table><thead><tr><th>讀者現在需要知道的事</th><th>起步時可以怎麼放</th><th>什麼時候再擴充</th></tr></thead><tbody><tr><td>這是什麼、如何開始、有哪些限制</td><td>README，加一個能照做的例子</td><td>首頁太長時，把安裝與進階用法拆出去並留下連結</td></tr><tr><td>可以如何使用、修改與散布</td><td>放好適用的授權條款</td><td>授權需求改變時重新評估，不等有人提問才處理</td></tr><tr><td>一般問題、安全問題要去哪裡回報</td><td>README 留一般入口，安全回報另給非公開管道</td><td>回報需要的資訊反覆缺漏時，再補範本</td></tr><tr><td>想協助修改，該先做什麼</td><td>先說是否接受修改，並留下討論想法的入口</td><td>開始邀請貢獻時，補開發與檢查步驟</td></tr><tr><td>多人一起討論或維護，要遵守什麼</td><td>準備招募貢獻或經營討論時，先交代行為邊界與處理方式</td><td>有固定協作者時，再補審查分工與發布權責</td></tr></tbody></table><p>這張表是我整理一人專案時的取捨，沒有規定 CONTRIBUTING 一定得晚寫。如果現在就需要請別人協助，先用幾行交代怎麼參與，會比讓對方來回問更省事。</p><h3 id="安全回報不能等"><a href="#安全回報不能等" class="headerlink" title="安全回報不能等"></a>安全回報不能等</h3><p>一般操作問題，可以請使用者建立 GitHub issue；它是專案用來追蹤問題與建議的討論頁。安全漏洞則要有私下回報的方法，不能等第一個人把敏感內容貼到公開留言區，才開始決定該寄到哪裡。我當時保留的 SECURITY 文件，就把一般問題和安全回報分開處理。</p><p>GitHub 提供私人漏洞回報功能，但在文件裡寫「請使用私人回報」不等於功能已經開啟。依 <a href="https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository">Configuring private vulnerability reporting for a repository</a> 的說明，維護者需要啟用功能，對方才會看到回報按鈕；通知設定也會影響維護者能否收到提醒。如果選擇用這個管道，公開前就要確認入口真的可用，而不只是把網址貼上去。</p><div class="note warning no-icon"><p>可以延後的是尚未用到的協作流程。授權條款、API 金鑰與個人資料的檢查、非公開的安全回報入口，都不適合等有人出事才補。把已提交過的文件從目前版本刪掉，也不會自動清除 Git 保留的過去版本紀錄；整理文件和處理資料外洩，是兩件不同的工作。</p></div><h2 id="有人想幫忙時怎麼補"><a href="#有人想幫忙時怎麼補" class="headerlink" title="有人想幫忙時怎麼補"></a>有人想幫忙時怎麼補</h2><p>假設有人試用後，在 issue 問：「我照著安裝說明做，但不知道設定檔要放哪裡。」這時先回覆位置，再把答案補到 README 對應的步驟旁邊就好。對方卡在使用說明，新增一份貢獻指南並不能幫他完成安裝。</p><p>接著，假設他說願意幫忙補一個安裝範例，事情才進到協作。我會先說明範例應放在哪裡、要涵蓋哪種環境，以及送出前怎麼確認步驟可用。不能等他全部做完，才告訴他我其實還要求另一組檢查；如果檢查方式只有我知道，我就得先補出來，或明講哪些部分會由我協助驗證。</p><p>對方把修改送成一筆變更提案，請我審查是否合併；GitHub 把這種提案稱為 pull request，簡稱 PR。第一輪合作結束後，可以把剛才那段說明整理進 CONTRIBUTING。內容不用突然長成一套制度，先讓下一位貢獻者知道「動手前先討論範圍、修改放哪裡、完成後如何檢查」就有用。之後發現每次都漏掉相同資訊，再把那一項加進 PR 範本。</p><p>若改的是功能，檢查方式可能是執行測試；若改的是安裝說明，就應實際照步驟走過。主要靠 AI 做修改的人，可以先請它列出能重做的檢查步驟，自己跑一次並保留結果，再決定文件要記哪些操作。AI 產出的「所有測試均已通過」，仍要有實際執行結果可以核對，不能直接拿這句話當驗收。</p><p>拆出 CONTRIBUTING 也有檔名以外的好處。GitHub 的 <a href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors">Setting guidelines for repository contributors</a> 說明，放在支援位置的貢獻指南，會在建立 issue 或 PR 時提供連結。協作開始固定發生後，把規則放到對方準備送出修改的位置，比一直藏在 README 中段更好找。</p><p>我把這種安排理解成「需要時再補規則」。時間點可以是第一次回饋，也可以是自己決定開始找人幫忙；不必硬等到第一個 PR 已經送來，更不用等同一個人踩兩次坑，才承認文件缺了一段。</p><h2 id="什麼時候該提早寫"><a href="#什麼時候該提早寫" class="headerlink" title="什麼時候該提早寫"></a>什麼時候該提早寫</h2><p>查資料時，我也看到跟我當時選擇不同的建議。<a href="https://opensource.guide/starting-a-project/">Starting an Open Source Project</a> 把授權、README、貢獻指南與行為準則都列為起步文件，也提到早期的貢獻指南可以很簡單。這個建議有道理，清楚的參與方式本來就能降低別人第一次幫忙的門檻，不能只看「現在沒人提修改」，就推論永遠不需要寫。</p><p>如果公開的目的就是招募協作者，或已經準備經營討論區，我會在邀請之前補好參與方式與行為準則，包括不當行為要向誰回報、維護者如何處理。人少也可能發生衝突，不能把「等有需要」解讀成等第一次爭執後再想規則。同樣地，多個人開始審查與發布時，誰可以合併、誰可以發版，也應該事先談好。</p><p>我的起點比較小，先把自己做的工具分享出去，由自己維護，沒有打算一開始就建立共同決策的社群。在這個前提下，我願意承擔第一次有人想幫忙時，多花一點時間說明和補文件的成本。所以我會先在 README 留下求助入口與是否接受貢獻，其他制度等實際互動再補。</p><hr><p>下次整理自己的專案，我會先挑一個已經能用的功能，從 README 開始照著做一次，看看哪一步還得靠腦中的記憶補完。那就是現在該寫的地方。至於暫時用不到的審查層級和完整提案範本，先留下需要時再補的空間，至少不用一邊改功能，一邊通知只有自己一個人的委員會。（當然，最好的習慣還是在製作過程中，就順手把需要的文件補好，省得最後再靠記憶補作業。）</p>]]>
     </content>
@@ -28,7 +47,7 @@
     <published>2026-09-19T00:00:00.000Z</published>
     <summary>先讓別人用得起來，再補實際需要的協作流程。</summary>
     <title>一個人的開源專案，文件要寫多少？</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -47,7 +66,7 @@
     <published>2026-09-12T00:00:00.000Z</published>
     <summary>把平常的修改紀錄整理成商店更新與開發紀錄，發版時少一次重新回想。</summary>
     <title>版本說明，別再發版時才重寫</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -66,7 +85,7 @@
     <published>2026-09-05T00:00:00.000Z</published>
     <summary>讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。</summary>
     <title>哪些工作該交給背景 AI agent？</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -85,7 +104,7 @@
     <published>2026-08-29T00:00:00.000Z</published>
     <summary>LilyScore 上架後，我把第一次發布會碰到的簽章、商店資料、測試軌與自動發版照順序整理，留一份下一個 App 能直接跟著做的操作筆記。</summary>
     <title>第一次上 Google Play，最麻煩的不是寫 App</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -104,7 +123,7 @@
     <published>2026-08-22T00:00:00.000Z</published>
     <summary>LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。</summary>
     <title>LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -123,7 +142,7 @@
     <published>2026-08-15T01:00:00.000Z</published>
     <summary>一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。</summary>
     <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -142,7 +161,7 @@
     <published>2026-08-08T05:00:00.000Z</published>
     <summary>Skill 裝得更多，不代表 AI agent 會持續變好。從整理與刪減 skill 的經驗，比較不同觀點，以及如何判斷規則該放在 skill、專案指引、獨立 agent 或程式檢查。</summary>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -161,7 +180,7 @@
     <published>2026-08-01T01:00:00.000Z</published>
     <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
     <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -180,7 +199,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -202,7 +221,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -225,7 +244,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -249,7 +268,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -270,7 +289,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -279,8 +298,8 @@
     <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
     <category term="Python" scheme="https://calmkoala.github.io/categories/study-notes/Python/"/>
     <category term="Python" scheme="https://calmkoala.github.io/tags/Python/"/>
-    <category term="Windows" scheme="https://calmkoala.github.io/tags/Windows/"/>
     <category term="APScheduler" scheme="https://calmkoala.github.io/tags/APScheduler/"/>
+    <category term="Windows" scheme="https://calmkoala.github.io/tags/Windows/"/>
     <content>
       <![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p><p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p><span id="more"></span><h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p><p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p><p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p><p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p><h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p><p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p><hr><p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>]]>
     </content>
@@ -292,7 +311,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -316,7 +335,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -345,7 +364,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
   <entry>
     <author>
@@ -366,6 +385,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-09-25T07:39:10.488Z</updated>
+    <updated>2026-09-26T01:10:26.839Z</updated>
   </entry>
 </feed>

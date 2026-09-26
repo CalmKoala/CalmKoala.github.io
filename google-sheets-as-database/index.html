@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+  <link rel="mask-icon" href="/images/koala-mono.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="從檔案、試算表到資料庫，替自己的小工具選個合適的存法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小工具一定要用資料庫嗎？">
+<meta property="og:url" content="https://calmkoala.github.io/google-sheets-as-database/">
+<meta property="og:site_name" content="CalmKoala">
+<meta property="og:description" content="從檔案、試算表到資料庫，替自己的小工具選個合適的存法。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="article:published_time" content="2026-09-26T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-26T01:10:26.839Z">
+<meta property="article:author" content="PingChun">
+<meta property="article:tag" content="Side Project">
+<meta property="article:tag" content="Google Sheets">
+<meta property="article:tag" content="資料庫">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+
+
+<link rel="canonical" href="https://calmkoala.github.io/google-sheets-as-database/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-TW","comments":true,"permalink":"https://calmkoala.github.io/google-sheets-as-database/","path":"/google-sheets-as-database/","title":"小工具一定要用資料庫嗎？"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>小工具一定要用資料庫嗎？ | CalmKoala</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
+  <script src="/js/third-party/tags/mermaid.js" defer></script>
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="CalmKoala" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">CalmKoala</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">30</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">18</span></a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E7%9C%8B%E8%B3%87%E6%96%99%E6%80%8E%E9%BA%BC%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">先看資料怎麼用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E7%94%A8%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E9%81%B8%E6%93%87"><span class="nav-number">2.</span> <span class="nav-text">不用資料庫的選擇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E8%88%87%E7%B0%A1%E5%96%AE%E7%B4%80%E9%8C%84%EF%BC%8C%E7%94%A8%E6%AA%94%E6%A1%88"><span class="nav-number">2.1.</span> <span class="nav-text">設定與簡單紀錄，用檔案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E4%BA%BA%E5%B7%A5%E6%95%B4%E7%90%86%EF%BC%8C%E7%94%A8%E8%A9%A6%E7%AE%97%E8%A1%A8"><span class="nav-number">2.2.</span> <span class="nav-text">需要人工整理，用試算表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%BA%AB%E8%83%BD%E5%B9%AB%E4%B8%8A%E4%BB%80%E9%BA%BC%E5%BF%99"><span class="nav-number">3.</span> <span class="nav-text">資料庫能幫上什麼忙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%BA%AB%E4%B8%8D%E4%B8%80%E5%AE%9A%E5%BE%88%E9%87%8D"><span class="nav-number">4.</span> <span class="nav-text">資料庫不一定很重</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SQLite%EF%BC%8C%E4%B8%8D%E5%BF%85%E5%8F%A6%E5%A4%96%E6%9E%B6%E6%9C%8D%E5%8B%99"><span class="nav-number">4.1.</span> <span class="nav-text">SQLite，不必另外架服務</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8D%A8%E7%AB%8B%E6%9C%8D%E5%8B%99%EF%BC%8C%E8%AE%93%E5%A4%9A%E5%80%8B%E7%A8%8B%E5%BC%8F%E5%85%B1%E7%94%A8"><span class="nav-number">4.2.</span> <span class="nav-text">獨立服務，讓多個程式共用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%BF%E8%87%AA%E5%B7%B1%E7%9A%84%E5%B7%A5%E5%85%B7%E5%81%9A%E9%81%B8%E6%93%87"><span class="nav-number">5.</span> <span class="nav-text">替自己的工具做選擇</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="PingChun"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">PingChun</p>
+  <div class="site-description" itemprop="description">後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml" rel="noopener me"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/google-sheets-as-database/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="小工具一定要用資料庫嗎？ | CalmKoala">
+      <meta itemprop="description" content="從檔案、試算表到資料庫，替自己的小工具選個合適的存法。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          小工具一定要用資料庫嗎？
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-09-26 08:00:00 / 修改時間：09:10:26" itemprop="dateCreated datePublished" datetime="2026-09-26T08:00:00+08:00">2026-09-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/%E9%96%8B%E7%99%BC/" itemprop="url" rel="index"><span itemprop="name">開發</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>13 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p>
+<p>我之前設計過一個 Telegram 記帳 bot 的原型，當時選的是 Google Sheets。預計讓使用者從聊天視窗記錄支出，由 bot 把帳目存進試算表，需要整理時再直接打開來看。這個想法很直覺，既然平常就會用表格記帳，讓程式幫忙填進去，似乎也不用為了看幾筆資料，另外做一個管理介面。</p>
+<p>選儲存方式時，我會先看資料要怎麼使用。同樣是一張帳目表，單純記下每天花多少錢，和要處理多人分帳、個別還款，需要照顧的事情就差很多。能直接打開表格整理，是選 Google Sheets 的理由，但也要一起考慮程式會怎麼讀取、修改這些資料。</p>
+<span id="more"></span>
+
+<h2 id="先看資料怎麼用"><a href="#先看資料怎麼用" class="headerlink" title="先看資料怎麼用"></a>先看資料怎麼用</h2><p>資料需要留下來，不代表一定要用資料庫。程式可以把設定寫進檔案，把報名資料放進試算表，也可以把帳目存進資料庫。幾種方式都能保存資料，選擇時要多看一步，想想以後會怎麼讀取、修改，以及修改到一半出錯時，能不能接受留下不完整的結果。</p>
+<p>例如，一個自己使用的工具，只要記住上次選的資料夾，下次開啟時再讀出來，檔案就很適合。活動名單需要主辦人隨時打開補註記，試算表的現成介面很方便。換成預約系統，兩個人可能同時搶最後一個名額，程式就得處理誰先成功，不能讓兩邊都收到預約完成的通知。資料量還很少，操作方式卻已經影響選擇了。</p>
+<p>我會先把這些使用情境寫下來，再比較工具。這時不用急著研究資料庫語法，先想想誰會改資料、會不會同時修改，以及弄錯一筆會怎樣。這比一開始就找「最好的資料庫」更有用，也比較不會選了一套功能齊全、自己卻用不上的架構。</p>
+<h2 id="不用資料庫的選擇"><a href="#不用資料庫的選擇" class="headerlink" title="不用資料庫的選擇"></a>不用資料庫的選擇</h2><h3 id="設定與簡單紀錄，用檔案"><a href="#設定與簡單紀錄，用檔案" class="headerlink" title="設定與簡單紀錄，用檔案"></a>設定與簡單紀錄，用檔案</h3><p>設定、單機工具的少量狀態，或每次執行後產生的一份報表，都可以先考慮檔案。常見的 JSON 適合表達有層次的資料，例如設定裡同時包含資料夾位置與通知偏好；CSV 則把內容存成一列一列，方便用試算表開啟。它們是檔案格式，讀取哪一筆、怎麼更新，以及哪些值才算合法，都要由程式處理。</p>
+<p>這種做法容易開始，但「存進檔案」仍有一些工作。我會先確認檔案放在哪裡，程式重啟或更新後重新上線，也就是重新部署時，資料會不會消失，再考慮怎麼備份。如果兩個操作同時讀取舊內容，改完各自存回，後存的那份可能蓋掉前一份修改；寫到一半中斷，也得有辦法避免原本的資料跟著壞掉。只由同一個程式依序處理簡單設定時，這些事情比較容易掌握；當自己開始補上大量防止覆寫、查找與更新的邏輯，就值得比較資料庫了。</p>
+<h3 id="需要人工整理，用試算表"><a href="#需要人工整理，用試算表" class="headerlink" title="需要人工整理，用試算表"></a>需要人工整理，用試算表</h3><p>Google Sheets 適合的情況，是你本來就需要一個能直接查看、修改資料的介面。例如活動名單由程式新增，主辦人再手動補註記；或像我的記帳 bot 原型，預計從 Telegram 記帳，需要整理時再打開試算表。Google 提供 API，也就是讓程式透過網路讀寫資料的入口，bot 可以藉此新增一列或讀取帳目，相關做法可參考 <a target="_blank" rel="noopener" href="https://developers.google.com/workspace/sheets/api/guides/values">Read and write cell values</a>。</p>
+<p>這裡省下的是自己做資料管理介面的工作，bot 本身仍要有地方執行，也得處理連線與權限。原型還沒有完成 Google Sheets 與 Telegram 的完整串接驗證，所以這是當時的設計考量，不能當成已經長期使用、證明可靠的成果。</p>
+<p>人能直接改表格，也代表程式依賴的格式可能被改掉。例如把「金額」欄改名，或刪除程式需要的編號，bot 就可能找不到資料。分享權限也要分開看，讓 bot 有權限開啟試算表，不代表任何傳訊息給 bot 的人都有權限查帳。因此，我會把供程式使用的原始紀錄和人工整理的報表分開，並限制誰能透過 bot 讀寫。若資料幾乎只由程式維護，這些現成介面的好處就少了，未必需要特地繞一圈用試算表。</p>
+<h2 id="資料庫能幫上什麼忙"><a href="#資料庫能幫上什麼忙" class="headerlink" title="資料庫能幫上什麼忙"></a>資料庫能幫上什麼忙</h2><p>如果工具要處理還款與撤銷操作，我會特別留意修改失敗後，帳目能不能對得起來。查找未還款紀錄、擋下重複記帳，以及把必須一起完成的修改放在一起處理，都可以用到資料庫的能力。即使只有少數人使用，這些需求也可能從第一天就存在，不必等到資料變多才考慮。</p>
+<p>假設記帳工具同時保存還款紀錄和欠款餘額。小美還了 300 元，程式要新增還款紀錄，也要把餘額減掉 300；如果只完成前半段就中斷，兩邊會對不起來。資料庫的「交易」可以把這些修改包成一組，成功時一起保留，失敗時撤回這一組修改。PostgreSQL 的 <a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/current/tutorial-transactions.html">3.4. Transactions</a> 用轉帳說明這個概念。程式仍要正確劃定這一組操作並處理失敗，裝好資料庫不會自動替你決定哪些事情要一起完成。</p>
+<p>分帳規則也會影響要存的資料。假設小明先付了 900 元晚餐，三個人平均分攤，小美還了 300 元，小華還沒還。如果資料只留一個「是否結清」欄位，無論放在試算表還是資料庫，都沒辦法完整表達這個狀態。必須先把每個人應付、已付多少分開記錄，程式才有資料可以算。換工具能省掉部分儲存與查詢工作，分帳規則還是得自己想好。</p>
+<p>重複記帳也是類似的情況。使用者沒收到回覆，再送一次訊息，資料庫不會憑空知道兩次是不是同一筆。程式需要識別這次操作，再配合資料庫的唯一性規則，拒絕重複寫入；如果只是新增兩筆編號不同的紀錄，資料庫仍可能照單全收。PostgreSQL 的 <a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/current/ddl-constraints.html">5.5. Constraints</a> 整理了這類可由資料庫檢查的條件。這些能力有用，但要和工具本身的規則配合。</p>
+<h2 id="資料庫不一定很重"><a href="#資料庫不一定很重" class="headerlink" title="資料庫不一定很重"></a>資料庫不一定很重</h2><h3 id="SQLite，不必另外架服務"><a href="#SQLite，不必另外架服務" class="headerlink" title="SQLite，不必另外架服務"></a>SQLite，不必另外架服務</h3><p>如果資料主要由程式讀寫，又不想另外管理一套資料庫服務，SQLite 很值得放進候選。它本身就是資料庫，只是由程式直接使用本機的資料庫檔案，不需要另開一個資料庫伺服器。官方的 <a target="_blank" rel="noopener" href="https://www.sqlite.org/serverless.html">SQLite Is Serverless</a> 說明了這個差異，所以「不用架資料庫服務」和「不用資料庫」是兩件事。</p>
+<p>SQLite 也有查詢與交易能力，可以拿來保存互有關聯的支出、成員與還款紀錄，不必自己在 JSON 或 CSV 裡重做整套查找和更新。它可以同時讓多個連線讀取，但每個資料庫檔案同一時間只容許一個寫入交易，細節見 <a target="_blank" rel="noopener" href="https://www.sqlite.org/lang_transaction.html">Transaction</a>。也就是有兩組修改同時要存入時，程式得安排等待或重試，讓它們依序完成。短時間的修改若能這樣處理，仍然可以支援多人透過同一個 bot 使用；「多人使用」不等於「每個人都直接開啟資料庫檔案」。</p>
+<p>需要注意的是，資料庫檔案仍要放在能長期保存的位置，備份也要使用適合資料庫的方式。SQLite 不會讓沒有持久儲存空間的部署環境，自動變成適合保管帳目的地方。選它之前，我會一起確認程式跑在哪裡、資料放在哪裡，以及換一台主機時怎麼還原。</p>
+<h3 id="獨立服務，讓多個程式共用"><a href="#獨立服務，讓多個程式共用" class="headerlink" title="獨立服務，讓多個程式共用"></a>獨立服務，讓多個程式共用</h3><p>當多台主機上的程式需要共同修改資料，或同時寫入的工作多到不適合依序等待，就值得評估 PostgreSQL 這類獨立的資料庫服務。程式透過網路連線，把讀寫請求交給資料庫處理，而不必讓每台主機直接操作同一個檔案。SQLite 官方的 <a target="_blank" rel="noopener" href="https://www.sqlite.org/whentouse.html">Appropriate Uses For SQLite</a> 也把寫入需求和資料的位置列為選擇依據，沒有用「幾個使用者」畫出固定分界。</p>
+<p>獨立服務可以自己架，也可以使用供應商代管的方案，例如雲端平台提供、開通後就能連線的資料庫。自己架要負責安裝、更新與備份，代管則能省下一部分工作，但還是要確認費用、連線方式、備份範圍，以及資料能不能匯出。不想自己架服務，不代表一定要退回檔案；如果程式原本就部署在雲端，而且平台已有合適的方案，一開始使用它也合理，沒有必要把所有選項照順序用過一次。</p>
+<h2 id="替自己的工具做選擇"><a href="#替自己的工具做選擇" class="headerlink" title="替自己的工具做選擇"></a>替自己的工具做選擇</h2><p>我把前面的使用情境和需要自己照顧的部分整理成下面這張表，可以拿自己的需求做第一輪比較。</p>
+<table>
+<thead>
+<tr>
+<th>使用情境</th>
+<th>可以先考慮</th>
+<th>要留意的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>簡單設定、依序處理的少量狀態、匯出報表</td>
+<td>JSON、CSV 等檔案</td>
+<td>更新方式、寫入中斷、存放位置與備份</td>
+</tr>
+<tr>
+<td>人需要經常開啟、整理，程式協助新增資料</td>
+<td>Google Sheets</td>
+<td>欄位變動、存取權限、網路與 API 使用限制</td>
+</tr>
+<tr>
+<td>資料主要由程式讀寫，集中在同一台主機</td>
+<td>SQLite</td>
+<td>寫入是否能排隊、資料檔保存與還原</td>
+</tr>
+<tr>
+<td>多台主機共用資料，或寫入需求較高</td>
+<td>獨立或代管資料庫服務</td>
+<td>連線權限、維運或方案費用、備份與匯出</td>
+</tr>
+</tbody></table>
+<p>以記帳 bot 為例，如果需求是記下支出，並且需要經常手動整理表格，Google Sheets 有它方便的地方。但若需要多人分帳、個別還款和撤銷操作，平常又幾乎不會打開表格，我會先評估 SQLite，前提是 bot 集中在同一台能長期保存資料的主機，寫入也能依序處理。這些都是設計時就能比較的條件，不需要等到試算表塞不下，才開始考慮資料庫。</p>
+<p>如果你是用 AI 做小工具，可以先告訴它程式預計跑在哪裡，再拿自己的兩三個實際操作，請它比較用檔案、試算表或資料庫時，資料會存在哪裡、一次修改會動到什麼。接著追問，兩個操作同時送出、寫到一半中斷、重新部署時，原本的資料會怎樣，並請它指出不建議採用的選項和原因。回答若只剩「這個比較簡單」「以後比較好擴充」，還不足以決定；把情境放進測試環境實際跑一次，才知道程式有沒有做到它說的事。</p>
+<hr>
+<p>我當時選 Google Sheets，是因為打開就能看帳，不想再做一個介面。換成只存設定或整理名單的工具，也可以先不用資料庫；要處理還款，SQLite 則可能比自己補齊檔案讀寫規則省事。做小工具時，我會先想清楚要存什麼、怎麼修改，再選資料放哪裡，免得連午餐都還沒記到，先多了一套要照顧的系統。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Side-Project/" rel="tag"># Side Project</a>
+              <a href="/tags/Google-Sheets/" rel="tag"># Google Sheets</a>
+              <a href="/tags/%E8%B3%87%E6%96%99%E5%BA%AB/" rel="tag"># 資料庫</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/solo-project-jit-governance/" rel="prev" title="一個人的開源專案，文件要寫多少？">
+                  <i class="fa fa-angle-left"></i> 一個人的開源專案，文件要寫多少？
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2023 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">PingChun</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="總字數">62k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="所需總閱讀時間">3:25</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="回到頂端">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"CalmKoala/blog-comments","issue_term":"pathname","theme":"preferred-color-scheme"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+
+</body>
+</html>

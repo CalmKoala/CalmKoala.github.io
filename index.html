@@ -114,7 +114,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">28</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">17</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">30</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">18</span></a></li>
   </ul>
 </nav>
 
@@ -153,7 +153,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
@@ -164,7 +164,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
@@ -190,6 +190,113 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/google-sheets-as-database/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="PingChun">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CalmKoala">
+      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | CalmKoala">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/google-sheets-as-database/" class="post-title-link" itemprop="url">小工具一定要用資料庫嗎？</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">發表於</span>
+      
+
+      <time title="創建時間：2026-09-26 08:00:00 / 修改時間：09:10:26" itemprop="dateCreated datePublished" datetime="2026-09-26T08:00:00+08:00">2026-09-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分類於</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study-notes/%E9%96%8B%E7%99%BC/" itemprop="url" rel="index"><span itemprop="name">開發</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="文章字數">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">文章字數：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="所需閱讀時間">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
+      <span>13 分鐘</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p>
+<p>我之前設計過一個 Telegram 記帳 bot 的原型，當時選的是 Google Sheets。預計讓使用者從聊天視窗記錄支出，由 bot 把帳目存進試算表，需要整理時再直接打開來看。這個想法很直覺，既然平常就會用表格記帳，讓程式幫忙填進去，似乎也不用為了看幾筆資料，另外做一個管理介面。</p>
+<p>選儲存方式時，我會先看資料要怎麼使用。同樣是一張帳目表，單純記下每天花多少錢，和要處理多人分帳、個別還款，需要照顧的事情就差很多。能直接打開表格整理，是選 Google Sheets 的理由，但也要一起考慮程式會怎麼讀取、修改這些資料。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/google-sheets-as-database/#more" rel="contents">
+                閱讀全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -235,7 +342,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -348,7 +455,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -463,7 +570,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -576,7 +683,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -689,7 +796,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -803,7 +910,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -917,7 +1024,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1030,7 +1137,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1147,7 +1254,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
+      <time title="修改時間：2026-09-26 09:10:26" itemprop="dateModified" datetime="2026-09-26T09:10:26+08:00">2026-09-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1232,121 +1339,6 @@ flowchart LR
 
 
 
-    
-
-
-<div class="post-block post-block-subtitle">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://calmkoala.github.io/subscription-cli-always-on-agent/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="PingChun">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="CalmKoala">
-      <meta itemprop="description" content="後端工程師<br> 寫程式學習筆記，以及 AI 工具、框架的觀察">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | CalmKoala">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/subscription-cli-always-on-agent/" class="post-title-link" itemprop="url">CLI 也能當 AI agent 的後端</a>
-        </h2>
-          <p class="post-subtitle" itemprop="alternativeHeadline">自己做 AI agent，不一定得從模型 API 開始。</p>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">發表於</span>
-
-      <time title="創建時間：2026-07-19 08:00:00" itemprop="dateCreated datePublished" datetime="2026-07-19T08:00:00+08:00">2026-07-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-09-25 15:39:10" itemprop="dateModified" datetime="2026-09-25T15:39:10+08:00">2026-09-25</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分類於</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/" itemprop="url" rel="index"><span itemprop="name">學習筆記</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/study-notes/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="文章字數">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">文章字數：</span>
-      <span>2.5k</span>
-    </span>
-    <span class="post-meta-item" title="所需閱讀時間">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
-      <span>8 分鐘</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>現在使用市面上的 AI agent framework，安裝完後遇到的第一個設定，通常就是選擇模型供應商，再填入一組 API key。</p>
-<p>這個設計很合理，框架總得知道要去哪裡找模型。但我卡在一個很現實的地方，我本來就在付 Claude 和 ChatGPT 的訂閱費，平常使用 Claude Code 與 Codex CLI 也都包含在方案額度裡。</p>
-<p>如果 agent 改走模型 API，等於又多開一條按 token 計費的路徑。技術上沒有問題，但我的錢很有問題啊啊啊。</p>
-<p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/subscription-cli-always-on-agent/#more" rel="contents">
-                閱讀全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" title="下一頁" aria-label="下一頁" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -1370,13 +1362,13 @@ flowchart LR
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="總字數">58k</span>
+    <span title="總字數">62k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="所需總閱讀時間">3:13</span>
+    <span title="所需總閱讀時間">3:25</span>
   </span>
 </div>
 
