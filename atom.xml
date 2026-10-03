@@ -10,7 +10,25 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-10-02T07:45:24.736Z</updated>
+  <updated>2026-10-03T01:10:27.027Z</updated>
+  <entry>
+    <author>
+      <name>PingChun</name>
+    </author>
+    <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
+    <category term="開發" scheme="https://calmkoala.github.io/categories/study-notes/%E9%96%8B%E7%99%BC/"/>
+    <category term="Side Project" scheme="https://calmkoala.github.io/tags/Side-Project/"/>
+    <category term="軟體測試" scheme="https://calmkoala.github.io/tags/%E8%BB%9F%E9%AB%94%E6%B8%AC%E8%A9%A6/"/>
+    <content>
+      <![CDATA[<p>你有沒有遇過，程式明明顯示測試通過，自己打開來用，卻連最常做的操作都沒辦法完成？例如做了一個能匯出報表的小工具，檢查時沒有報錯，按下按鈕也出現成功訊息，下載後才發現檔案是空的。這時再看那一排通過的結果，很難不懷疑，剛才到底測了什麼。</p><p>我在做一套讓 AI 分工的工具時，也遇過類似的落差。角色設定檔產生了，檔案比對也通過，實際打開使用它的工具，卻找不到那些角色。那次通過的是「產生的檔案和預期一致」，並沒有驗到「工具真的讀得懂這些檔案」。兩件事只差一步，對使用結果的影響卻差很多。</p><p>所以看到測試通過，我會接著確認它涵蓋到哪裡。檢查計算結果、檔案內容，和從平常的入口完成一件事，各自能找出不同的問題。做自己的小工具，不必一開始準備完整的測試制度，但至少要挑一條主要流程，確認從開始操作到拿到結果都走得通。</p><span id="more"></span><h2 id="檔案有了，工具卻沒讀到"><a href="#檔案有了，工具卻沒讀到" class="headerlink" title="檔案有了，工具卻沒讀到"></a>檔案有了，工具卻沒讀到</h2><p>那套工具會依照角色定義，產生給開發工具讀取的設定檔，例如負責修改程式的角色、負責審查的角色。設定檔開頭有名稱、用途等欄位，必須照固定格式填寫，開發工具才知道要怎麼使用這個角色。我另外放了一行註解，標明檔案由哪個來源產生，方便日後維護。</p><p>問題出在順序。當時我把註解放在最前面，設定資料排在後面，檔案內容看起來都在，但目標工具要求設定資料必須從第一行開始。它沒有照我預期的方式讀取，幾個角色就這樣被忽略了。直到檢查工具裡的角色清單，並嘗試實際呼叫，才發現檔案有產生，角色卻沒有出現。</p><p>原本的自動檢查會重新產生一份檔案，再和保存的範本比對，確認內容沒有意外改變。比對時，那段註解會先被略過，只比較剩下的設定和內文，因此沒有檢查註解與設定區塊的先後順序。它也沒有啟動目標工具，確認角色能不能被載入。檢查沒有失靈，只是我還少驗了後面那一段。</p><pre><code class="mermaid">graph TD    A[角色定義] --&gt; B[產生設定檔]    B --&gt; C[開發工具讀取]    C --&gt; D[角色出現在清單]    D --&gt; E[實際交付任務]    B -. 比對檔案內容 .-&gt; F[既有檢查通過]</code></pre><p>修正時，我把註解移到設定區塊之後，也把「從工具清單確認已載入，並實際呼叫一次」列為之後的驗收項目。檔案比對仍然保留，因為它適合找出不該改變的內容；只是不能再拿這個結果，代替整條使用流程的確認。這個例子甚至還沒走到複雜的程式邏輯，光是第一行放什麼，就足以讓功能消失。</p><h2 id="先看測試驗到哪裡"><a href="#先看測試驗到哪裡" class="headerlink" title="先看測試驗到哪裡"></a>先看測試驗到哪裡</h2><p>測試會依照設定好的條件判斷結果。例如匯出報表時，檢查總金額是不是算對，和檢查下載的檔案能不能打開，是不同的條件。前者可以直接把資料交給計算程式，快速試很多組數字；後者要經過選資料、按匯出、產生檔案與下載，才能知道這些部分接在一起有沒有問題。</p><p>還有一種常見做法，是在測試裡用預先準備好的回應，暫時代替外部服務。假設工具需要把檔案存到雲端，測試就假裝雲端已回覆「儲存成功」，觀察自己的程式接著會不會顯示正確訊息。這通常叫模擬，或 mock，可以讓測試不必每次連上網路，也方便試出失敗的情況。Playwright 的 <a href="https://playwright.dev/docs/mock">Mock APIs | Playwright</a> 就示範了攔截請求、回傳測試資料，過程中不會真的連到原本的服務。</p><p>這樣的測試有用，但它沒有檢查真實帳號能不能登入、目前有沒有寫入權限，或檔案最後是否真的存在。看到「成功」之前，要先知道這個成功是外部服務回的，還是測試事先安排的。我會保留這些快速檢查，再另外驗證需要實際連接的部分，不會要求每一項測試都去操作一次雲端。</p><h2 id="從平常的入口走一次"><a href="#從平常的入口走一次" class="headerlink" title="從平常的入口走一次"></a>從平常的入口走一次</h2><h3 id="先寫出完成的樣子"><a href="#先寫出完成的樣子" class="headerlink" title="先寫出完成的樣子"></a>先寫出完成的樣子</h3><p>如果我要驗收匯出報表，會先寫下一個具體結果，例如「選定日期後，下載的 CSV 用試算表打開，應該看得到這段期間的紀錄，而且金額和原始資料一致」。CSV 是能用試算表開啟的表格文字檔；這裡要檢查的終點是它裡面的內容，不能只停在按鈕變色或出現成功訊息。</p><p>接著準備少量容易核對的測試資料。例如選定日期內放兩筆紀錄，金額分別是 100 和 200，再放一筆日期外的紀錄。預期匯出只有前兩筆，若工具也提供加總，結果就應該是 300。資料不用多，但要先知道正確答案，才能看出它有沒有漏掉、混入或改錯資料。這裡的報表是示範情境，換成整理照片、預約或待辦工具，也可以用同樣方式訂出完成條件。</p><h3 id="用預計交付的版本操作"><a href="#用預計交付的版本操作" class="headerlink" title="用預計交付的版本操作"></a>用預計交付的版本操作</h3><p>驗收時，要從平常會用的入口開始。網頁工具就打開網頁，選日期、按匯出，再檢查下載的檔案；bot 就從聊天視窗送出操作，確認最後拿到的結果。只在程式裡直接呼叫匯出函式，即使結果正確，也還沒檢查畫面上的按鈕是不是接到了它。</p><p>環境也要對得上。自己電腦裡已經登入的帳號、事先建好的資料夾、開發時留下的設定，可能讓流程剛好能跑。若工具準備放到另一台主機，或交給其他人使用，就要在對應的測試環境重新確認，並使用符合一般使用者權限的測試帳號。不能拿管理員帳號跑過一次，就當作其他人也一定能用。</p><p>這類從操作入口驗到最後結果的檢查，常稱為端到端測試，英文縮寫是 E2E。它也能自動化，不必永遠靠自己點。Playwright 的 <a href="https://playwright.dev/docs/best-practices">Best Practices | Playwright</a> 建議驗證使用者看得到的行為，這也是我選驗收終點的依據。先把流程和預期結果定好，之後才有辦法判斷自動化測試是不是涵蓋了同一件事。</p><h3 id="成功之外，也試一次失敗"><a href="#成功之外，也試一次失敗" class="headerlink" title="成功之外，也試一次失敗"></a>成功之外，也試一次失敗</h3><p>主要流程走通後，我會挑容易出錯、出錯後又需要人處理的情況補測。以報表來說，沒有符合日期的資料時，工具應該說明沒有資料，或產生事先約定好的空報表；儲存失敗時，不該仍然顯示「已儲存」。結果要怎麼呈現可以自己決定，但不能讓使用者以為事情做完了，實際上什麼都沒留下。</p><p>不用一開始窮舉所有異常。若工具只是匯出檔案，可以先測空資料和寫入失敗；若會新增或扣除資料，就多看重複點擊與中途中斷。難以安全重現的情況，可以先用模擬回應測自己的處理邏輯，再把尚未驗證的真實連線列出來。每次只增加一個條件，也比較容易知道問題是從哪裡開始的。</p><div class="note warning no-icon"><p>實跑用的是實際操作方式，不代表要拿正式資料冒險。使用可丟棄的測試資料與獨立帳號；涉及寄信、付款、刪除或對外發布時，要使用測試模式或隔離環境，不要為了驗收真的送出去。</p></div><h2 id="讓-AI-回報做過的檢查"><a href="#讓-AI-回報做過的檢查" class="headerlink" title="讓 AI 回報做過的檢查"></a>讓 AI 回報做過的檢查</h2><p>如果工具主要由 AI 協助開發，我會請它把「已完成」拆成可以核對的內容。它執行了哪個版本、用了什麼測試資料、從哪個入口開始，以及最後看到了什麼結果。拿匯出報表來說，「測試全部通過」太籠統；「用測試帳號從網頁匯出，下載後確認有兩筆紀錄，金額分別是 100 和 200」，才知道這次驗到了哪裡。再附上產出檔、截圖或執行紀錄的位置，才有辦法實際核對。</p><p>報告裡也要留下沒有做的部分。如果 AI 只能讀程式、跑本機測試，卻沒有瀏覽器或測試帳號，就把網頁操作標成未驗證，交給人補做。檔案比對通過、模擬服務回應正確、實際登入後操作成功，可以分開記，不需要湊成一句全部正常。自己不熟程式碼，也能先用這些具體結果，判斷還欠哪一段驗收。</p><p>檢查紀錄不用寫成長篇報告。留下版本、環境、操作、預期與實際結果，以及未驗證項目就夠了；若附截圖或執行紀錄，要先移除金鑰、個人資料與登入資訊。下次出現「我這邊可以，你那邊不行」，至少有資料能比較雙方到底用了什麼條件。</p><h2 id="把漏掉的補回測試"><a href="#把漏掉的補回測試" class="headerlink" title="把漏掉的補回測試"></a>把漏掉的補回測試</h2><p>發現問題後，修好再重跑同一條流程，接著看能不能加上一項自動檢查，讓相同錯誤在日後修改時能被抓到，這也是回歸測試的用途。例如設定區塊是否從第一行開始，就很適合自動檢查；至於目標工具更新後還能不能載入，仍是另一次實跑要驗證的事。</p><p>我不會因此把所有測試都改成從頭操作一次。金額計算、格式判斷這些局部規則，用小範圍測試就能快速確認；資料保存與讀回，要檢查相關部分接在一起的結果；最常用、失敗影響又大的完整流程，再保留端到端驗收。每一層都能做自己的工作，才不用改一行文字，就把整套系統重新點過一次。</p><hr><p>自己的工具，很適合拿平常真的要做的事驗收。挑一個主要功能，準備幾筆知道答案的資料，從正常入口做到拿到結果，再把漏掉的檢查補上。我的角色設定檔已經證明，檔案整整齊齊地躺在那裡，也可能完全沒人理它。下次看到那排通過的結果，我還是會打開工具，確認自己要用的功能真的在。</p>]]>
+    </content>
+    <id>https://calmkoala.github.io/tests-pass-but-does-it-work/</id>
+    <link href="https://calmkoala.github.io/tests-pass-but-does-it-work/"/>
+    <published>2026-10-03T00:00:00.000Z</published>
+    <summary>從檔案檢查到實際操作，替自己的小工具補上最後一段驗收。</summary>
+    <title>測試通過，真的能用了嗎？</title>
+    <updated>2026-10-03T01:10:27.027Z</updated>
+  </entry>
   <entry>
     <author>
       <name>PingChun</name>
@@ -28,7 +46,7 @@
     <published>2026-09-26T00:00:00.000Z</published>
     <summary>從檔案、試算表到資料庫，替自己的小工具選個合適的存法。</summary>
     <title>小工具一定要用資料庫嗎？</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -47,7 +65,7 @@
     <published>2026-09-19T00:00:00.000Z</published>
     <summary>先讓別人用得起來，再補實際需要的協作流程。</summary>
     <title>一個人的開源專案，文件要寫多少？</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -66,7 +84,7 @@
     <published>2026-09-12T00:00:00.000Z</published>
     <summary>把平常的修改紀錄整理成商店更新與開發紀錄，發版時少一次重新回想。</summary>
     <title>版本說明，別再發版時才重寫</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -85,7 +103,7 @@
     <published>2026-09-05T00:00:00.000Z</published>
     <summary>讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。</summary>
     <title>哪些工作該交給背景 AI agent？</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -104,7 +122,7 @@
     <published>2026-08-29T00:00:00.000Z</published>
     <summary>LilyScore 上架後，我把第一次發布會碰到的簽章、商店資料、測試軌與自動發版照順序整理，留一份下一個 App 能直接跟著做的操作筆記。</summary>
     <title>第一次上 Google Play，最麻煩的不是寫 App</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -123,7 +141,7 @@
     <published>2026-08-22T00:00:00.000Z</published>
     <summary>LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。</summary>
     <title>LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -142,7 +160,7 @@
     <published>2026-08-15T01:00:00.000Z</published>
     <summary>一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。</summary>
     <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -161,7 +179,7 @@
     <published>2026-08-08T05:00:00.000Z</published>
     <summary>Skill 裝得更多，不代表 AI agent 會持續變好。從整理與刪減 skill 的經驗，比較不同觀點，以及如何判斷規則該放在 skill、專案指引、獨立 agent 或程式檢查。</summary>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -180,7 +198,7 @@
     <published>2026-08-01T01:00:00.000Z</published>
     <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
     <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <updated>2026-10-02T07:45:24.736Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -199,7 +217,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -221,7 +239,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -244,7 +262,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -268,7 +286,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -289,7 +307,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -311,7 +329,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -335,7 +353,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -364,7 +382,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
   <entry>
     <author>
@@ -385,6 +403,6 @@
       <![CDATA[<h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-10-02T07:45:24.735Z</updated>
+    <updated>2026-10-03T01:10:27.026Z</updated>
   </entry>
 </feed>
