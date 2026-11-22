@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
@@ -15,10 +15,10 @@
 
 
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="我有一個常駐的 AI 助理 bot，平常會主動推播提醒、報告工作進度，偶爾覺得它有點吵。某天下午我要重啟它裝新功能，才發現它消失了一陣子。log 最後一行停在前一天早上十點多，沒報錯，也沒留下半點線索，就這樣安靜地不見了 16 個小時。事後推測應該是機器重開的時候沒有一起把服務重啟。 這讓我開始思考一個問題：要是哪天換別的原因害它死掉，我會不會一樣過了半天才發現？畢竟我平常只有在它跳出訊息的時候去">
 <meta property="og:type" content="article">
@@ -27,15 +27,15 @@
 <meta property="og:site_name" content="CalmKoala">
 <meta property="og:description" content="我有一個常駐的 AI 助理 bot，平常會主動推播提醒、報告工作進度，偶爾覺得它有點吵。某天下午我要重啟它裝新功能，才發現它消失了一陣子。log 最後一行停在前一天早上十點多，沒報錯，也沒留下半點線索，就這樣安靜地不見了 16 個小時。事後推測應該是機器重開的時候沒有一起把服務重啟。 這讓我開始思考一個問題：要是哪天換別的原因害它死掉，我會不會一樣過了半天才發現？畢竟我平常只有在它跳出訊息的時候去">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="og:image" content="https://calmkoala.github.io/og/long-running-service-watchdog.png">
 <meta property="article:published_time" content="2026-07-12T00:00:00.000Z">
-<meta property="article:modified_time" content="2026-10-10T01:10:27.322Z">
+<meta property="article:modified_time" content="2026-11-22T10:40:47.718Z">
 <meta property="article:author" content="PingChun">
-<meta property="article:tag" content="自動化">
-<meta property="article:tag" content="系統設計">
 <meta property="article:tag" content="SRE">
+<meta property="article:tag" content="系統設計">
+<meta property="article:tag" content="自動化">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta name="twitter:image" content="https://calmkoala.github.io/og/long-running-service-watchdog.png">
 
 
 <link rel="canonical" href="https://calmkoala.github.io/long-running-service-watchdog/">
@@ -55,7 +55,6 @@
 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   
@@ -85,12 +84,7 @@
   <main class="main">
     <div class="column">
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切換導航欄" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
+  <div class="site-nav-search popup-trigger" aria-label="搜尋" role="button">
   </div>
 
   <div class="site-meta">
@@ -103,9 +97,8 @@
       <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
   </div>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
-    </div>
+  <div class="site-nav-toggle" aria-label="切換導航欄" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
   </div>
 </div>
 
@@ -236,7 +229,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -256,7 +249,7 @@
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>4k</span>
@@ -295,7 +288,17 @@
 <h1 id="看門的人，不能睡在屋裡"><a href="#看門的人，不能睡在屋裡" class="headerlink" title="看門的人，不能睡在屋裡"></a>看門的人，不能睡在屋裡</h1><p>先講一個你家就有的東西：煙霧偵測器。</p>
 <p>它為什麼裝在天花板、還自己帶一顆電池？因為如果它只靠家裡的電路，哪天電線走火、跳電了，它剛好跟著斷電，火最大的那一刻它已經睡死了。它至少要有獨立的備援電源，不能在房子跳電時跟著完全失效。</p>
 <p>長駐服務的守護也是同一句話：監測一個東西的機制，不能跟那個東西一起死。管理員可以跟服務住在同一台機器，但外部心跳監控得站到主機外面；開機自啟則交給作業系統。三層不是整齊的一圈包一圈，比較像一條恢復鏈，再加上一條獨立的報警線：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">flowchart LR</span><br><span class="line">  OS[第三層：作業系統開機自啟] --&gt; SUP[第一層：服務管理員]</span><br><span class="line">  SUP --&gt;|啟動與監督| SVC([長駐服務])</span><br><span class="line">  SUP -.異常退出後重啟.-&gt; SVC</span><br><span class="line">  SVC --&gt;|完成工作後定時打卡| HC[第二層：外部心跳監控]</span><br><span class="line">  HC --&gt;|逾時告警| YOU([你的手機])</span><br></pre></td></tr></table></figure>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  OS[第三層：作業系統開機自啟] --&gt; SUP[第一層：服務管理員]
+  SUP --&gt;|啟動與監督| SVC([長駐服務])
+  SUP -.異常退出後重啟.-&gt; SVC
+  SVC --&gt;|完成工作後定時打卡| HC[第二層：外部心跳監控]
+  HC --&gt;|逾時告警| YOU([你的手機])
+</code>
+</pre>
 
 <h1 id="第一層-管理員：倒了就扶它起來"><a href="#第一層-管理員：倒了就扶它起來" class="headerlink" title="第一層 管理員：倒了就扶它起來"></a>第一層 管理員：倒了就扶它起來</h1><p>先接最單純的死法，自己把遺書寫好的死法。</p>
 <p>這邊的處理方法很簡單，就是不要讓服務「自己跑」，我們在它旁邊派一個管理員，服務一倒就把它扶起來。</p>
@@ -323,7 +326,7 @@
 <h1 id="最後"><a href="#最後" class="headerlink" title="最後"></a>最後</h1><p>這三層防的是「它死掉」，防不了「它做錯事」。服務要是活得好好的、health 也正常回報，卻把某筆資料算錯了，看門狗只會一路跟你說一切安好。「它還在做事」跟「它做對事」是兩回事，這套只保證前者。後者是另一個題目，得靠別的東西守，這篇罩不到。</p>
 <hr>
 <p>三層設完之後，服務一斷氣，一分鐘內我手機就會叮一聲。當初還嫌這 bot 有點吵，結果我又在旁邊多養了一隻，專門在它出事的時候吵我，家裡的叮咚聲大概只會更多，但至少不會再有下一個安靜消失的 16 小時了(?</p>
-
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li><li><a href="/llm-agent-isolation/">多人共用 AI bot，別讓它認錯使用者</a></li></ul></div>
     </div>
 
     
@@ -333,8 +336,8 @@
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E8%87%AA%E5%8B%95%E5%8C%96/" rel="tag"># 自動化</a>
-              <a href="/tags/%E7%B3%BB%E7%B5%B1%E8%A8%AD%E8%A8%88/" rel="tag"># 系統設計</a>
               <a href="/tags/SRE/" rel="tag"># SRE</a>
+              <a href="/tags/%E7%B3%BB%E7%B5%B1%E8%A8%AD%E8%A8%88/" rel="tag"># 系統設計</a>
           </div>
 
         
@@ -399,7 +402,6 @@
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
   </div>
-  <div class="sidebar-dimmer"></div>
   <div class="back-to-top" role="button" aria-label="回到頂端">
     <i class="fa fa-arrow-up fa-lg"></i>
     <span>0%</span>

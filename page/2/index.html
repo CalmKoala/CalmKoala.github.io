@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
@@ -15,10 +15,10 @@
 
 
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="後端工程師 寫程式學習筆記，以及 AI 工具、框架的觀察">
 <meta property="og:type" content="website">
@@ -29,13 +29,13 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
 <meta property="article:author" content="PingChun">
-<meta property="article:tag" content="backend">
-<meta property="article:tag" content="software">
-<meta property="article:tag" content="後端">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="Hexo">
-<meta property="article:tag" content="框架">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="software">
 <meta property="article:tag" content="tessa">
+<meta property="article:tag" content="後端">
+<meta property="article:tag" content="框架">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
 
@@ -57,7 +57,6 @@
 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   
@@ -87,12 +86,7 @@
   <main class="main">
     <div class="column">
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切換導航欄" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
+  <div class="site-nav-search popup-trigger" aria-label="搜尋" role="button">
   </div>
 
   <div class="site-meta">
@@ -105,9 +99,8 @@
       <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
   </div>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
-    </div>
+  <div class="site-nav-toggle" aria-label="切換導航欄" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
   </div>
 </div>
 
@@ -236,7 +229,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -256,7 +249,7 @@
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>5.1k</span>
@@ -353,7 +346,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -373,7 +366,7 @@
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>4.9k</span>
@@ -483,7 +476,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -503,7 +496,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>2.5k</span>
@@ -598,7 +591,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -618,7 +611,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>4k</span>
@@ -711,7 +704,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -731,7 +724,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>1.6k</span>
@@ -825,7 +818,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -845,7 +838,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>608</span>
@@ -936,7 +929,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -956,7 +949,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>1.1k</span>
@@ -1048,7 +1041,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1068,7 +1061,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>1.2k</span>
@@ -1163,7 +1156,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1183,7 +1176,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>3.2k</span>
@@ -1282,7 +1275,7 @@ flowchart LR
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1306,7 +1299,7 @@ flowchart LR
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>3.4k</span>
@@ -1327,7 +1320,7 @@ flowchart LR
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="CI-x2F-CD"><a href="#CI-x2F-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
+          <h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/CI-CD-Github-Action/#more" rel="contents">
@@ -1395,7 +1388,6 @@ flowchart LR
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
   </div>
-  <div class="sidebar-dimmer"></div>
   <div class="back-to-top" role="button" aria-label="回到頂端">
     <i class="fa fa-arrow-up fa-lg"></i>
     <span>0%</span>

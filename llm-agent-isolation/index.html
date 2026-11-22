@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
@@ -15,10 +15,10 @@
 
 
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"calmkoala.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":"utterances","storage":true,"lazyload":false,"nav":null,"activeClass":"utterances"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。">
 <meta property="og:type" content="article">
@@ -27,15 +27,15 @@
 <meta property="og:site_name" content="CalmKoala">
 <meta property="og:description" content="多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta property="og:image" content="https://calmkoala.github.io/og/llm-agent-isolation.png">
 <meta property="article:published_time" content="2026-07-25T00:00:00.000Z">
-<meta property="article:modified_time" content="2026-10-10T01:10:27.323Z">
+<meta property="article:modified_time" content="2026-11-22T10:40:47.718Z">
 <meta property="article:author" content="PingChun">
 <meta property="article:tag" content="AI">
-<meta property="article:tag" content="系統設計">
 <meta property="article:tag" content="安全">
+<meta property="article:tag" content="系統設計">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://calmkoala.github.io/images/og-image.png">
+<meta name="twitter:image" content="https://calmkoala.github.io/og/llm-agent-isolation.png">
 
 
 <link rel="canonical" href="https://calmkoala.github.io/llm-agent-isolation/">
@@ -55,7 +55,6 @@
 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   
@@ -85,12 +84,7 @@
   <main class="main">
     <div class="column">
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切換導航欄" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
+  <div class="site-nav-search popup-trigger" aria-label="搜尋" role="button">
   </div>
 
   <div class="site-meta">
@@ -103,9 +97,8 @@
       <p class="site-subtitle" itemprop="description">One is never too old to learn</p>
   </div>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜尋" role="button">
-    </div>
+  <div class="site-nav-toggle" aria-label="切換導航欄" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
   </div>
 </div>
 
@@ -236,7 +229,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-10-10 09:10:27" itemprop="dateModified" datetime="2026-10-10T09:10:27+08:00">2026-10-10</time>
+      <time title="修改時間：2026-11-22 18:40:47" itemprop="dateModified" datetime="2026-11-22T18:40:47+08:00">2026-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -256,7 +249,7 @@
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
+        <i class="far fa-file-lines"></i>
       </span>
       <span class="post-meta-item-text">文章字數：</span>
       <span>4.9k</span>
@@ -436,7 +429,7 @@ flowchart LR
 <p>也要檢查模型是否擁有旁路能力。Read、Write、Bash、瀏覽器、資料庫查詢與自訂 MCP 工具，都可能繞過原本設計的記憶 API。</p>
 <p>我的第一版沒有漏寫那個 <code>if</code>。我把模型產生的 <code>requester_id</code> 當成通過驗證的身份，才讓檢查看似存在，實際上仍由模型控制。</p>
 <p>兩人版可以把身份固定在專屬 process，多人共用的服務可以放進每次請求專用的伺服器端上下文。實作方式會隨規模改變，模型只負責選擇操作與資源，系統負責決定它目前代表誰，以及可以操作哪些資料。</p>
-
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>
     </div>
 
     
@@ -512,7 +505,6 @@ flowchart LR
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
   </div>
-  <div class="sidebar-dimmer"></div>
   <div class="back-to-top" role="button" aria-label="回到頂端">
     <i class="fa fa-arrow-up fa-lg"></i>
     <span>0%</span>
