@@ -1,6 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
+    <url>//tessa/</url>
+    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
+<ul>
+<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
+<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
+<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
+</ul>
+<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
+<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
+<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
+<span id="more"></span>
+
+<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
+<ul>
+<li><strong>planner</strong>：拆需求、列候選方案</li>
+<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
+<li><strong>executor</strong>：照規格動手產出</li>
+<li><strong>qa</strong>：對照規格驗收</li>
+<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
+</ul>
+<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
+<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
+<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
+<p>整個流程被拆成 6 段，依序跑：</p>
+<ol>
+<li>planner 出候選結構</li>
+<li>planning_manager 審候選</li>
+<li>planner 寫完整規格書</li>
+<li>planning_manager 審規格書</li>
+<li>executor 照規格產出</li>
+<li>qa + execution_manager 驗收</li>
+</ol>
+<p>每段中間都有「審過才往下走」的閘門。</p>
+<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
+<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
+<ul>
+<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
+<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
+<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
+<li>其中 2 條是 planner 自己也沒答的開放問題</li>
+</ul>
+<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
+<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
+<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
+<ul>
+<li>對 planner 推薦的方案逐條對齊原始需求</li>
+<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
+<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
+<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
+</ul>
+<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
+<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
+<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
+<ul>
+<li>不可以寫某幾個競品名</li>
+<li>不可以提某幾個個人專案名</li>
+<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
+</ul>
+<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
+<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
+<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
+<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
+<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
+<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
+<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
+<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
+<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
+<ul>
+<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
+<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
+<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
+</ul>
+<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
+<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
+<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
+<p>這個資料夾裡裝的是：</p>
+<ul>
+<li>幾個角色的職責描述（markdown）</li>
+<li>幾個流程的步驟清單（markdown）</li>
+<li>幾條團隊共用的紀律規則（markdown）</li>
+<li>團隊共同的記憶檔（markdown）</li>
+</ul>
+<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
+<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
+<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
+<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
+<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
+<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
+<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
+<hr>
+<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
+<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
+<li><a href="https://claude.com/claude-code">Claude Code</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
+</ul>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/lilyscore-launch/">LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>個人專案</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>個人專案</tag>
+        <tag>開發工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CI/CD(Github Action)</title>
     <url>//CI-CD-Github-Action/</url>
     <content><![CDATA[<h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
@@ -118,143 +226,6 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
       </tags>
   </entry>
   <entry>
-    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <url>//tessa/</url>
-    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
-<ul>
-<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
-<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
-<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
-</ul>
-<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
-<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
-<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
-<span id="more"></span>
-
-<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
-<ul>
-<li><strong>planner</strong>：拆需求、列候選方案</li>
-<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
-<li><strong>executor</strong>：照規格動手產出</li>
-<li><strong>qa</strong>：對照規格驗收</li>
-<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
-</ul>
-<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
-<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
-<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
-<p>整個流程被拆成 6 段，依序跑：</p>
-<ol>
-<li>planner 出候選結構</li>
-<li>planning_manager 審候選</li>
-<li>planner 寫完整規格書</li>
-<li>planning_manager 審規格書</li>
-<li>executor 照規格產出</li>
-<li>qa + execution_manager 驗收</li>
-</ol>
-<p>每段中間都有「審過才往下走」的閘門。</p>
-<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
-<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
-<ul>
-<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
-<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
-<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
-<li>其中 2 條是 planner 自己也沒答的開放問題</li>
-</ul>
-<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
-<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
-<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
-<ul>
-<li>對 planner 推薦的方案逐條對齊原始需求</li>
-<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
-<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
-<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
-</ul>
-<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
-<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
-<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
-<ul>
-<li>不可以寫某幾個競品名</li>
-<li>不可以提某幾個個人專案名</li>
-<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
-</ul>
-<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
-<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
-<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
-<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
-<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
-<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
-<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
-<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
-<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
-<ul>
-<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
-<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
-<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
-</ul>
-<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
-<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
-<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
-<p>這個資料夾裡裝的是：</p>
-<ul>
-<li>幾個角色的職責描述（markdown）</li>
-<li>幾個流程的步驟清單（markdown）</li>
-<li>幾條團隊共用的紀律規則（markdown）</li>
-<li>團隊共同的記憶檔（markdown）</li>
-</ul>
-<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
-<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
-<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
-<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
-<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
-<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
-<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
-<hr>
-<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
-<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
-<li><a href="https://claude.com/claude-code">Claude Code</a></li>
-<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
-</ul>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/lilyscore-launch/">LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>個人專案</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>個人專案</tag>
-        <tag>開發工具</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <url>//apscheduler-windows-misfire/</url>
-    <content><![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
-<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
-<span id="more"></span>
-
-<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
-<p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
-<p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
-<p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
-<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
-<p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p>
-<hr>
-<p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/subprocess-cp950/">subprocess 在 Windows 的 cp950 編碼坑</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>APScheduler</tag>
-        <tag>Windows</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
     <url>//script-first/</url>
     <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
@@ -302,26 +273,31 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
       </tags>
   </entry>
   <entry>
-    <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <url>//subprocess-cp950/</url>
-    <content><![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
+    <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
+    <url>//apscheduler-windows-misfire/</url>
+    <content><![CDATA[<p>最近有很多需要定期執行的項目，用 APScheduler 排好時間後，想說設定完就不用再管它。結果某天發現它沒正常運作，連續好幾天都沒動靜，但程式看起來一切正常，也沒噴任何錯誤，第一直覺就是自己程式一定寫錯了(抖</p>
+<p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
 <span id="more"></span>
 
-<h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
-<p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p>
-<p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p>
-<h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
+<p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
+<p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
+<p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
+<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
-<p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/apscheduler-windows-misfire/">排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
+<p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
+<p>這裡可能會有個疑問，既然問題出在 Windows，為什麼不乾脆用 Windows 內建的 Task Scheduler？<br>因為我這支程式希望可以同時在 Mac 跟 Windows 上跑，APScheduler 讓我用同一套 Python 排程兩邊通用，不必為每個作業系統各維護一份排程設定。換個角度看，這個 misfire 坑算是把排程放進程式裡、換取跨平台便利的代價。</p>
+<hr>
+<p>這個坑的麻煩不在難解，在難發現，它躲在一行 log 裡，表面上什麼都正常。整件事最好笑的是，根因不過是一個預設 1 秒的參數，我一直以為是程式哪裡有問題，研究了一陣子，最後讓 AI 跑一下，馬上就揪出來。如果你的排程在 Windows 上「偶爾」或「整天」不執行又不報錯，先去翻 <code>misfire_grace_time</code>，省得跟我一樣繞遠路。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/subprocess-cp950/">subprocess 在 Windows 的 cp950 編碼坑</a></li></ul></div>]]></content>
       <categories>
         <category>學習筆記</category>
         <category>Python</category>
       </categories>
       <tags>
-        <tag>AI</tag>
         <tag>Python</tag>
+        <tag>APScheduler</tag>
         <tag>Windows</tag>
       </tags>
   </entry>
@@ -495,6 +471,30 @@ flowchart LR
       </categories>
       <tags>
         <tag>AI</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>subprocess 在 Windows 的 cp950 編碼坑</title>
+    <url>//subprocess-cp950/</url>
+    <content><![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
+<span id="more"></span>
+
+<h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
+<p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p>
+<p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p>
+<h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/apscheduler-windows-misfire/">排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>Python</tag>
+        <tag>Windows</tag>
       </tags>
   </entry>
   <entry>
@@ -798,52 +798,6 @@ flowchart LR
       </tags>
   </entry>
   <entry>
-    <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <url>//when-multi-agent-works/</url>
-    <content><![CDATA[<p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
-<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
-<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
-<span id="more"></span>
-
-<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
-  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
-  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
-  RETRY --&gt; DELIVER
-</code>
-</pre>
-
-<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
-<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
-<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
-<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
-<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
-<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
-<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
-<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
-<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
-<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
-<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
-<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
-<p>一篇名為 <a href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
-<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
-<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>AI agent</tag>
-        <tag>Multi-agent</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
     <url>//ai-agent-skills-more-is-better/</url>
     <content><![CDATA[<p>AI agent 的 skill 很好用。網路上可以找到各式各樣的 skill，每次看到一個可能用得上的，我總會迫不及待裝起來試試看。我原本以為，skill 裝得越多，AI agent 能做的事也會越多。</p>
@@ -923,6 +877,52 @@ flowchart LR
         <tag>AI</tag>
         <tag>AI agent</tag>
         <tag>Agent Skills</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
+    <url>//when-multi-agent-works/</url>
+    <content><![CDATA[<p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
+<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
+<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
+<span id="more"></span>
+
+<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
+  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
+  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
+  RETRY --&gt; DELIVER
+</code>
+</pre>
+
+<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
+<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
+<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
+<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
+<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
+<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
+<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
+<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
+<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
+<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
+<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
+<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
+<p>一篇名為 <a href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
+<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
+<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>AI agent</tag>
+        <tag>Multi-agent</tag>
       </tags>
   </entry>
   <entry>
@@ -1518,83 +1518,6 @@ flowchart TD
       </tags>
   </entry>
   <entry>
-    <title>一個人的開源專案，文件要寫多少？</title>
-    <url>//solo-project-jit-governance/</url>
-    <content><![CDATA[<p>你有沒有做完一個小工具，準備公開時，就順手請 AI 幫忙把文件也補齊？現在用 AI 整理使用說明很方便，原本懶得從空白頁寫起的安裝步驟、操作範例，都能先有個草稿。既然都請它寫了，再補一份貢獻指南、行為準則，好像也不費什麼力氣，專案看起來還更完整。</p>
-<p>我之前準備公開一套 AI 協作框架時，也整理出了一整套文件。它用 Markdown 和 YAML 這類文字檔，描述不同 AI 角色該做什麼，以及工作要怎麼交接，讓我不用每次重新交代同一套分工。原本想分享的是這個做法，整理到後來，專案裡卻已經有貢獻流程、社群規範和一大份內部架構說明。</p>
-<p>只是文件生出來之後，裡面的流程還是得有人照著做、隨著專案更新。當時我仍打算以一人維護的方式經營專案，並沒有要照那套完整制度運作，後來便把其中幾份文件從對外版本移除，保留自己查閱需要的內容。我開始想的是，第一次看到這個專案的人，到底缺哪一份說明；如果他連怎麼開始用都不知道，我先寫完分支命名規則，好像也幫不上忙。</p>
-<span id="more"></span>
-
-<h2 id="我刪掉的是哪一種文件"><a href="#我刪掉的是哪一種文件" class="headerlink" title="我刪掉的是哪一種文件"></a>我刪掉的是哪一種文件</h2><p>GitHub 上的專案通常會有一份 README，直接顯示在專案首頁，讓人知道這是什麼、如何使用。想協助修改的人，則可能需要 CONTRIBUTING，也就是貢獻指南，裡面交代怎麼準備開發環境、檢查修改結果，以及把變更交給維護者。兩份文件的讀者可能是同一個人，卻是在不同時候找答案。</p>
-<p>我那次移除的是 CONTRIBUTING、Code of Conduct（行為準則），以及 ARCHITECTURE（內部架構說明）。授權條款和安全回報說明仍然保留，使用者需要的安裝方式也沒有一起拿掉。這是在調整當下對外維護的文件範圍，並不是刪光說明、只留下程式碼。</p>
-<p>其中最需要分開看的是架構文件。未來協作者可能需要知道檔案怎麼組合，第一次使用的人卻未必需要讀完每個設計決策。後來我又把安裝、基本概念、自訂方式等使用說明拆進文件目錄，從首頁連過去。內部筆記可以先留給自己，但別人操作時缺的說明，還是得補回公開文件裡。</p>
-<p>對我來說，成本主要在寫完之後。測試指令換了，貢獻指南得跟著改；工作方式調整了，審查流程也得更新。AI 可以協助更新內容，但裡面的指令是否真的能跑、承諾的流程是否做得到，仍得自己確認。文件寫得越完整，需要核對的地方也越多。</p>
-<h2 id="公開前先交代什麼"><a href="#公開前先交代什麼" class="headerlink" title="公開前先交代什麼"></a>公開前先交代什麼</h2><h3 id="讓第一個使用者能開始"><a href="#讓第一個使用者能開始" class="headerlink" title="讓第一個使用者能開始"></a>讓第一個使用者能開始</h3><p>我現在會先從使用者的第一個動作往回看。對這套 AI 協作框架來說，他需要知道哪些工具能用、怎麼安裝，再用一個小任務確認角色有正常運作。至於我當初比較過哪些設計、為什麼淘汰某種分工方式，可以放在後面，不必擋在開始使用之前。</p>
-<p>換成一般的小工具也一樣。README 至少要說明它解決什麼問題、需要先準備什麼，以及照著做完會看到什麼結果。如果還有尚未支援的平台、可能改動的功能，或只在自己的環境測過，也要讓人事先知道。只寫「安裝後即可使用」，卻沒交代安裝成功長什麼樣子，讀者卡住時還是只能猜。</p>
-<p>這些資訊不一定要各自拆成一份檔案。我會先按用途分配，再決定要放在哪裡。</p>
-<table>
-<thead>
-<tr>
-<th>讀者現在需要知道的事</th>
-<th>起步時可以怎麼放</th>
-<th>什麼時候再擴充</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>這是什麼、如何開始、有哪些限制</td>
-<td>README，加一個能照做的例子</td>
-<td>首頁太長時，把安裝與進階用法拆出去並留下連結</td>
-</tr>
-<tr>
-<td>可以如何使用、修改與散布</td>
-<td>放好適用的授權條款</td>
-<td>授權需求改變時重新評估，不等有人提問才處理</td>
-</tr>
-<tr>
-<td>一般問題、安全問題要去哪裡回報</td>
-<td>README 留一般入口，安全回報另給非公開管道</td>
-<td>回報需要的資訊反覆缺漏時，再補範本</td>
-</tr>
-<tr>
-<td>想協助修改，該先做什麼</td>
-<td>先說是否接受修改，並留下討論想法的入口</td>
-<td>開始邀請貢獻時，補開發與檢查步驟</td>
-</tr>
-<tr>
-<td>多人一起討論或維護，要遵守什麼</td>
-<td>準備招募貢獻或經營討論時，先交代行為邊界與處理方式</td>
-<td>有固定協作者時，再補審查分工與發布權責</td>
-</tr>
-</tbody></table>
-<p>這張表是我整理一人專案時的取捨，沒有規定 CONTRIBUTING 一定得晚寫。如果現在就需要請別人協助，先用幾行交代怎麼參與，會比讓對方來回問更省事。</p>
-<h3 id="安全回報不能等"><a href="#安全回報不能等" class="headerlink" title="安全回報不能等"></a>安全回報不能等</h3><p>一般操作問題，可以請使用者建立 GitHub issue；它是專案用來追蹤問題與建議的討論頁。安全漏洞則要有私下回報的方法，不能等第一個人把敏感內容貼到公開留言區，才開始決定該寄到哪裡。我當時保留的 SECURITY 文件，就把一般問題和安全回報分開處理。</p>
-<p>GitHub 提供私人漏洞回報功能，但在文件裡寫「請使用私人回報」不等於功能已經開啟。依 <a href="https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository">Configuring private vulnerability reporting for a repository</a> 的說明，維護者需要啟用功能，對方才會看到回報按鈕；通知設定也會影響維護者能否收到提醒。如果選擇用這個管道，公開前就要確認入口真的可用，而不只是把網址貼上去。</p>
-<div class="note warning no-icon"><p>可以延後的是尚未用到的協作流程。授權條款、API 金鑰與個人資料的檢查、非公開的安全回報入口，都不適合等有人出事才補。把已提交過的文件從目前版本刪掉，也不會自動清除 Git 保留的過去版本紀錄；整理文件和處理資料外洩，是兩件不同的工作。</p>
-</div>
-
-<h2 id="有人想幫忙時怎麼補"><a href="#有人想幫忙時怎麼補" class="headerlink" title="有人想幫忙時怎麼補"></a>有人想幫忙時怎麼補</h2><p>假設有人試用後，在 issue 問：「我照著安裝說明做，但不知道設定檔要放哪裡。」這時先回覆位置，再把答案補到 README 對應的步驟旁邊就好。對方卡在使用說明，新增一份貢獻指南並不能幫他完成安裝。</p>
-<p>接著，假設他說願意幫忙補一個安裝範例，事情才進到協作。我會先說明範例應放在哪裡、要涵蓋哪種環境，以及送出前怎麼確認步驟可用。不能等他全部做完，才告訴他我其實還要求另一組檢查；如果檢查方式只有我知道，我就得先補出來，或明講哪些部分會由我協助驗證。</p>
-<p>對方把修改送成一筆變更提案，請我審查是否合併；GitHub 把這種提案稱為 pull request，簡稱 PR。第一輪合作結束後，可以把剛才那段說明整理進 CONTRIBUTING。內容不用突然長成一套制度，先讓下一位貢獻者知道「動手前先討論範圍、修改放哪裡、完成後如何檢查」就有用。之後發現每次都漏掉相同資訊，再把那一項加進 PR 範本。</p>
-<p>若改的是功能，檢查方式可能是執行測試；若改的是安裝說明，就應實際照步驟走過。主要靠 AI 做修改的人，可以先請它列出能重做的檢查步驟，自己跑一次並保留結果，再決定文件要記哪些操作。AI 產出的「所有測試均已通過」，仍要有實際執行結果可以核對，不能直接拿這句話當驗收。</p>
-<p>拆出 CONTRIBUTING 也有檔名以外的好處。GitHub 的 <a href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors">Setting guidelines for repository contributors</a> 說明，放在支援位置的貢獻指南，會在建立 issue 或 PR 時提供連結。協作開始固定發生後，把規則放到對方準備送出修改的位置，比一直藏在 README 中段更好找。</p>
-<p>我把這種安排理解成「需要時再補規則」。時間點可以是第一次回饋，也可以是自己決定開始找人幫忙；不必硬等到第一個 PR 已經送來，更不用等同一個人踩兩次坑，才承認文件缺了一段。</p>
-<h2 id="什麼時候該提早寫"><a href="#什麼時候該提早寫" class="headerlink" title="什麼時候該提早寫"></a>什麼時候該提早寫</h2><p>查資料時，我也看到跟我當時選擇不同的建議。<a href="https://opensource.guide/starting-a-project/">Starting an Open Source Project</a> 把授權、README、貢獻指南與行為準則都列為起步文件，也提到早期的貢獻指南可以很簡單。這個建議有道理，清楚的參與方式本來就能降低別人第一次幫忙的門檻，不能只看「現在沒人提修改」，就推論永遠不需要寫。</p>
-<p>如果公開的目的就是招募協作者，或已經準備經營討論區，我會在邀請之前補好參與方式與行為準則，包括不當行為要向誰回報、維護者如何處理。人少也可能發生衝突，不能把「等有需要」解讀成等第一次爭執後再想規則。同樣地，多個人開始審查與發布時，誰可以合併、誰可以發版，也應該事先談好。</p>
-<p>我的起點比較小，先把自己做的工具分享出去，由自己維護，沒有打算一開始就建立共同決策的社群。在這個前提下，我願意承擔第一次有人想幫忙時，多花一點時間說明和補文件的成本。所以我會先在 README 留下求助入口與是否接受貢獻，其他制度等實際互動再補。</p>
-<hr>
-<p>下次整理自己的專案，我會先挑一個已經能用的功能，從 README 開始照著做一次，看看哪一步還得靠腦中的記憶補完。那就是現在該寫的地方。至於暫時用不到的審查層級和完整提案範本，先留下需要時再補的空間，至少不用一邊改功能，一邊通知只有自己一個人的委員會。（當然，最好的習慣還是在製作過程中，就順手把需要的文件補好，省得最後再靠記憶補作業。）</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li><li><a href="/google-sheets-as-database/">小工具一定要用資料庫嗎？</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>開發</category>
-      </categories>
-      <tags>
-        <tag>工作流程</tag>
-        <tag>開源</tag>
-        <tag>Side Project</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>小工具一定要用資料庫嗎？</title>
     <url>//google-sheets-as-database/</url>
     <content><![CDATA[<p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p>
@@ -1659,8 +1582,8 @@ flowchart TD
         <category>開發</category>
       </categories>
       <tags>
-        <tag>Side Project</tag>
         <tag>Google Sheets</tag>
+        <tag>Side Project</tag>
         <tag>資料庫</tag>
       </tags>
   </entry>
@@ -1777,6 +1700,83 @@ graph TD
       <tags>
         <tag>自動化</tag>
         <tag>Telegram</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一個人的開源專案，文件要寫多少？</title>
+    <url>//solo-project-jit-governance/</url>
+    <content><![CDATA[<p>你有沒有做完一個小工具，準備公開時，就順手請 AI 幫忙把文件也補齊？現在用 AI 整理使用說明很方便，原本懶得從空白頁寫起的安裝步驟、操作範例，都能先有個草稿。既然都請它寫了，再補一份貢獻指南、行為準則，好像也不費什麼力氣，專案看起來還更完整。</p>
+<p>我之前準備公開一套 AI 協作框架時，也整理出了一整套文件。它用 Markdown 和 YAML 這類文字檔，描述不同 AI 角色該做什麼，以及工作要怎麼交接，讓我不用每次重新交代同一套分工。原本想分享的是這個做法，整理到後來，專案裡卻已經有貢獻流程、社群規範和一大份內部架構說明。</p>
+<p>只是文件生出來之後，裡面的流程還是得有人照著做、隨著專案更新。當時我仍打算以一人維護的方式經營專案，並沒有要照那套完整制度運作，後來便把其中幾份文件從對外版本移除，保留自己查閱需要的內容。我開始想的是，第一次看到這個專案的人，到底缺哪一份說明；如果他連怎麼開始用都不知道，我先寫完分支命名規則，好像也幫不上忙。</p>
+<span id="more"></span>
+
+<h2 id="我刪掉的是哪一種文件"><a href="#我刪掉的是哪一種文件" class="headerlink" title="我刪掉的是哪一種文件"></a>我刪掉的是哪一種文件</h2><p>GitHub 上的專案通常會有一份 README，直接顯示在專案首頁，讓人知道這是什麼、如何使用。想協助修改的人，則可能需要 CONTRIBUTING，也就是貢獻指南，裡面交代怎麼準備開發環境、檢查修改結果，以及把變更交給維護者。兩份文件的讀者可能是同一個人，卻是在不同時候找答案。</p>
+<p>我那次移除的是 CONTRIBUTING、Code of Conduct（行為準則），以及 ARCHITECTURE（內部架構說明）。授權條款和安全回報說明仍然保留，使用者需要的安裝方式也沒有一起拿掉。這是在調整當下對外維護的文件範圍，並不是刪光說明、只留下程式碼。</p>
+<p>其中最需要分開看的是架構文件。未來協作者可能需要知道檔案怎麼組合，第一次使用的人卻未必需要讀完每個設計決策。後來我又把安裝、基本概念、自訂方式等使用說明拆進文件目錄，從首頁連過去。內部筆記可以先留給自己，但別人操作時缺的說明，還是得補回公開文件裡。</p>
+<p>對我來說，成本主要在寫完之後。測試指令換了，貢獻指南得跟著改；工作方式調整了，審查流程也得更新。AI 可以協助更新內容，但裡面的指令是否真的能跑、承諾的流程是否做得到，仍得自己確認。文件寫得越完整，需要核對的地方也越多。</p>
+<h2 id="公開前先交代什麼"><a href="#公開前先交代什麼" class="headerlink" title="公開前先交代什麼"></a>公開前先交代什麼</h2><h3 id="讓第一個使用者能開始"><a href="#讓第一個使用者能開始" class="headerlink" title="讓第一個使用者能開始"></a>讓第一個使用者能開始</h3><p>我現在會先從使用者的第一個動作往回看。對這套 AI 協作框架來說，他需要知道哪些工具能用、怎麼安裝，再用一個小任務確認角色有正常運作。至於我當初比較過哪些設計、為什麼淘汰某種分工方式，可以放在後面，不必擋在開始使用之前。</p>
+<p>換成一般的小工具也一樣。README 至少要說明它解決什麼問題、需要先準備什麼，以及照著做完會看到什麼結果。如果還有尚未支援的平台、可能改動的功能，或只在自己的環境測過，也要讓人事先知道。只寫「安裝後即可使用」，卻沒交代安裝成功長什麼樣子，讀者卡住時還是只能猜。</p>
+<p>這些資訊不一定要各自拆成一份檔案。我會先按用途分配，再決定要放在哪裡。</p>
+<table>
+<thead>
+<tr>
+<th>讀者現在需要知道的事</th>
+<th>起步時可以怎麼放</th>
+<th>什麼時候再擴充</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>這是什麼、如何開始、有哪些限制</td>
+<td>README，加一個能照做的例子</td>
+<td>首頁太長時，把安裝與進階用法拆出去並留下連結</td>
+</tr>
+<tr>
+<td>可以如何使用、修改與散布</td>
+<td>放好適用的授權條款</td>
+<td>授權需求改變時重新評估，不等有人提問才處理</td>
+</tr>
+<tr>
+<td>一般問題、安全問題要去哪裡回報</td>
+<td>README 留一般入口，安全回報另給非公開管道</td>
+<td>回報需要的資訊反覆缺漏時，再補範本</td>
+</tr>
+<tr>
+<td>想協助修改，該先做什麼</td>
+<td>先說是否接受修改，並留下討論想法的入口</td>
+<td>開始邀請貢獻時，補開發與檢查步驟</td>
+</tr>
+<tr>
+<td>多人一起討論或維護，要遵守什麼</td>
+<td>準備招募貢獻或經營討論時，先交代行為邊界與處理方式</td>
+<td>有固定協作者時，再補審查分工與發布權責</td>
+</tr>
+</tbody></table>
+<p>這張表是我整理一人專案時的取捨，沒有規定 CONTRIBUTING 一定得晚寫。如果現在就需要請別人協助，先用幾行交代怎麼參與，會比讓對方來回問更省事。</p>
+<h3 id="安全回報不能等"><a href="#安全回報不能等" class="headerlink" title="安全回報不能等"></a>安全回報不能等</h3><p>一般操作問題，可以請使用者建立 GitHub issue；它是專案用來追蹤問題與建議的討論頁。安全漏洞則要有私下回報的方法，不能等第一個人把敏感內容貼到公開留言區，才開始決定該寄到哪裡。我當時保留的 SECURITY 文件，就把一般問題和安全回報分開處理。</p>
+<p>GitHub 提供私人漏洞回報功能，但在文件裡寫「請使用私人回報」不等於功能已經開啟。依 <a href="https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository">Configuring private vulnerability reporting for a repository</a> 的說明，維護者需要啟用功能，對方才會看到回報按鈕；通知設定也會影響維護者能否收到提醒。如果選擇用這個管道，公開前就要確認入口真的可用，而不只是把網址貼上去。</p>
+<div class="note warning no-icon"><p>可以延後的是尚未用到的協作流程。授權條款、API 金鑰與個人資料的檢查、非公開的安全回報入口，都不適合等有人出事才補。把已提交過的文件從目前版本刪掉，也不會自動清除 Git 保留的過去版本紀錄；整理文件和處理資料外洩，是兩件不同的工作。</p>
+</div>
+
+<h2 id="有人想幫忙時怎麼補"><a href="#有人想幫忙時怎麼補" class="headerlink" title="有人想幫忙時怎麼補"></a>有人想幫忙時怎麼補</h2><p>假設有人試用後，在 issue 問：「我照著安裝說明做，但不知道設定檔要放哪裡。」這時先回覆位置，再把答案補到 README 對應的步驟旁邊就好。對方卡在使用說明，新增一份貢獻指南並不能幫他完成安裝。</p>
+<p>接著，假設他說願意幫忙補一個安裝範例，事情才進到協作。我會先說明範例應放在哪裡、要涵蓋哪種環境，以及送出前怎麼確認步驟可用。不能等他全部做完，才告訴他我其實還要求另一組檢查；如果檢查方式只有我知道，我就得先補出來，或明講哪些部分會由我協助驗證。</p>
+<p>對方把修改送成一筆變更提案，請我審查是否合併；GitHub 把這種提案稱為 pull request，簡稱 PR。第一輪合作結束後，可以把剛才那段說明整理進 CONTRIBUTING。內容不用突然長成一套制度，先讓下一位貢獻者知道「動手前先討論範圍、修改放哪裡、完成後如何檢查」就有用。之後發現每次都漏掉相同資訊，再把那一項加進 PR 範本。</p>
+<p>若改的是功能，檢查方式可能是執行測試；若改的是安裝說明，就應實際照步驟走過。主要靠 AI 做修改的人，可以先請它列出能重做的檢查步驟，自己跑一次並保留結果，再決定文件要記哪些操作。AI 產出的「所有測試均已通過」，仍要有實際執行結果可以核對，不能直接拿這句話當驗收。</p>
+<p>拆出 CONTRIBUTING 也有檔名以外的好處。GitHub 的 <a href="https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors">Setting guidelines for repository contributors</a> 說明，放在支援位置的貢獻指南，會在建立 issue 或 PR 時提供連結。協作開始固定發生後，把規則放到對方準備送出修改的位置，比一直藏在 README 中段更好找。</p>
+<p>我把這種安排理解成「需要時再補規則」。時間點可以是第一次回饋，也可以是自己決定開始找人幫忙；不必硬等到第一個 PR 已經送來，更不用等同一個人踩兩次坑，才承認文件缺了一段。</p>
+<h2 id="什麼時候該提早寫"><a href="#什麼時候該提早寫" class="headerlink" title="什麼時候該提早寫"></a>什麼時候該提早寫</h2><p>查資料時，我也看到跟我當時選擇不同的建議。<a href="https://opensource.guide/starting-a-project/">Starting an Open Source Project</a> 把授權、README、貢獻指南與行為準則都列為起步文件，也提到早期的貢獻指南可以很簡單。這個建議有道理，清楚的參與方式本來就能降低別人第一次幫忙的門檻，不能只看「現在沒人提修改」，就推論永遠不需要寫。</p>
+<p>如果公開的目的就是招募協作者，或已經準備經營討論區，我會在邀請之前補好參與方式與行為準則，包括不當行為要向誰回報、維護者如何處理。人少也可能發生衝突，不能把「等有需要」解讀成等第一次爭執後再想規則。同樣地，多個人開始審查與發布時，誰可以合併、誰可以發版，也應該事先談好。</p>
+<p>我的起點比較小，先把自己做的工具分享出去，由自己維護，沒有打算一開始就建立共同決策的社群。在這個前提下，我願意承擔第一次有人想幫忙時，多花一點時間說明和補文件的成本。所以我會先在 README 留下求助入口與是否接受貢獻，其他制度等實際互動再補。</p>
+<hr>
+<p>下次整理自己的專案，我會先挑一個已經能用的功能，從 README 開始照著做一次，看看哪一步還得靠腦中的記憶補完。那就是現在該寫的地方。至於暫時用不到的審查層級和完整提案範本，先留下需要時再補的空間，至少不用一邊改功能，一邊通知只有自己一個人的委員會。（當然，最好的習慣還是在製作過程中，就順手把需要的文件補好，省得最後再靠記憶補作業。）</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li><li><a href="/google-sheets-as-database/">小工具一定要用資料庫嗎？</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>開發</category>
+      </categories>
+      <tags>
+        <tag>工作流程</tag>
+        <tag>Side Project</tag>
+        <tag>開源</tag>
       </tags>
   </entry>
 </search>
