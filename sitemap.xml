@@ -11,6 +11,15 @@
   </url>
   
   <url>
+    <loc>https://calmkoala.github.io/categories/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://calmkoala.github.io/tessa/</loc>
     
     <lastmod>2026-11-24</lastmod>
@@ -174,15 +183,6 @@
   
   <url>
     <loc>https://calmkoala.github.io/telegram-message-formatting/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/categories/</loc>
     
     <lastmod>2026-11-24</lastmod>
     
