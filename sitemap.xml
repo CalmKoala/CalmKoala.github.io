@@ -11,60 +11,6 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/release-notes-from-commits/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/solo-project-jit-governance/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/google-sheets-as-database/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/tests-pass-but-does-it-work/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/telegram-message-formatting/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/categories/</loc>
-    
-    <lastmod>2026-11-24</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://calmkoala.github.io/tessa/</loc>
     
     <lastmod>2026-11-24</lastmod>
@@ -75,6 +21,15 @@
   
   <url>
     <loc>https://calmkoala.github.io/script-first/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/apscheduler-windows-misfire/</loc>
     
     <lastmod>2026-11-24</lastmod>
     
@@ -182,7 +137,52 @@
   </url>
   
   <url>
-    <loc>https://calmkoala.github.io/apscheduler-windows-misfire/</loc>
+    <loc>https://calmkoala.github.io/release-notes-from-commits/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/solo-project-jit-governance/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/google-sheets-as-database/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/tests-pass-but-does-it-work/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/telegram-message-formatting/</loc>
+    
+    <lastmod>2026-11-24</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/categories/</loc>
     
     <lastmod>2026-11-24</lastmod>
     
@@ -270,6 +270,13 @@
   
   <url>
     <loc>https://calmkoala.github.io/tags/Python/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://calmkoala.github.io/tags/APScheduler/</loc>
     <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -438,13 +445,6 @@
   
   <url>
     <loc>https://calmkoala.github.io/tags/Telegram/</loc>
-    <lastmod>2026-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://calmkoala.github.io/tags/APScheduler/</loc>
     <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
