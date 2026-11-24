@@ -10,7 +10,7 @@
   <rights>All rights reserved 2026, PingChun</rights>
   <subtitle>One is never too old to learn</subtitle>
   <title>CalmKoala</title>
-  <updated>2026-11-24T09:19:35.864Z</updated>
+  <updated>2026-11-24T09:21:06.618Z</updated>
   <entry>
     <author>
       <name>PingChun</name>
@@ -27,7 +27,7 @@
     <published>2026-10-10T00:00:00.000Z</published>
     <summary>從特殊字元造成的 400 錯誤，整理訊息格式轉換與純文字補送的做法。</summary>
     <title>Telegram 訊息加了格式，怎麼就送不出去了？</title>
-    <updated>2026-11-24T09:19:35.864Z</updated>
+    <updated>2026-11-24T09:21:06.618Z</updated>
   </entry>
   <entry>
     <author>
@@ -45,7 +45,7 @@
     <published>2026-10-03T00:00:00.000Z</published>
     <summary>從檔案檢查到實際操作，替自己的小工具補上最後一段驗收。</summary>
     <title>測試通過，真的能用了嗎？</title>
-    <updated>2026-11-24T09:19:35.864Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -64,7 +64,7 @@
     <published>2026-09-26T00:00:00.000Z</published>
     <summary>從檔案、試算表到資料庫，替自己的小工具選個合適的存法。</summary>
     <title>小工具一定要用資料庫嗎？</title>
-    <updated>2026-11-24T09:19:35.864Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -83,7 +83,7 @@
     <published>2026-09-19T00:00:00.000Z</published>
     <summary>先讓別人用得起來，再補實際需要的協作流程。</summary>
     <title>一個人的開源專案，文件要寫多少？</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -91,8 +91,8 @@
     </author>
     <category term="開發筆記" scheme="https://calmkoala.github.io/categories/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/"/>
     <category term="工具" scheme="https://calmkoala.github.io/categories/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/%E5%B7%A5%E5%85%B7/"/>
-    <category term="開發筆記" scheme="https://calmkoala.github.io/tags/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/"/>
     <category term="CI/CD" scheme="https://calmkoala.github.io/tags/CI-CD/"/>
+    <category term="開發筆記" scheme="https://calmkoala.github.io/tags/%E9%96%8B%E7%99%BC%E7%AD%86%E8%A8%98/"/>
     <category term="Git" scheme="https://calmkoala.github.io/tags/Git/"/>
     <content>
       <![CDATA[<p>最近替自己的樂譜練習 App LilyScore 準備發版，功能做完、測試也跑過，最後卻卡在一個很普通的問題：這版到底更新了什麼？</p><p>過程中加過播放器功能、修過樂譜庫，還順手調了幾個小地方。每個當下我都知道自己在做什麼，隔了幾天再回頭看，腦袋卻只剩下「好像改了播放器」、「還有一個 bug」。接著又開始翻 commit、issue 和對話紀錄，把剛做完的事情重新整理一次。</p><p>LilyScore 第一次走完整個上架流程時，我才發現每一版都會遇到同一件事。商店要一份讓練習的人看得懂的更新說明，GitHub Release 又要保留完整紀錄；兩份都靠發版前臨時回想，很像考前一天才開始整理筆記。<del>而且還是自己出的題目。</del></p><p>後來我沒有再多維護一份版本說明文件，而是把平常留下的修改紀錄，直接拿來當發版時的原料。</p><span id="more"></span><h2 id="先留下可讀的修改紀錄"><a href="#先留下可讀的修改紀錄" class="headerlink" title="先留下可讀的修改紀錄"></a>先留下可讀的修改紀錄</h2><p>Git 是程式專案常用的版本管理工具；commit 則是每次保存一小段修改時，替那次變更留下的紀錄。tag（版本標記）是替某個版本做的記號，從上一個發版 tag 往後看，就能找出這一版新增了哪些修改。</p><p>如果目前還沒有發版腳本，先手動做一次就夠了：</p><ol><li>找到上一個發版的 tag。</li><li>列出那個 tag 到現在的 commit。</li><li>挑出使用者會在意的功能與修正，改寫成幾行版本說明。</li></ol><p>例如上一版是 <code>v2.2.0</code>，可以先用下面這行列出後續的 commit 標題：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> v2.2.0..HEAD --pretty=%s</span><br></pre></td></tr></table></figure><p>這裡還不用急著自動化。先讓每次修改都留下一句能看懂的紀錄，發版時就不必從聊天紀錄裡考古。如果你還沒用 Git，同樣可以把紀錄放在待辦清單或更新筆記裡，只要它能回答「上次發布後，我做了什麼」就行。</p><h2 id="兩份版本說明"><a href="#兩份版本說明" class="headerlink" title="兩份版本說明"></a>兩份版本說明</h2><p>同一批 commit，我會整理成兩份內容。短版給實際使用 App 的人看，只留下多了什麼、修了什麼；完整版留給以後的我，連文件、測試與發版過程都保留。以 LilyScore 為例，短版放到 Google Play，完整版放到 GitHub Release，也就是 GitHub 上每個版本的發布頁。</p><p>為了讓腳本分得出哪些修改值得對外說，我在新增功能的標題前加上 <code>feat:</code>，修正問題則用 <code>fix:</code>。這只是平常寫紀錄時採用的分類，先有一致的寫法，發版時才有規則可以篩選。</p><table><thead><tr><th>去哪裡</th><th>取哪些內容</th><th>用來做什麼</th></tr></thead><tbody><tr><td>Google Play</td><td>新增功能與問題修正，篩選後再確認文字</td><td>讓使用者知道這版增加與修正了什麼</td></tr><tr><td>GitHub Release</td><td>版本範圍內的所有 commit 標題與短編號</td><td>讓自己日後追查每一筆修改</td></tr></tbody></table><p>不過，拿掉前綴還不一定能直接放上商店。LilyScore 真的有過下面兩筆 commit，自動整理只會做到中間那欄；右邊是我把同一件事改寫給使用者看的示例，並非腳本會自動產出的文字。</p><table><thead><tr><th>原始 commit</th><th>自動整理的候選文字</th><th>人工改寫示例</th></tr></thead><tbody><tr><td><code>feat(player): A-B 循環在進度條上可視化</code></td><td>A-B 循環在進度條上可視化</td><td>在播放進度條上顯示 A-B 循環範圍，方便查看反覆播放的起點與終點。</td></tr><tr><td><code>fix(home): 空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</code></td><td>空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</td><td>修正尚未匯入樂譜時，畫面重複出現「匯入樂譜」按鈕的問題。</td></tr></tbody></table><p>「空狀態」對寫程式的人很直覺，使用者卻要先猜它指的是哪個畫面。腳本能幫我找出這筆修正，換成對方看得懂的說法，仍然要由我決定。GitHub Release 則保留原本的標題、前綴與短編號，連文件、雜項維護和發版本身的 commit 都列出；要看實際改了哪些程式，再點進 commit。</p><p>這張圖把人工確認也列進流程，這一步目前仍要在發版指令前手動完成。</p><pre><code class="mermaid">flowchart TD    A[留下可讀的修改紀錄] --&gt; B[選定本次更新範圍]    B --&gt; C[挑出新功能與問題修正]    C --&gt; D[人工確認與改寫]    D --&gt; E[Google Play 短版]    B --&gt; F[保留所有修改標題]    F --&gt; G[GitHub Release 完整版]</code></pre><h2 id="Commit-標題要寫給人看"><a href="#Commit-標題要寫給人看" class="headerlink" title="Commit 標題要寫給人看"></a>Commit 標題要寫給人看</h2><p>當 commit 標題有可能出現在商店裡，我就不能再寫「fix bug」、「調整一下」或「final final 真的 final」。以前這種標題只會讓幾週後的我看不懂，現在還可能直接變成使用者看到的版本說明，丟臉範圍變大了。</p><p>這也是我最喜歡的副作用。版本說明的品質，早在每次保存小改動時就決定了一部分。如果你讓 AI 幫忙寫 commit，也要看一眼「這個改動要怎麼講給人聽」。否則只會得到一串文法很完整，卻不知道做了什麼的句子。</p><p>當然，不是所有 commit 都適合對外說。重構、調整測試、修 CI，可能對維護很重要，卻不一定是練習的人需要知道的更新。所以我只把 <code>feat:</code> 和 <code>fix:</code> 當成商店候選內容；你也可以使用自己的分類，先決定哪些變更值得出現在使用者面前即可。</p><h2 id="LilyScore-的發版流程"><a href="#LilyScore-的發版流程" class="headerlink" title="LilyScore 的發版流程"></a>LilyScore 的發版流程</h2><p>我後來把固定步驟放進 <code>scripts/release.ps1</code>。它會檢查目前是不是在主分支 <code>main</code>、有沒有已追蹤但尚未提交的修改、本機是否落後遠端、tag 是否重複，再檢查程式是否有靜態分析能找出的錯誤。通過後，腳本更新版號與建置編號、整理 Play 說明，接著建立 release commit、tag 並推上 GitHub。後續測試、簽章建置與上傳，交給 GitHub Actions 自動執行，這就是下面提到的 CI。</p><h3 id="發版前先確認文字"><a href="#發版前先確認文字" class="headerlink" title="發版前先確認文字"></a>發版前先確認文字</h3><p>這裡還有個目前腳本沒補上的步驟。它會在終端印出版本說明，接著直接 commit、打 tag 並 push，沒有停下來等我確認。因此，要先檢查文字，就得在執行發版指令之前，用前面的 <code>git log</code> 列出修改、整理好內容，再用 <code>-Notes</code> 傳入已確認的版本說明。例如只要說明這次循環範圍的更新，可以在 LilyScore 專案裡執行：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\scripts\release.ps1 <span class="literal">-Version</span> <span class="number">2.3</span>.<span class="number">0</span> <span class="literal">-Notes</span> <span class="string">&#x27;在播放進度條上顯示 A-B 循環範圍。&#x27;</span></span><br></pre></td></tr></table></figure><p>這樣會覆寫自動彙整的文字，並繼續完成發版；它是一條會提交和推送的指令。腳本也有 <code>-NoPush</code> 參數，但那仍會建立 commit 與 tag，只省略推送，不能當成單純預覽。想把「產生候選文字、人工確認、正式送出」接成不中斷的流程，還需要替腳本補上預覽與確認步驟。</p><h3 id="測試版的更新範圍"><a href="#測試版的更新範圍" class="headerlink" title="測試版的更新範圍"></a>測試版的更新範圍</h3><p>兩份紀錄還有個小差別，從哪個版本開始算。假設上次送到 Play 的版本是 <code>v2.2.0</code>，中間做過 <code>v2.3.0-alpha.1</code> 與 <code>v2.3.0-beta.1</code>，現在準備送出 <code>v2.3.0</code>，商店說明應該包含整段測試期間累積的功能。GitHub Release 則每個測試版都有紀錄，可以分開追查這幾次修改。</p><p>LilyScore 因此把名稱含 <code>-</code> 的 tag 視為測試版，只建立 GitHub Release；不含 <code>-</code> 才送進 Play 封閉測試軌道，讓加入測試的人收到更新，這不代表已經發布到正式軌道。Play 說明從上一個不含 <code>-</code> 的 tag 開始，GitHub Release 則取排除本次 tag 後、依版本號排序的第一個 <code>v*</code> tag 作為起點。這是我目前專案的分流規則，其他專案可以按自己的發布方式調整。</p><h2 id="自動彙整的四個邊界"><a href="#自動彙整的四個邊界" class="headerlink" title="自動彙整的四個邊界"></a>自動彙整的四個邊界</h2><h3 id="沒有-feat-或-fix"><a href="#沒有-feat-或-fix" class="headerlink" title="沒有 feat: 或 fix:"></a>沒有 <code>feat:</code> 或 <code>fix:</code></h3><p>這版若找不到 <code>feat:</code> 或 <code>fix:</code>，腳本目前會放入「穩定性與效能改善。」這句備用文字，避免產生空白說明。但這句話未必有 commit 可以證明；更保守的做法是中止發版，要求人工補上內容。目前腳本還沒這樣做，需要在執行前確認這版改了什麼，再用前面的 <code>-Notes</code> 傳入合適的文字。</p><h3 id="內容超過商店上限"><a href="#內容超過商店上限" class="headerlink" title="內容超過商店上限"></a>內容超過商店上限</h3><p>Google Play 的 <a href="https://support.google.com/googleplay/android-developer/answer/9859348?hl=en">Prepare and roll out a release</a> 說明目前允許每種語言最多 500 個 Unicode 字元。我的腳本依新到舊逐條放入，快滿時就停止。它用 PowerShell 的字串長度做較保守的檢查，純中文通常不受影響，emoji 可能提早碰到限制；大改版仍會改用手寫說明。</p><h3 id="tag-畫錯版本範圍"><a href="#tag-畫錯版本範圍" class="headerlink" title="tag 畫錯版本範圍"></a>tag 畫錯版本範圍</h3><p>目前的腳本依版本號排序找上一個 tag，前提是 release tag 都在同一條主線，版號也一直往上增加。如果專案同時維護多條版本分支或做 backport，就該限制為目前 <code>HEAD</code> 的祖先 tag，否則 <code>git log A..HEAD</code> 可能抓錯版本。重寫 Git 歷史、壓縮 commit 或把 tag 打錯位置，也會改變輸出。</p><h3 id="CI-讀不到舊紀錄"><a href="#CI-讀不到舊紀錄" class="headerlink" title="CI 讀不到舊紀錄"></a>CI 讀不到舊紀錄</h3><p><code>actions/checkout</code> 預設只抓觸發 workflow 的一個 commit，runner 可能根本沒有舊 tag。本來要列整段變更的 <code>git log</code>，最後就只剩本次 commit；LilyScore 因此把 <code>fetch-depth</code> 設為 <code>0</code>，讓 CI 取得完整歷史。這類問題平常不容易出現，通常會挑發版那天才突然讓人想把電腦闔起來。</p><hr><p>版本說明最後還是得由我看過，因為讀者不是 CI，也不會因為內容由腳本產生就突然看得懂。有了平常留下的紀錄，發版時可以從這份清單挑選、改寫，不必再從空白頁開始回想。</p><p>把已經寫在 commit 裡的資訊再整理一次，聽起來很勤勞，實際上只是我以前還沒想到要偷懶而已。</p><div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/google-play-first-release/">第一次上 Google Play，最麻煩的不是寫 App</a></li></ul></div>]]>
@@ -102,7 +102,7 @@
     <published>2026-09-12T00:00:00.000Z</published>
     <summary>把平常的修改紀錄整理成商店更新與開發紀錄，發版時少一次重新回想。</summary>
     <title>版本說明，別再發版時才重寫</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -121,7 +121,7 @@
     <published>2026-09-05T00:00:00.000Z</published>
     <summary>讓 AI agent 在背景執行，可以省下等待時間，但任務還得經得起沒人在場。從一次多角色討論的實作，整理我判斷背景任務的四個條件。</summary>
     <title>哪些工作該交給背景 AI agent？</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -129,9 +129,9 @@
     </author>
     <category term="學習筆記" scheme="https://calmkoala.github.io/categories/study-notes/"/>
     <category term="開發" scheme="https://calmkoala.github.io/categories/study-notes/%E9%96%8B%E7%99%BC/"/>
-    <category term="CI/CD" scheme="https://calmkoala.github.io/tags/CI-CD/"/>
     <category term="Android" scheme="https://calmkoala.github.io/tags/Android/"/>
     <category term="Google Play" scheme="https://calmkoala.github.io/tags/Google-Play/"/>
+    <category term="CI/CD" scheme="https://calmkoala.github.io/tags/CI-CD/"/>
     <content>
       <![CDATA[<p>LilyScore 在我的手機上能正常開啟、能讀 PDF、能播伴奏時，我以為最難的部分已經過了。接下來大概就是把 App 打包、拖進 Google Play Console，等審核而已。</p><p>真的開始上架後，我才發現，能跑的 App 跟能上架的 App 中間，還隔著 application ID、簽章金鑰、商店資料、內容申報、測試軌與發布權限。這些設定散在本機、Play Console、Google Cloud 和 GitHub，每一項單獨看都不難，第一次卻會在同一段時間一起出現。</p><p>這篇把 LilyScore 從 Flutter 專案走到 Google Play 正式版的順序完整記下來。前半段是第一次上架一定會碰到的工作，後半段才是 GitHub Actions 自動發版；如果只想手動上傳，做到測試軌與正式版就可以停。</p><span id="more"></span><div class="note info no-icon"><p>本文最後查核日期是 2026 年 8 月 23 日。Google Play 的政策、表單與選單名稱會改，實際送審時仍要以 Play Console Dashboard 顯示的待辦和官方文件為準。</p><p>文章以 Flutter 的 Android App 為例。開始前要有一個已完成註冊與驗證的 Google Play 開發者帳號，以及能在實機執行的 App；帳號需要提供的資料會依個人或組織身分而不同。<a href="https://support.google.com/googleplay/android-developer/answer/13628312">Required information to create a Play Console developer account</a> 文章的終點是測試者能從 Google Play 安裝，並知道如何送往正式軌。</p></div><h2 id="上架流程總覽"><a href="#上架流程總覽" class="headerlink" title="上架流程總覽"></a>上架流程總覽</h2><p>我最後走過的順序如下。第一次上架的主線走到正式版就結束，自動發版是手動流程成功後才加上去的。LilyScore 的自動化終點只有 closed testing，production 仍是 Play Console 裡的人工動作。</p><pre><code class="mermaid">graph TD    app[App 可在實機執行] --&gt; identity[固定 App 永久識別字&lt;br&#x2F;&gt;application ID]    identity --&gt; key[建立上傳金鑰]    key --&gt; aab[簽出第一個上傳檔案&lt;br&#x2F;&gt;AAB]    aab --&gt; console[Play Console 建立 App]    console --&gt; listing[商店資料與內容申報]    listing --&gt; first[手動上傳第一版]    first --&gt; test[測試軌與測試者]    test --&gt; production[申請並發布正式版]    first --&gt; api[選用：設定 Play API]    api --&gt; ci[選用：自動發版&lt;br&#x2F;&gt;GitHub Actions]    ci --&gt; test</code></pre><p>整條流程牽涉五個地方。把它們分開看，遇到錯誤時會比較容易知道該去哪裡找。</p><table><thead><tr><th>場所</th><th>放什麼</th><th>大約多久處理一次</th></tr></thead><tbody><tr><td>本機</td><td>Flutter 專案、上傳金鑰、金鑰設定檔</td><td>每個 App 設定一次，金鑰長期保存</td></tr><tr><td>Play Console</td><td>App、商店資料、內容申報、測試軌、正式軌</td><td>第一次設定最多，之後每版確認</td></tr><tr><td>Google Cloud</td><td>Play API、服務帳號</td><td>只有自動上傳才需要，設定一次</td></tr><tr><td>GitHub Secrets</td><td>自動發版的簽章資料與 Play 憑證</td><td>只有自動上傳才需要，憑證輪替時更新</td></tr><tr><td>GitHub Actions</td><td>測試、建置、建立 Release、上傳測試軌</td><td>只有自動上傳才需要，每次發版執行</td></tr></tbody></table><h2 id="準備-Android-發布檔"><a href="#準備-Android-發布檔" class="headerlink" title="準備 Android 發布檔"></a>準備 Android 發布檔</h2><h3 id="固定-App-識別字"><a href="#固定-App-識別字" class="headerlink" title="固定 App 識別字"></a>固定 App 識別字</h3><p><code>applicationId</code> 是 Google Play 用來辨認 App 的永久識別字，格式通常長得像 <code>com.example.myapp</code>。第一個 AAB 上傳到 Play 後若改掉，Play 會把它視為另一個 App，原本的使用者也收不到更新，因此要在上傳前定案。<a href="https://developer.android.com/build/configure-app-module">Configure the app module</a></p><p>Flutter 專案可以在 <code>android/app/build.gradle.kts</code> 的 <code>defaultConfig</code> 找到它。還要檢查 CI 上傳步驟使用的 <code>packageName</code> 是否完全相同，大小寫也不要自行改。LilyScore 用的是 <code>com.CalmKoala.LilyScore</code>，這是專案選擇，不是 Google 要求的命名格式。</p><h3 id="建立簽章金鑰"><a href="#建立簽章金鑰" class="headerlink" title="建立簽章金鑰"></a>建立簽章金鑰</h3><p>Android App 發布時會遇到兩把金鑰。上傳金鑰（upload key）由開發者保管，用來簽署送進 Play Console 的 AAB；應用程式簽署金鑰（app signing key）由 Play App Signing 保管，Google 會用它簽署真正送到使用者裝置上的 APK。上傳金鑰遺失或外洩時可以申請重設，但仍應把金鑰檔與密碼備份好。<a href="https://developer.android.com/studio/publish/app-signing">Sign your app</a></p><p>Flutter 官方文件提供用 <code>keytool</code> 建立金鑰的方式。下面是 LilyScore 在專案根目錄使用的路徑，金鑰會放在已被 <code>.gitignore</code> 排除的 <code>android/app/</code>；建立時輸入的密碼要直接存進密碼管理器。</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool <span class="literal">-genkey</span> <span class="literal">-v</span> <span class="literal">-keystore</span> android/app/upload<span class="literal">-keystore</span>.jks <span class="literal">-storetype</span> JKS <span class="literal">-keyalg</span> RSA <span class="literal">-keysize</span> <span class="number">2048</span> <span class="literal">-validity</span> <span class="number">10000</span> <span class="literal">-alias</span> upload</span><br></pre></td></tr></table></figure><p>如果終端機顯示找不到 <code>keytool</code>，先執行 <code>flutter doctor -v</code>，找到輸出裡的 <code>Java binary at</code>。<code>keytool</code> 和 <code>java</code> 會在同一個 <code>bin</code> 目錄，可以用它的完整路徑重新執行上面的指令。Android Studio 內附的 JDK 通常已經包含它，不需要另外下載來路不明的工具。</p><p>接著建立 <code>android/key.properties</code>，讓 Gradle 知道 release build 要使用哪一把金鑰。</p><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">storePassword</span>=<span class="string">&lt;keystore 的密碼&gt;</span></span><br><span class="line"><span class="attr">keyPassword</span>=<span class="string">&lt;key 的密碼&gt;</span></span><br><span class="line"><span class="attr">keyAlias</span>=<span class="string">upload</span></span><br><span class="line"><span class="attr">storeFile</span>=<span class="string">upload-keystore.jks</span></span><br></pre></td></tr></table></figure><p>這組 <code>storeFile</code> 寫法成立，是因為 LilyScore 把金鑰放在 <code>android/app/</code>，而 Gradle 的 App module 也從這裡解析路徑。若你把金鑰放在其他位置，兩邊要一起調整。<code>key.properties</code>、<code>*.jks</code> 與 <code>*.keystore</code> 都要放進 <code>.gitignore</code>。金鑰檔轉成 base64 也只是編碼，不會因此變安全；base64 內容同樣不能放進 repo、對話紀錄或公開文件。</p><p>最後還要在 <code>android/app/build.gradle.kts</code> 載入 <code>key.properties</code>，建立 release signing config，並讓 release build type 使用它。下面保留 LilyScore 實際需要的部分，其他 Flutter 與 Android 設定不用為了這段刪掉。</p><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.FileInputStream</span><br><span class="line"><span class="keyword">import</span> java.util.Properties</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> keystoreProperties = Properties()</span><br><span class="line"><span class="keyword">val</span> keystorePropertiesFile = rootProject.file(<span class="string">&quot;key.properties&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> hasReleaseSigning = keystorePropertiesFile.exists()</span><br><span class="line"><span class="keyword">val</span> isReleaseTask = gradle.startParameter.taskNames.any &#123;</span><br><span class="line">    it.contains(<span class="string">&quot;Release&quot;</span>, ignoreCase = <span class="literal">true</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (hasReleaseSigning) &#123;</span><br><span class="line">    keystoreProperties.load(FileInputStream(keystorePropertiesFile))</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (isReleaseTask) &#123;</span><br><span class="line">    <span class="keyword">throw</span> GradleException(<span class="string">&quot;缺少 android/key.properties，不能建立 release 版本&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="keyword">if</span> (hasReleaseSigning) &#123;</span><br><span class="line">        signingConfigs &#123;</span><br><span class="line">            create(<span class="string">&quot;release&quot;</span>) &#123;</span><br><span class="line">                keyAlias = keystoreProperties[<span class="string">&quot;keyAlias&quot;</span>] <span class="keyword">as</span> String</span><br><span class="line">                keyPassword = keystoreProperties[<span class="string">&quot;keyPassword&quot;</span>] <span class="keyword">as</span> String</span><br><span class="line">                storeFile = file(keystoreProperties[<span class="string">&quot;storeFile&quot;</span>] <span class="keyword">as</span> String)</span><br><span class="line">                storePassword = keystoreProperties[<span class="string">&quot;storePassword&quot;</span>] <span class="keyword">as</span> String</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            <span class="keyword">if</span> (hasReleaseSigning) &#123;</span><br><span class="line">                signingConfig = signingConfigs.getByName(<span class="string">&quot;release&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>這裡先檢查 <code>key.properties</code> 是否存在，是為了讓沒有私密金鑰的新 clone 仍能執行 debug build，同時讓 release build 在缺少設定時直接報錯。Flutter 新專案的 release build type 可能暫時沿用 debug key，接上這段時要把原本的 debug signing 設定移除。如果這段交給 AI 修改，我會要求它說明改了哪個檔案、release build type 最後指向哪個 signing config，再由自己檢查 diff。這樣比只問「幫我把簽章接好」更容易知道它有沒有偷偷沿用 debug key。</p><div class="note warning no-icon"><p>AI 可以幫忙產生 <code>key.properties</code> 範本、Gradle 簽章設定與檢查清單，但不要把金鑰檔、密碼或服務帳號 JSON 貼進對話。讓 AI 告訴你欄位要放在哪裡，實際值由自己填入。</p></div><h3 id="建立-AAB"><a href="#建立-AAB" class="headerlink" title="建立 AAB"></a>建立 AAB</h3><p>Android App Bundle（AAB）是送進 Google Play 的上傳檔案，Play 會再依使用者的裝置產生合適的 APK。Flutter 的 <code>pubspec.yaml</code> 會用 <code>version: x.y.z+N</code> 同時表示兩個值。前面的 <code>x.y.z</code> 會成為使用者看到的 <code>versionName</code>，加號後面的 <code>N</code> 會成為 Play 判斷新舊版本的 <code>versionCode</code>。每次上傳都要使用更大的 <code>versionCode</code>，已經上傳過的數字不能重複使用。<a href="https://developer.android.com/studio/publish/versioning">Version your app</a></p><p>簽章設定接好後，在專案根目錄執行：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flutter build appbundle <span class="literal">--release</span></span><br></pre></td></tr></table></figure><p>Flutter 會在 <code>build/app/outputs/bundle/release/</code> 產生 AAB。本機的完成標誌是 release AAB 成功出現，而且 <code>build.gradle.kts</code> 的 release build type 指向前面建立的 release signing config；路徑、密碼或 alias 有任何一項對不上，建置會在這裡失敗。這時也要再檢查 <code>applicationId</code> 已經定案，以及 <code>versionCode</code> 沒有用過。Flutter 官方的 Android 發布指南整理了 keystore、Gradle 與 AAB 的完整設定方式。<a href="https://docs.flutter.dev/deployment/android">Build and release an Android app</a></p><h2 id="設定-Play-Console"><a href="#設定-Play-Console" class="headerlink" title="設定 Play Console"></a>設定 Play Console</h2><h3 id="建立商店頁"><a href="#建立商店頁" class="headerlink" title="建立商店頁"></a>建立商店頁</h3><p>Play Console 的「建立應用程式」會要求預設語言、App 名稱、App 或遊戲、免費或付費、聯絡信箱與政策聲明。建立完成後，Dashboard 會列出送審前仍缺少的工作。<a href="https://support.google.com/googleplay/android-developer/answer/9859152">Create and set up your app</a></p><p>我會在開始填 Console 之前先備好下面這些材料，避免每完成一格又回頭找圖。</p><table><thead><tr><th>材料</th><th>用途或檢查方式</th></tr></thead><tbody><tr><td>App 名稱、簡短說明、完整說明</td><td>名稱與說明要和實際功能一致</td></tr><tr><td>512×512 App 圖示</td><td>Play 商店列表與搜尋結果使用</td></tr><tr><td>1024×500 主題圖片</td><td>商店刊登資訊使用</td></tr><tr><td>手機與平板截圖</td><td>依實際支援裝置準備，不要放尚未推出的畫面</td></tr><tr><td>聯絡信箱與網站</td><td>給使用者聯絡，隱私權政策也需要公開網址</td></tr><tr><td>隱私權政策</td><td>內容要對得上 App 與使用的第三方 SDK</td></tr><tr><td>測試者名單</td><td>封閉測試使用，名單內的人仍要自行 opt-in</td></tr></tbody></table><p>商店素材的尺寸與數量可能調整，正式製作前可以回到 <a href="https://support.google.com/googleplay/android-developer/answer/9866151">Add preview assets to showcase your app</a> 檢查當下要求。</p><h3 id="填寫內容申報"><a href="#填寫內容申報" class="headerlink" title="填寫內容申報"></a>填寫內容申報</h3><p>App content 不是固定十二題。Play Console 會依 App 類型、權限、目標地區與功能顯示需要填寫的申報，常見項目包含隱私權政策、廣告、審查人員如何存取 App、目標對象、內容分級、Data safety 與敏感權限。每一項都要按照 App 實際行為填寫，不能只照另一個 App 的答案複製。<a href="https://support.google.com/googleplay/android-developer/answer/9859455">Prepare your app for review</a></p><p>Data safety 特別容易和程式實作脫節。即使自己的程式沒有主動收集資料，分析、登入、付款或雲端 SDK 仍可能處理使用者資料，所以填表前要把相依套件一起檢查。AI 可以協助列出 Android manifest 的權限、專案裡使用的 SDK，以及程式可能把哪些資料送到網路，但表單答案仍要由自己對照實際行為與第三方文件確認，不能把 AI 的推測直接送出。送審前我會以 Dashboard 沒有未完成的必要項目作為完成標誌。</p><h3 id="上傳第一版"><a href="#上傳第一版" class="headerlink" title="上傳第一版"></a>上傳第一版</h3><p>Google Play Developer Publishing API 的 Edits 文件目前仍寫著，API 只能修改至少已有一個套件上傳的 App，因此第一個套件要先透過 Play Console 上傳。<a href="https://developers.google.com/android-publisher/edits">Edits</a> LilyScore 的第一顆 AAB 也走手動流程，等 Console 已經認得這個 App 後，後續版本才交給 GitHub Actions。</p><p>第一次手動上傳可以照這個順序走：</p><ol><li>打開 Play Console 並選擇 App，進入「Test and release」下的 internal testing 或 closed testing。</li><li>建立一個 release，第一次使用 AAB 時依畫面啟用 Play App Signing。</li><li>上傳前面產生的 release AAB，等 Console 完成處理並顯示新的 <code>versionCode</code>。</li><li>填寫這版的名稱與更新說明，處理 Console 顯示的錯誤或警告。</li><li>儲存後依畫面上的按鈕 rollout 或發布；是否進入審查，要看 Dashboard 與該軌道的狀態。</li><li>到測試者頁面建立 email 名單或 Google Group，取得 opt-in 連結並傳給測試者。</li></ol><p>對新 App 來說，先用 internal testing 驗證安裝速度最快，但它不會累積新個人帳號需要的 12 人、14 天 closed testing 資格。受到正式版測試門檻限制的帳號，還要另外建立 closed testing；<code>opt-in</code> 指的是測試者打開加入連結、主動成為測試成員，不是開發者把 email 填進名單就完成。<a href="https://support.google.com/googleplay/android-developer/answer/9859348">Prepare and roll out a release</a></p><p>「測試者 email 已在名單裡」還不算完成。至少要找一位測試者打開 opt-in 連結、加入測試，再從 Google Play 安裝成功；做到這裡，才代表商店資料、測試軌、簽章與發布設定真的接起來。</p><h3 id="測試內購"><a href="#測試內購" class="headerlink" title="測試內購"></a>測試內購</h3><p>如果 App 有內購，要先讓包含 Google Play Billing Library 的版本進入任一測試軌，再到 Play Console 建立商品。商品 ID 必須和程式內查詢的字串相同；建立後也要完成定價並啟用。做到商品在 Console 顯示為有效，而且 license tester 能看到測試付款工具，才算把內購測試接通。</p><p>測試軌的測試者和 license tester 是兩份設定，兩者用途不同，同一個 Google 帳號可以同時存在於兩邊。</p><table><thead><tr><th>身分</th><th>用途</th><th>容易搞錯的地方</th></tr></thead><tbody><tr><td>測試軌測試者</td><td>安裝 internal 或 closed testing 的版本</td><td>加入名單後仍要點 opt-in</td></tr><tr><td>License tester</td><td>使用測試付款工具驗證內購</td><td>只有測試軌身分仍可能被真實扣款</td></tr></tbody></table><p>如果 App 有內購，測試帳號要加到 Play Console 的 license testing 名單。裝置有多個 Google 帳號時，通常由下載 App 的帳號進行付款，因此測試前要先確認購買面板顯示的是哪一個帳號。<a href="https://developer.android.com/google/play/billing/test">Test your Google Play Billing Library integration</a></p><h3 id="封閉測試門檻"><a href="#封閉測試門檻" class="headerlink" title="封閉測試門檻"></a>封閉測試門檻</h3><p>截至 2026 年 8 月 23 日，2023 年 11 月 13 日後建立的個人開發者帳號，在取得正式版權限前，需要讓至少 12 名測試者在 closed test 持續 opt-in 14 天。時間達標後還要從 Dashboard 申請 production access，回答測試過程、收到的回饋與正式發布準備；完成測試不等於自動取得正式版權限。<a href="https://support.google.com/googleplay/android-developer/answer/14151465">App testing requirements for new personal developer accounts</a></p><div class="note warning no-icon"><p>這 14 天是日曆時間，不能在功能做完後靠自動化追回來。我下次會在 App 已經能完成主要流程時就建立 closed test，提早準備測試者與 opt-in 連結，同時繼續修畫面和商店資料。</p></div><p>取得 production access 後，可以建立正式版 release，也可以把測試軌已驗證的版本升到 production。LilyScore 的 CI 只負責把版本送進封閉測試軌，正式發布仍保留在 Play Console 手動操作，避免測試版因為打了一個 tag 就直接推給所有使用者。</p><h3 id="發布正式版"><a href="#發布正式版" class="headerlink" title="發布正式版"></a>發布正式版</h3><p>Production access 核准後，我會繼續用測試過的同一顆 AAB，不重新建一個相同 <code>versionCode</code> 的檔案。實際選單名稱可能隨 Console 改版，但目前可以照下面的順序操作。<a href="https://support.google.com/googleplay/android-developer/answer/9859348">Prepare and roll out a release</a></p><ol><li>在 Play Console 選擇 App，進入「Test and release」下的 Production。</li><li>點「Create new release」。如果按鈕不能使用，先回 Dashboard 完成它列出的設定或申報。</li><li>從 artifact library 選擇已經在測試軌驗證過的 AAB；若這版尚未上傳，也可以在這裡上傳新的 release AAB。</li><li>確認 <code>versionCode</code>、版本名稱與更新說明，並檢查要發布的國家、地區和定價設定。</li><li>處理頁面上的錯誤。警告不一定會阻擋發布，但仍要逐項確認原因，再進入 release review。</li><li>確認摘要後開始 rollout to production。第一次正式 rollout 通過審查後，會提供給所選國家與地區的使用者。</li><li>回到 Publishing overview 或 Latest releases 追蹤狀態。除了看到 Production release，也要實際打開選定地區的商店頁，確認頁面能搜尋或透過連結開啟，並從 Google Play 安裝正式版。</li></ol><p>對我來說，按下 rollout 還不算結束。Play Console 顯示正式版已發布、商店頁可開啟，而且安裝後跑得過主要流程，這一版才真正完成。</p><div class="note info no-icon"><p>如果只想完成手動上架，做到這裡就可以停。後面的 Google Cloud、服務帳號、GitHub Secrets 與 workflow 都是自動發版才需要的設定。</p></div><h2 id="設定自動發版"><a href="#設定自動發版" class="headerlink" title="設定自動發版"></a>設定自動發版</h2><p>自動發版不是第一次上架的前置條件。如果一年只更新幾次，手動簽 AAB 再上傳也能完成工作；LilyScore 會接 CI，是因為我想把測試、簽章、GitHub Release 與封閉測試上傳固定成同一條流程。</p><h3 id="授權-GitHub-Actions"><a href="#授權-GitHub-Actions" class="headerlink" title="授權 GitHub Actions"></a>授權 GitHub Actions</h3><p>CI 要對 Play 上傳，會跨 Google Cloud 與 Play Console 做一次設定。</p><ol><li>在 Google Cloud 建立或選擇一個 project。</li><li>啟用 Google Play Android Developer API。</li><li>建立專用 service account。</li><li>回到 Play Console 的「使用者和權限」，邀請 service account 的 email。</li><li>只授予這個 App 與目標測試軌需要的發布權限。LilyScore 使用「發布應用程式至測試群組」與「管理測試群組並編輯測試人員名單」，其他 App 應依 workflow 真正執行的動作縮減。</li></ol><p>服務帳號在 Google Cloud 建立，能不能發布 App 則由 Play Console 的權限決定。少做任何一邊，CI 都無法完成上傳。完成時，Play Console 的使用者清單應看得到這個 service account，而且指定 App 的權限已儲存。<a href="https://developers.google.com/android-publisher/getting_started">Getting Started — Google Play Developer API</a></p><p>LilyScore 使用 service account JSON 存進 GitHub Secret，設定快，但它是長期有效的憑證，外洩後等同別人拿到 CI 的發布身分。</p><div class="note info no-icon"><p>若下一個專案要重新建立，我會再評估 Workload Identity Federation，讓 GitHub Actions 用短期憑證連到 Google Cloud。<a href="https://cloud.google.com/iam/docs/workload-identity-federation">Workload Identity Federation</a></p><p>它只取代長期保存的 JSON key，service account 與 Play Console 授權仍然需要。Workflow 還要開啟 GitHub OIDC 權限、限制可交換身分的 repository 與 branch 或 tag，並確認上傳工具支援這種驗證方式，因此不是刪掉原本的 Secret 就完成。</p></div><h3 id="設定-GitHub-Secrets"><a href="#設定-GitHub-Secrets" class="headerlink" title="設定 GitHub Secrets"></a>設定 GitHub Secrets</h3><p>GitHub Actions 需要四項簽章資料與一項 Play API 憑證。Secret 名稱可以公開，值不行。</p><table><thead><tr><th>GitHub Secret</th><th>內容</th><th>Workflow 裡的用途</th></tr></thead><tbody><tr><td><code>ANDROID_KEYSTORE_BASE64</code></td><td>上傳金鑰檔的 base64</td><td>執行時還原 <code>upload-keystore.jks</code></td></tr><tr><td><code>ANDROID_KEYSTORE_PASSWORD</code></td><td>keystore 密碼</td><td>重建 <code>key.properties</code></td></tr><tr><td><code>ANDROID_KEY_ALIAS</code></td><td>key alias</td><td>重建 <code>key.properties</code></td></tr><tr><td><code>ANDROID_KEY_PASSWORD</code></td><td>key 密碼</td><td>重建 <code>key.properties</code></td></tr><tr><td><code>PLAY_SERVICE_ACCOUNT_JSON</code></td><td>service account JSON 全文</td><td>呼叫 Play API</td></tr></tbody></table><p>GitHub Secrets 只有在 workflow 顯式引用時才會提供給工作。Log 的遮蔽機制也不是外洩保證，因此 workflow 不應印出 Secret、解碼後的金鑰或完整環境變數。<a href="https://docs.github.com/en/actions/concepts/security/secrets">Secrets</a></p><h3 id="自動發版流程"><a href="#自動發版流程" class="headerlink" title="自動發版流程"></a>自動發版流程</h3><p>LilyScore 的 <code>release.yml</code> 會在收到 <code>v*</code> tag 後依序執行：</p><ol><li>安裝指定版本的 Flutter 與 JDK。</li><li>執行 <code>flutter analyze</code> 與 <code>flutter test</code>。</li><li>從 Secrets 還原 keystore 與 <code>key.properties</code>。</li><li>建立簽章好的 AAB，以及方便直接安裝測試的 arm64 APK。</li><li>建立 GitHub Release 並附上兩份產物。</li><li>正常版 tag 才把 AAB 上傳到 Play 封閉測試軌；帶 pre-release 字尾的 tag 不上 Play。</li></ol><p>Google Play API 裡的軌道名稱不一定等於 Console 畫面上的顯示文字。官方文件目前將 internal、open testing 與 production 的預設 API 名稱列為 <code>qa</code>、<code>beta</code>、<code>production</code>，closed testing 則可以使用自訂名稱。<a href="https://developers.google.com/android-publisher/tracks">APKs and Tracks</a> LilyScore 的 closed track 剛好叫 <code>alpha</code>，這個值不能直接複製到其他 App。</p><p>LilyScore 第一次讓 CI 上傳時遇到 <code>403</code>。服務帳號建好了，Play Console 權限也給了，最後才發現 Google Cloud 裡的 Play Developer API 沒有啟用。錯誤看起來像程式或權限壞掉，實際上只是另一個 Console 少按了一次開關。</p><h2 id="發布後續版本"><a href="#發布後續版本" class="headerlink" title="發布後續版本"></a>發布後續版本</h2><p>沒有接 CI 時，後續更新就是第一次手動上傳的縮短版。先更新 <code>versionName</code> 與 <code>versionCode</code>，執行測試並建立簽章 AAB，再到 Play Console 的目標軌道建立 release、上傳 AAB、填更新說明，最後 rollout。測試完成後要上正式版，則依前面的 production 步驟選擇同一顆 AAB。只要每次留下版本號、更新說明與測試結果，手動發版也能保有完整紀錄。</p><p>LilyScore 把這條路接上自動化後，正式封測版會從一行指令開始：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scripts\release.ps1 <span class="literal">-Version</span> <span class="number">2.3</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure><p>腳本會檢查目前在 <code>main</code>、工作區沒有已追蹤的未提交修改、本機沒有落後 <code>origin/main</code>、tag 尚未存在，而且 <code>flutter analyze</code> 通過。接著它更新 <code>pubspec.yaml</code> 的版本名稱、自動增加 build number、產生 Play 更新說明，最後建立 commit 與 tag，再 push 讓 CI 接手。</p><p>我另外留了三個參數，避免所有版本都只能走同一條路。</p><table><thead><tr><th>用法</th><th>作用</th></tr></thead><tbody><tr><td><code>-Notes &quot;文字&quot;</code></td><td>覆寫自動產生的 Play 更新說明</td></tr><tr><td><code>-NoPush</code></td><td>停在本機 commit 與 tag，檢查完再手動 push</td></tr><tr><td><code>-Pre alpha.1</code></td><td>建立 GitHub pre-release 與安裝檔，不上傳 Play</td></tr></tbody></table><p>Play 的「這個版本的新功能」會從上一個沒有 pre-release 字尾的 tag 開始，只取 <code>feat:</code> 與 <code>fix:</code> commit 標題；GitHub Release 則從上一個 <code>v*</code> tag 開始列出所有 commit。兩邊面向的讀者不同，所以來源範圍也不同。每次正常版最後仍要確認 Actions 全綠、Play Console 出現新的 <code>versionCode</code>，並在測試軌實際安裝一次。</p><p>正式版不由 LilyScore 的 CI 自動推送。封閉測試確認沒問題後，我會回到 Play Console，把同一顆 AAB 升到 production，再檢查送審狀態與最終商店頁。</p><h2 id="常見錯誤"><a href="#常見錯誤" class="headerlink" title="常見錯誤"></a>常見錯誤</h2><table><thead><tr><th>症狀</th><th>優先檢查</th><th>常見原因</th></tr></thead><tbody><tr><td>終端機找不到 <code>keytool</code></td><td><code>flutter doctor -v</code> 的 Java 路徑</td><td>JDK 已安裝，但它的 <code>bin</code> 不在 <code>PATH</code></td></tr><tr><td><code>Package not found</code></td><td>Play Console、<code>packageName</code></td><td>App 尚未建立、第一個套件尚未上傳，或 application ID 不一致</td></tr><tr><td>API 呼叫回傳 <code>403</code></td><td>Google Cloud、Play Console</td><td>Play Developer API 未啟用，或 service account 沒有目標 App／軌道權限</td></tr><tr><td>Play 拒收版本</td><td><code>pubspec.yaml</code>、Console 版本紀錄</td><td><code>versionCode</code> 已使用或沒有增加</td></tr><tr><td>Workflow 找不到軌道</td><td>Play Console 與 API 回傳值</td><td>把顯示名稱當成 API track name</td></tr><tr><td>CI 簽章失敗</td><td>四個 Android Secrets</td><td>keystore base64、密碼、alias 或還原路徑不一致</td></tr><tr><td>更新卡在送審前</td><td>Play Console Dashboard</td><td>商店資料、App content、定價或政策申報仍有缺項</td></tr><tr><td>測試內購出現真實卡片</td><td>License testing、裝置帳號</td><td>測試者只加入測試軌，或付款帳號不是 license tester</td></tr></tbody></table><p>遇到錯誤時，我會按照「本機 → GitHub → Google Cloud → Play Console」逐段檢查。這個順序不保證每次最快，但至少不會看到 <code>403</code> 就立刻重寫發版腳本。</p><h2 id="上架檢查清單"><a href="#上架檢查清單" class="headerlink" title="上架檢查清單"></a>上架檢查清單</h2><h3 id="一次性設定"><a href="#一次性設定" class="headerlink" title="一次性設定"></a>一次性設定</h3><ul><li><input disabled="" type="checkbox"> application ID 已定案，Gradle 與 CI 的 <code>packageName</code> 相同</li><li><input disabled="" type="checkbox"> upload keystore 已建立，金鑰與密碼分開備份</li><li><input disabled="" type="checkbox"> <code>key.properties</code>、<code>*.jks</code> 已被 <code>.gitignore</code> 擋住</li><li><input disabled="" type="checkbox"> release AAB 能在本機成功建置</li><li><input disabled="" type="checkbox"> Play Console App 已建立</li><li><input disabled="" type="checkbox"> 商店素材、聯絡資料與隱私權政策已準備</li><li><input disabled="" type="checkbox"> Dashboard 要求的 App content 已完成</li><li><input disabled="" type="checkbox"> 第一個 AAB 已手動送進測試軌</li><li><input disabled="" type="checkbox"> 測試者已 opt-in，並從 Google Play 安裝成功</li><li><input disabled="" type="checkbox"> 帳號若受測試門檻限制，closed test 已提早開始</li><li><input disabled="" type="checkbox"> production access 已申請</li><li><input disabled="" type="checkbox"> production access 已核准</li><li><input disabled="" type="checkbox"> 正式版已送審，並確認最終發布狀態</li></ul><h3 id="自動發版設定"><a href="#自動發版設定" class="headerlink" title="自動發版設定"></a>自動發版設定</h3><ul><li><input disabled="" type="checkbox"> Google Play Android Developer API 已啟用</li><li><input disabled="" type="checkbox"> service account 已建立並加入 Play Console</li><li><input disabled="" type="checkbox"> 權限只涵蓋指定 App 與需要的測試軌</li><li><input disabled="" type="checkbox"> CI 簽章資料與 Play 憑證已放入 Secrets</li><li><input disabled="" type="checkbox"> workflow 的 <code>packageName</code> 與 track name 已核對</li><li><input disabled="" type="checkbox"> CI 成功建置、簽章並上傳一個測試版</li></ul><h3 id="每版檢查"><a href="#每版檢查" class="headerlink" title="每版檢查"></a>每版檢查</h3><ul><li><input disabled="" type="checkbox"> <code>versionCode</code> 比 Play 上既有版本大</li><li><input disabled="" type="checkbox"> 使用者看得懂這版更新說明</li><li><input disabled="" type="checkbox"> analyze 與 test 通過</li><li><input disabled="" type="checkbox"> AAB 使用 release key 簽章</li><li><input disabled="" type="checkbox"> GitHub Release 與 Play 測試軌都出現預期版本</li><li><input disabled="" type="checkbox"> 從 Play 安裝並跑過主要流程</li><li><input disabled="" type="checkbox"> 要上正式版時，人工確認升軌與送審內容</li></ul><p>我還會在私有專案文件或密碼管理器的 metadata 欄位留下 application ID、GCP project 名稱、service account email、closed track 的 API 名稱、金鑰備份位置，以及最後一次查核 Play 政策的日期。公開文件只記欄位名稱與存放位置，不貼真實 project number、email 或檔案路徑。這些紀錄能省下半年後重新在四個 Console 裡找路的時間。</p><hr><p>LilyScore 終於上架後，我最想先忘掉的就是這些設定。偏偏它們又是下一個 App 最容易重踩的地方，所以這次乾脆把完成標誌、Secrets 和排錯順序一起記下來。</p><p>希望下次看到 <code>403</code> 時，我能先想到「少了哪個地方的設定」，不要又先懷疑自己把程式寫壞了。啊啊啊～</p><div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/release-notes-from-commits/">版本說明，別再發版時才重寫</a></li><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li></ul></div>]]>
     </content>
@@ -140,7 +140,7 @@
     <published>2026-08-29T00:00:00.000Z</published>
     <summary>LilyScore 上架後，我把第一次發布會碰到的簽章、商店資料、測試軌與自動發版照順序整理，留一份下一個 App 能直接跟著做的操作筆記。</summary>
     <title>第一次上 Google Play，最麻煩的不是寫 App</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -159,7 +159,7 @@
     <published>2026-08-22T00:00:00.000Z</published>
     <summary>LilyScore 是 Android 樂譜練習 App，讓同一份 PDF 樂譜關聯多個示範或伴奏音檔，看譜時就能切換、變速與循環播放。</summary>
     <title>LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -178,7 +178,7 @@
     <published>2026-08-15T01:00:00.000Z</published>
     <summary>一個 AI agent 做不好時，增加 agent 不一定能解決問題。從一次被獨立審查推翻的系統設計，整理什麼工作適合交給第二個 agent，以及拆分任務時要注意的依賴與共用資料。</summary>
     <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -197,7 +197,7 @@
     <published>2026-08-08T05:00:00.000Z</published>
     <summary>Skill 裝得更多，不代表 AI agent 會持續變好。從整理與刪減 skill 的經驗，比較不同觀點，以及如何判斷規則該放在 skill、專案指引、獨立 agent 或程式檢查。</summary>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -216,7 +216,7 @@
     <published>2026-08-01T01:00:00.000Z</published>
     <summary>AI agent 的記憶可以同時使用 Markdown、SQLite 與 LLM Wiki。從 Hermes、LLM Wiki 與個人三層協定，比較精選記憶、歷史搜尋、知識整理與工作接續的分工。</summary>
     <title>AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -235,7 +235,7 @@
     <published>2026-07-25T00:00:00.000Z</published>
     <summary>多人共用 AI bot 時，認錯人可能讀出別人的私人資料。從一個兩人 bot 的實作，說明身份應該從哪裡來，以及如何檢查 AI 產生的設計。</summary>
     <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -257,7 +257,7 @@
 <p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>]]>
     </summary>
     <title>CLI 也能當 AI agent 的後端</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -280,7 +280,7 @@
 <p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>]]>
     </summary>
     <title>一個人也需要 SRE</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -304,7 +304,7 @@
 <p><img src="/images/ffmpeg-frames-pipeline.png" alt="整條流程：錄影 → 抽影格 → AI 逐張讀 → 去重"></p>]]>
     </summary>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -325,7 +325,7 @@
       <![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>]]>
     </summary>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -347,7 +347,7 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>]]>
     </summary>
     <title>排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -371,7 +371,7 @@
 <p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>]]>
     </summary>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -400,7 +400,7 @@
 <p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>]]>
     </summary>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <updated>2026-11-24T09:19:35.863Z</updated>
+    <updated>2026-11-24T09:21:06.617Z</updated>
   </entry>
   <entry>
     <author>
@@ -421,6 +421,6 @@
       <![CDATA[<h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>]]>
     </summary>
     <title>CI/CD(Github Action)</title>
-    <updated>2026-11-24T09:19:35.862Z</updated>
+    <updated>2026-11-24T09:21:06.616Z</updated>
   </entry>
 </feed>

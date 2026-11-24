@@ -118,6 +118,53 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
       </tags>
   </entry>
   <entry>
+    <title>重複的事，別每次都讓 AI 重做一遍</title>
+    <url>//script-first/</url>
+    <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
+<p>於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。</p>
+<p>最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出來。每個月、每一份都重來一次。</p>
+<p>第一次叫 AI 做，成果非常好，沒什麼問題。問題是第二次、第三次，我還是叫它「再做一次」，它就又跑一輪推理，重新理解一次需求，重新產出。</p>
+<p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>
+<span id="more"></span>
+
+<h1 id="其實，回到以前的做法就好"><a href="#其實，回到以前的做法就好" class="headerlink" title="其實，回到以前的做法就好"></a>其實，回到以前的做法就好</h1><p>但仔細想想，這件事的規則其實完全固定：把檔案解開、抽出表格。這種事在以前還沒有 AI 的時候，我會寫個腳本，每次需要的時候執行就好。</p>
+<p>怎麼有了 AI，反而退化成每次都從頭做一遍？</p>
+<p>解法其實很簡單，回到以前的做法：先讓 AI 把它寫成一支腳本，之後只要執行腳本就好。把 AI 做的事，從「每次重做」改成「寫出腳本」。</p>
+<p>規則固定、會重複很多次的工作，先讓 AI 寫成腳本，之後每次只要叫 AI 執行那支腳本。AI 的角色，從「每次重做的苦力」，變成「維護一支工具、需要時跑它」。</p>
+<p>回到對帳單：我把流程寫成一支腳本，丟進資料夾，腳本自己用存好的密碼解開、批次處理、輸出整理好的表格。現在我只要把檔案放進去、跑腳本就好，AI 不必再一份一份重解，省下的時間和 token 很可觀，而且每個月輸出格式都一模一樣。</p>
+<p>換成腳本之後，你會拿回這些東西：</p>
+<ul>
+<li><strong>一致性</strong>：腳本每次輸出都一樣。LLM 每次重跑，格式、用詞、漏項都可能漂移。</li>
+<li><strong>省時省額度</strong>：跑一支寫好的腳本，比重跑一輪 LLM 推理快得多，也不燒 token。</li>
+<li><strong>可檢查</strong>：腳本是固定邏輯，你可以讀、可以測。LLM 中間怎麼想的是黑箱，錯了不好查。</li>
+<li><strong>可累積</strong>：今天寫好，以後每次直接用，不用每次重新交代一遍前因後果。</li>
+</ul>
+<h1 id="但不是什麼都該腳本化"><a href="#但不是什麼都該腳本化" class="headerlink" title="但不是什麼都該腳本化"></a>但不是什麼都該腳本化</h1><p>當然，不是所有事情都該寫成腳本，硬寫反而會綁手綁腳。</p>
+<ul>
+<li><strong>該寫</strong>：規則固定、輸入輸出結構明確、會重複很多次。格式轉換、批次處理、固定報表這類。</li>
+<li><strong>不該寫</strong>：一次性的、規則模糊、每次都要靠語意判斷的。這種就留給 LLM，它的強項本來就在這。</li>
+</ul>
+<p>判斷標準很簡單：這件事下次還會用同樣的規則再做一遍嗎？如果會，那就值得寫成腳本。</p>
+<p>實際上手也不難：</p>
+<ol>
+<li>第一次遇到重複性工作，先讓 AI 寫成腳本。</li>
+<li>你讀過一遍，確認邏輯對。</li>
+<li>之後每次，直接叫 AI 跑這支腳本。</li>
+</ol>
+<p>核心是把 LLM 當推理引擎，不是當苦力。確定性的、重複的事，交給確定性的程式碼，AI 留著做真正需要判斷的部分。</p>
+<hr>
+<p>總之對我這種窮人來說，能少燒一點 token 是一點，跟 AI 公司的 token 之戰仍在持續(?</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>工作流</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>tessa：純 markdown 的 AI 多角色協作框架</title>
     <url>//tessa/</url>
     <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
@@ -255,53 +302,6 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
       </tags>
   </entry>
   <entry>
-    <title>重複的事，別每次都讓 AI 重做一遍</title>
-    <url>//script-first/</url>
-    <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
-<p>於是我開始想，有什麼方法可以降低 token 使用量。最先想到的，就是那些重複性的工作。</p>
-<p>最有感的是每個月的銀行對帳單。我會收到幾份 PDF，都是加密的，而且不同來源用不同密碼。一開始我直接把檔案都丟給 AI，請它打開、再把裡面的表格整理出來。每個月、每一份都重來一次。</p>
-<p>第一次叫 AI 做，成果非常好，沒什麼問題。問題是第二次、第三次，我還是叫它「再做一次」，它就又跑一輪推理，重新理解一次需求，重新產出。</p>
-<p>這件事的代價，不只是「多等一下」。每跑一輪，AI 都要重新讀懂需求、重新推理，慢，而且燒 token。更麻煩的是結果不穩——同樣的輸入，這次跟上次的格式、用詞、有沒有漏項，都可能不一樣。重複越多次，成本疊得越高。</p>
-<span id="more"></span>
-
-<h1 id="其實，回到以前的做法就好"><a href="#其實，回到以前的做法就好" class="headerlink" title="其實，回到以前的做法就好"></a>其實，回到以前的做法就好</h1><p>但仔細想想，這件事的規則其實完全固定：把檔案解開、抽出表格。這種事在以前還沒有 AI 的時候，我會寫個腳本，每次需要的時候執行就好。</p>
-<p>怎麼有了 AI，反而退化成每次都從頭做一遍？</p>
-<p>解法其實很簡單，回到以前的做法：先讓 AI 把它寫成一支腳本，之後只要執行腳本就好。把 AI 做的事，從「每次重做」改成「寫出腳本」。</p>
-<p>規則固定、會重複很多次的工作，先讓 AI 寫成腳本，之後每次只要叫 AI 執行那支腳本。AI 的角色，從「每次重做的苦力」，變成「維護一支工具、需要時跑它」。</p>
-<p>回到對帳單：我把流程寫成一支腳本，丟進資料夾，腳本自己用存好的密碼解開、批次處理、輸出整理好的表格。現在我只要把檔案放進去、跑腳本就好，AI 不必再一份一份重解，省下的時間和 token 很可觀，而且每個月輸出格式都一模一樣。</p>
-<p>換成腳本之後，你會拿回這些東西：</p>
-<ul>
-<li><strong>一致性</strong>：腳本每次輸出都一樣。LLM 每次重跑，格式、用詞、漏項都可能漂移。</li>
-<li><strong>省時省額度</strong>：跑一支寫好的腳本，比重跑一輪 LLM 推理快得多，也不燒 token。</li>
-<li><strong>可檢查</strong>：腳本是固定邏輯，你可以讀、可以測。LLM 中間怎麼想的是黑箱，錯了不好查。</li>
-<li><strong>可累積</strong>：今天寫好，以後每次直接用，不用每次重新交代一遍前因後果。</li>
-</ul>
-<h1 id="但不是什麼都該腳本化"><a href="#但不是什麼都該腳本化" class="headerlink" title="但不是什麼都該腳本化"></a>但不是什麼都該腳本化</h1><p>當然，不是所有事情都該寫成腳本，硬寫反而會綁手綁腳。</p>
-<ul>
-<li><strong>該寫</strong>：規則固定、輸入輸出結構明確、會重複很多次。格式轉換、批次處理、固定報表這類。</li>
-<li><strong>不該寫</strong>：一次性的、規則模糊、每次都要靠語意判斷的。這種就留給 LLM，它的強項本來就在這。</li>
-</ul>
-<p>判斷標準很簡單：這件事下次還會用同樣的規則再做一遍嗎？如果會，那就值得寫成腳本。</p>
-<p>實際上手也不難：</p>
-<ol>
-<li>第一次遇到重複性工作，先讓 AI 寫成腳本。</li>
-<li>你讀過一遍，確認邏輯對。</li>
-<li>之後每次，直接叫 AI 跑這支腳本。</li>
-</ol>
-<p>核心是把 LLM 當推理引擎，不是當苦力。確定性的、重複的事，交給確定性的程式碼，AI 留著做真正需要判斷的部分。</p>
-<hr>
-<p>總之對我這種窮人來說，能少燒一點 token 是一點，跟 AI 公司的 token 之戰仍在持續(?</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>工作流</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>subprocess 在 Windows 的 cp950 編碼坑</title>
     <url>//subprocess-cp950/</url>
     <content><![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
@@ -363,6 +363,67 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
         <tag>AI</tag>
         <tag>ffmpeg</tag>
         <tag>自動化</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CLI 也能當 AI agent 的後端</title>
+    <url>//subscription-cli-always-on-agent/</url>
+    <content><![CDATA[<p>現在使用市面上的 AI agent framework，安裝完後遇到的第一個設定，通常就是選擇模型供應商，再填入一組 API key。</p>
+<p>這個設計很合理，框架總得知道要去哪裡找模型。但我卡在一個很現實的地方，我本來就在付 Claude 和 ChatGPT 的訂閱費，平常使用 Claude Code 與 Codex CLI 也都包含在方案額度裡。</p>
+<p>如果 agent 改走模型 API，等於又多開一條按 token 計費的路徑。技術上沒有問題，但我的錢很有問題啊啊啊。</p>
+<p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>
+<span id="more"></span>
+
+<h2 id="把-API-client-換成一個-CLI-process"><a href="#把-API-client-換成一個-CLI-process" class="headerlink" title="把 API client 換成一個 CLI process"></a>把 API client 換成一個 CLI process</h2><p>一般的 agent 架構大概長這樣：</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  USER[使用者] --&gt; APP[Agent program]
+  APP --&gt; SDK[模型 SDK &#x2F; API client]
+  SDK --&gt; API[模型 API]
+</code>
+</pre>
+
+<p>改用 CLI 後，中間那層換成 OS 裡的一個 subprocess：</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  USER[使用者] --&gt; APP[Agent program]
+  APP --&gt;|啟動 process、傳入 prompt| CLI[Claude Code &#x2F; Codex CLI]
+  CLI --&gt;|JSON &#x2F; 串流事件| APP
+  CLI --&gt; MODEL[模型服務]
+</code>
+</pre>
+
+<p>Agent program 啟動 CLI，把 prompt 寫進 stdin，再從 stdout 讀回結構化事件。對 agent program 而言，這和呼叫 SDK 的角色很接近，只是邊界從 function call 變成 process communication。</p>
+<p>模型服務背後當然還是存在。這裡省掉的是「自己的 program 直接整合供應商 API」那一層，並非讓模型離線執行。</p>
+<h2 id="CLI-憑什麼能當-backend"><a href="#CLI-憑什麼能當-backend" class="headerlink" title="CLI 憑什麼能當 backend"></a>CLI 憑什麼能當 backend</h2><p>CLI 平常看起來是人坐在終端機前使用的介面，但 Claude Code 與 Codex 都提供非互動模式，也能輸出 JSON Lines 等結構化格式。</p>
+<p>Claude Code 可以用 <code>-p</code> 接收非互動輸入，搭配 <code>stream-json</code> 持續讀寫事件；Codex 則提供 <code>codex exec --json</code>，執行完一個任務後把過程以 JSON Lines 輸出。</p>
+<p>這代表 agent 不必模擬鍵盤輸入，也不用從終端機畫面硬拆文字。只要替不同 CLI 做一層 adapter，就能把輸入與輸出轉成自己系統內統一的格式。</p>
+<p>更有意思的是，CLI 已經包好不少 API client 原本要自己處理的東西，包括帳號登入、模型選擇、工具設定與本機權限。Agent program 可以專心處理自己的路由、排程和狀態。</p>
+<p>Claude 已有 Telegram marketplace plugin，Codex app 也有 Remote，兩者都能讓使用者從手機繼續工作。<a href="https://github.com/anthropics/claude-plugins-official/blob/main/external_plugins/telegram/README.md">claude-plugins-official&#x2F;external_plugins&#x2F;telegram&#x2F;README.md at main · anthropics&#x2F;claude-plugins-official · GitHub</a>、<a href="https://learn.chatgpt.com/docs/remote-connections">Remote connections - OpenAI</a></p>
+<div class="note info no-icon"><p>這些遠端功能解決的是「人如何從手機操作產品」。這篇談的是讓自己的 program 把 CLI 當成模型後端。若你只想遠端繼續對話，直接使用現成功能會簡單很多。</p>
+</div>
+
+<h2 id="真正麻煩的是-process-lifecycle"><a href="#真正麻煩的是-process-lifecycle" class="headerlink" title="真正麻煩的是 process lifecycle"></a>真正麻煩的是 process lifecycle</h2><p>把 CLI 包進 subprocess 只能算第一步。它開始長時間執行後，就會出現一批 API SDK 不太像的問題。</p>
+<p>CLI process 可能卡住、意外結束，或碰到 rate limit。兩個請求也不能同時往同一條 input stream 裡寫，不然回傳事件會混在一起。Agent 得自己處理 timeout、序列化、重啟與錯誤復原。</p>
+<p>對話狀態也要納入 backend contract。Claude 回傳 session ID 後，可以透過 <code>claude --resume &lt;session-id&gt;</code> 接回先前的 session；Codex 的非互動模式也提供 <code>codex exec resume</code>。兩邊都有續接能力，命令格式與生命週期卻不相同。<a href="https://docs.anthropic.com/en/docs/claude-code/cli-usage">CLI reference - Anthropic</a>、<a href="https://learn.chatgpt.com/docs/non-interactive-mode">Non-interactive mode - OpenAI</a></p>
+<p>所以 adapter 除了傳 prompt、收答案，還得管理 CLI process。它要決定 process 什麼時候啟動或關閉；同時收到多個 request 時，先排好順序；也要保存 session ID，讓 process 掛掉或重啟後能接回原本的對話。這些行為都得寫在 adapter 裡，模型不會幫你處理。</p>
+<h2 id="訂閱帳號也能沿用"><a href="#訂閱帳號也能沿用" class="headerlink" title="訂閱帳號也能沿用"></a>訂閱帳號也能沿用</h2><p>我會走這條路，還有一個很現實的原因。我本來就在付 Claude 與 ChatGPT 的訂閱費。</p>
+<p>Claude Code 和 Codex CLI 都能使用訂閱帳號登入。只要使用量還在方案額度內，透過 CLI 執行的任務就不會另外產生一張 API key 的按量帳單。Codex 官方文件也把 ChatGPT 登入與 API key 列為不同的驗證和計費方式。<a href="https://learn.chatgpt.com/docs/auth">Authentication - OpenAI</a>、<a href="https://learn.chatgpt.com/docs/pricing">Pricing - OpenAI</a></p>
+<p>這不等於免費。訂閱本身要付費，也有 rate limit 與使用上限；CLI 背後照樣會連到模型服務。比較準確的說法是，我沿用訂閱方案內含的使用額度，沒有讓自己的 agent 另外走 API key 計費。</p>
+<h2 id="什麼時候不該這樣做"><a href="#什麼時候不該這樣做" class="headerlink" title="什麼時候不該這樣做"></a>什麼時候不該這樣做</h2><p>CLI backend 很適合本機、單人，而且本來就在使用訂閱版 CLI 的情境。離開這個範圍，代價會逐漸浮現。</p>
+<p>CLI 版本更新可能改變事件格式，登入狀態也不適合複製到大量伺服器。正式服務需要多人共用、成本歸戶、穩定併發或 CI 自動化時，直接使用 API 通常比較容易管理。</p>
+<p>它也會讓 agent 多出 process management 的責任。如果你的 program 只是偶爾呼叫一次模型，為了省一層 API client 卻加上 supervisor、timeout 和 session recovery，可能反而繞了遠路。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
       </tags>
   </entry>
   <entry>
@@ -434,241 +495,6 @@ flowchart LR
         <tag>自動化</tag>
         <tag>SRE</tag>
         <tag>系統設計</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CLI 也能當 AI agent 的後端</title>
-    <url>//subscription-cli-always-on-agent/</url>
-    <content><![CDATA[<p>現在使用市面上的 AI agent framework，安裝完後遇到的第一個設定，通常就是選擇模型供應商，再填入一組 API key。</p>
-<p>這個設計很合理，框架總得知道要去哪裡找模型。但我卡在一個很現實的地方，我本來就在付 Claude 和 ChatGPT 的訂閱費，平常使用 Claude Code 與 Codex CLI 也都包含在方案額度裡。</p>
-<p>如果 agent 改走模型 API，等於又多開一條按 token 計費的路徑。技術上沒有問題，但我的錢很有問題啊啊啊。</p>
-<p>既然 CLI 已經登入，也支援非互動執行，能不能讓自己的 program 直接呼叫它？答案當然是可以，原本給人操作的 CLI，也能放到 agent 的模型層，成為一種 backend。</p>
-<span id="more"></span>
-
-<h2 id="把-API-client-換成一個-CLI-process"><a href="#把-API-client-換成一個-CLI-process" class="headerlink" title="把 API client 換成一個 CLI process"></a>把 API client 換成一個 CLI process</h2><p>一般的 agent 架構大概長這樣：</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  USER[使用者] --&gt; APP[Agent program]
-  APP --&gt; SDK[模型 SDK &#x2F; API client]
-  SDK --&gt; API[模型 API]
-</code>
-</pre>
-
-<p>改用 CLI 後，中間那層換成 OS 裡的一個 subprocess：</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  USER[使用者] --&gt; APP[Agent program]
-  APP --&gt;|啟動 process、傳入 prompt| CLI[Claude Code &#x2F; Codex CLI]
-  CLI --&gt;|JSON &#x2F; 串流事件| APP
-  CLI --&gt; MODEL[模型服務]
-</code>
-</pre>
-
-<p>Agent program 啟動 CLI，把 prompt 寫進 stdin，再從 stdout 讀回結構化事件。對 agent program 而言，這和呼叫 SDK 的角色很接近，只是邊界從 function call 變成 process communication。</p>
-<p>模型服務背後當然還是存在。這裡省掉的是「自己的 program 直接整合供應商 API」那一層，並非讓模型離線執行。</p>
-<h2 id="CLI-憑什麼能當-backend"><a href="#CLI-憑什麼能當-backend" class="headerlink" title="CLI 憑什麼能當 backend"></a>CLI 憑什麼能當 backend</h2><p>CLI 平常看起來是人坐在終端機前使用的介面，但 Claude Code 與 Codex 都提供非互動模式，也能輸出 JSON Lines 等結構化格式。</p>
-<p>Claude Code 可以用 <code>-p</code> 接收非互動輸入，搭配 <code>stream-json</code> 持續讀寫事件；Codex 則提供 <code>codex exec --json</code>，執行完一個任務後把過程以 JSON Lines 輸出。</p>
-<p>這代表 agent 不必模擬鍵盤輸入，也不用從終端機畫面硬拆文字。只要替不同 CLI 做一層 adapter，就能把輸入與輸出轉成自己系統內統一的格式。</p>
-<p>更有意思的是，CLI 已經包好不少 API client 原本要自己處理的東西，包括帳號登入、模型選擇、工具設定與本機權限。Agent program 可以專心處理自己的路由、排程和狀態。</p>
-<p>Claude 已有 Telegram marketplace plugin，Codex app 也有 Remote，兩者都能讓使用者從手機繼續工作。<a href="https://github.com/anthropics/claude-plugins-official/blob/main/external_plugins/telegram/README.md">claude-plugins-official&#x2F;external_plugins&#x2F;telegram&#x2F;README.md at main · anthropics&#x2F;claude-plugins-official · GitHub</a>、<a href="https://learn.chatgpt.com/docs/remote-connections">Remote connections - OpenAI</a></p>
-<div class="note info no-icon"><p>這些遠端功能解決的是「人如何從手機操作產品」。這篇談的是讓自己的 program 把 CLI 當成模型後端。若你只想遠端繼續對話，直接使用現成功能會簡單很多。</p>
-</div>
-
-<h2 id="真正麻煩的是-process-lifecycle"><a href="#真正麻煩的是-process-lifecycle" class="headerlink" title="真正麻煩的是 process lifecycle"></a>真正麻煩的是 process lifecycle</h2><p>把 CLI 包進 subprocess 只能算第一步。它開始長時間執行後，就會出現一批 API SDK 不太像的問題。</p>
-<p>CLI process 可能卡住、意外結束，或碰到 rate limit。兩個請求也不能同時往同一條 input stream 裡寫，不然回傳事件會混在一起。Agent 得自己處理 timeout、序列化、重啟與錯誤復原。</p>
-<p>對話狀態也要納入 backend contract。Claude 回傳 session ID 後，可以透過 <code>claude --resume &lt;session-id&gt;</code> 接回先前的 session；Codex 的非互動模式也提供 <code>codex exec resume</code>。兩邊都有續接能力，命令格式與生命週期卻不相同。<a href="https://docs.anthropic.com/en/docs/claude-code/cli-usage">CLI reference - Anthropic</a>、<a href="https://learn.chatgpt.com/docs/non-interactive-mode">Non-interactive mode - OpenAI</a></p>
-<p>所以 adapter 除了傳 prompt、收答案，還得管理 CLI process。它要決定 process 什麼時候啟動或關閉；同時收到多個 request 時，先排好順序；也要保存 session ID，讓 process 掛掉或重啟後能接回原本的對話。這些行為都得寫在 adapter 裡，模型不會幫你處理。</p>
-<h2 id="訂閱帳號也能沿用"><a href="#訂閱帳號也能沿用" class="headerlink" title="訂閱帳號也能沿用"></a>訂閱帳號也能沿用</h2><p>我會走這條路，還有一個很現實的原因。我本來就在付 Claude 與 ChatGPT 的訂閱費。</p>
-<p>Claude Code 和 Codex CLI 都能使用訂閱帳號登入。只要使用量還在方案額度內，透過 CLI 執行的任務就不會另外產生一張 API key 的按量帳單。Codex 官方文件也把 ChatGPT 登入與 API key 列為不同的驗證和計費方式。<a href="https://learn.chatgpt.com/docs/auth">Authentication - OpenAI</a>、<a href="https://learn.chatgpt.com/docs/pricing">Pricing - OpenAI</a></p>
-<p>這不等於免費。訂閱本身要付費，也有 rate limit 與使用上限；CLI 背後照樣會連到模型服務。比較準確的說法是，我沿用訂閱方案內含的使用額度，沒有讓自己的 agent 另外走 API key 計費。</p>
-<h2 id="什麼時候不該這樣做"><a href="#什麼時候不該這樣做" class="headerlink" title="什麼時候不該這樣做"></a>什麼時候不該這樣做</h2><p>CLI backend 很適合本機、單人，而且本來就在使用訂閱版 CLI 的情境。離開這個範圍，代價會逐漸浮現。</p>
-<p>CLI 版本更新可能改變事件格式，登入狀態也不適合複製到大量伺服器。正式服務需要多人共用、成本歸戶、穩定併發或 CI 自動化時，直接使用 API 通常比較容易管理。</p>
-<p>它也會讓 agent 多出 process management 的責任。如果你的 program 只是偶爾呼叫一次模型，為了省一層 API client 卻加上 supervisor、timeout 和 session recovery，可能反而繞了遠路。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>多人共用 AI bot，別讓它認錯使用者</title>
-    <url>//llm-agent-isolation/</url>
-    <content><![CDATA[<p>試著想像一個故事：小明和小美共用同一個 AI bot。兩人都會請它記住一些事情，可能是待辦、工作筆記，也可能是不想讓對方看到的私人內容。</p>
-<p>當小明問「我上次說過什麼？」時，bot 卻把小美留下的內容回傳給他。一次錯誤回答，就變成了私人資料外洩。</p>
-<p>這裡要先分清楚 bot 和 AI。bot 是整套應用系統，負責接收訊息，並串起身份確認、工具與資料。AI 是其中負責理解文字、選擇下一步操作的元件。</p>
-<p>要避免拿錯資料，bot 必須在把訊息交給 AI 之前，先從聊天平台或登入系統確認訊息是誰傳的，不能讓 AI 自己判斷身分。AI 可以判斷小明想找什麼，但不能決定自己目前是代表小明還是小美。</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-    U[&quot;小明傳來訊息&quot;] --&gt; P
-    subgraph B[&quot;AI bot 系統&quot;]
-        P[&quot;訊息入口&lt;br&#x2F;&gt;確認是小明&quot;] --&gt; A[&quot;AI&lt;br&#x2F;&gt;理解小明想做什麼&quot;]
-        A --&gt; T[&quot;記憶工具&lt;br&#x2F;&gt;沿用已確認的身份&quot;]
-    end
-    T --&gt; D[&quot;只讀小明的資料&quot;]
-</code>
-</pre>
-
-<p>圖中的 AI 位於 bot 系統裡面，只負責理解需求。訊息入口先確認現在是誰，記憶工具再沿用這個結果查詢資料。把身份也交給 AI 填，它就有機會用別人的身份讀資料。</p>
-<p>模型可能誤解對話、受到提示注入影響，或在呼叫工具時填錯資料。身份是權限的起點，不能建立在「模型應該會填對」的假設上。</p>
-<span id="more"></span>
-
-<h2 id="工具把-AI-填的身份當成真的"><a href="#工具把-AI-填的身份當成真的" class="headerlink" title="工具把 AI 填的身份當成真的"></a>工具把 AI 填的身份當成真的</h2><p>我的 bot 只有兩名固定使用者。AI 要讀取記憶時，會呼叫我提供的工具。第一版的工具要求 AI 填入兩個值。</p>
-<table>
-<thead>
-<tr>
-<th>欄位</th>
-<th>代表什麼</th>
-<th>第一版由誰填</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>memory_id</code></td>
-<td>想讀哪則記憶</td>
-<td>AI</td>
-</tr>
-<tr>
-<td><code>requester_id</code></td>
-<td>現在是哪位使用者</td>
-<td>AI</td>
-</tr>
-</tbody></table>
-<p>問題就在第二個值。當小明傳來訊息時，只要 AI 取得小美某則記憶的編號，再把 <code>requester_id</code> 填成小美，工具查到的「記憶主人」就會和 <code>requester_id</code> 相同。</p>
-<p>從工具的角度看，記憶主人和提出要求的人都是小美。它沒有收到平台確認的真正身份，因此不知道原始訊息來自小明，權限檢查仍然會通過。</p>
-<p>當時的程式碼大概長這樣。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span>, requester_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    memory = load(memory_id)</span><br><span class="line">    <span class="keyword">if</span> memory.owner != requester_id:</span><br><span class="line">        <span class="keyword">raise</span> PermissionError(<span class="string">&quot;not your memory&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> memory.content</span><br></pre></td></tr></table></figure>
-
-<p>程式裡的 <code>if</code> 只確認「記憶主人」和 <code>requester_id</code> 是否相同。由於 <code>requester_id</code> 也是 AI 填的，這個檢查無法確認真正傳來訊息的人。</p>
-<p><code>memory_id</code> 可以由模型選，工具再用可信身份檢查目前使用者是否有權讀取。<code>requester_id</code> 則是認證結果，必須來自聊天平台或登入系統，不能由模型自己聲明。</p>
-<h2 id="主要靠-AI-寫程式，也能先檢查三件事"><a href="#主要靠-AI-寫程式，也能先檢查三件事" class="headerlink" title="主要靠 AI 寫程式，也能先檢查三件事"></a>主要靠 AI 寫程式，也能先檢查三件事</h2><p>如果你平常主要靠 vibe coding，不必先學會審查每一行程式。請 AI 回答下面三件事，就能找到需要進一步檢查的地方。</p>
-<h3 id="追出身份從哪裡來"><a href="#追出身份從哪裡來" class="headerlink" title="追出身份從哪裡來"></a>追出身份從哪裡來</h3><p>請 AI 畫出身份從登入或訊息平台，一路傳到工具與資料庫的流程，並標出每個值由誰產生。</p>
-<p>一張可用的圖大概會長這樣。</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-    U[&quot;小明傳送訊息&quot;] --&gt; P[&quot;聊天平台&lt;br&#x2F;&gt;確認是小明&quot;]
-    P --&gt;|&quot;已驗證身份&quot;| B[&quot;bot 訊息入口&quot;]
-
-    B --&gt;|&quot;訊息內容&quot;| A[&quot;AI&lt;br&#x2F;&gt;理解想做什麼&quot;]
-    B --&gt; C[&quot;伺服器端上下文&lt;br&#x2F;&gt;保存小明的身份&quot;]
-
-    A --&gt;|&quot;想讀哪則記憶&quot;| T[&quot;記憶工具&quot;]
-    C --&gt;|&quot;小明的身份&quot;| T
-
-    T --&gt; D[&quot;只查小明的資料&quot;]
-</code>
-</pre>
-
-<p>這張圖有兩條路。AI 提供「想做什麼」，伺服器端上下文提供「現在是誰」，兩者最後在工具會合。</p>
-<p>如果使用者身份改成從 AI 流向工具，就代表模型有機會替換身份。身份若來自使用者輸入、提示詞或 LLM 的工具參數，也不能直接拿來做授權。可信來源通常是通過驗證的登入狀態、平台訊息，或伺服器建立的請求上下文。</p>
-<h3 id="假設模型能任意填寫工具參數"><a href="#假設模型能任意填寫工具參數" class="headerlink" title="假設模型能任意填寫工具參數"></a>假設模型能任意填寫工具參數</h3><p>可以直接把這段要求交給 AI。</p>
-<blockquote>
-<p>假設 LLM 可以任意填寫每個工具參數，找出它跨使用者讀取、修改或刪除資料的所有路徑。</p>
-</blockquote>
-<p>看到 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 或 <code>requester_id</code> 出現在工具參數中，可以先追查這些值的來源。欄位名稱本身不代表一定有漏洞，重點是模型能否利用它改變自己的權限。</p>
-<h3 id="同時測兩名使用者，檢查身份是否混用"><a href="#同時測兩名使用者，檢查身份是否混用" class="headerlink" title="同時測兩名使用者，檢查身份是否混用"></a>同時測兩名使用者，檢查身份是否混用</h3><p>許多 AI 產生的範例只測試一名使用者，因此看不出身份混用。請 AI 同時模擬 A 與 B，檢查對話、暫存狀態、工作目錄與請求上下文是否互相影響。</p>
-<p>如果實作會修改一個全域的目前使用者，兩個並行請求就可能互相覆寫身份。</p>
-<h2 id="系統要在入口確認身份，再一路帶到資料查詢"><a href="#系統要在入口確認身份，再一路帶到資料查詢" class="headerlink" title="系統要在入口確認身份，再一路帶到資料查詢"></a>系統要在入口確認身份，再一路帶到資料查詢</h2><p>上面的圖把身份與操作分成兩條路。要讓身份這條路可信，訊息入口還得先驗證來源。</p>
-<p>網站要先驗證登入 session 或 token，聊天平台的 webhook 也要先驗證簽章。完成驗證後，訊息入口才把身份綁進伺服器端上下文或專屬執行環境。</p>
-<p>工具從這個位置取得身份。LLM 可以選擇操作與資源，例如「讀取這則記憶」，但工具仍會用通過驗證的身份限制資料範圍。</p>
-<h2 id="我的兩人版，另外守住執行環境、工具與資料"><a href="#我的兩人版，另外守住執行環境、工具與資料" class="headerlink" title="我的兩人版，另外守住執行環境、工具與資料"></a>我的兩人版，另外守住執行環境、工具與資料</h2><p>我的 bot 讓每位使用者各自使用一個長駐 Claude CLI process。訊息入口驗證使用者後，會從伺服器端保存的對應關係找到該使用者的 process。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">proc = <span class="keyword">await</span> asyncio.create_subprocess_exec(</span><br><span class="line">    <span class="string">&quot;claude&quot;</span>, <span class="string">&quot;-p&quot;</span>, <span class="string">&quot;--input-format&quot;</span>, <span class="string">&quot;stream-json&quot;</span>,</span><br><span class="line">    cwd=<span class="string">f&quot;state/private/<span class="subst">&#123;user_id&#125;</span>/&quot;</span>,</span><br><span class="line">    env=&#123;**os.environ, <span class="string">&quot;DYAD_USER_ID&quot;</span>: user_id&#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>每個 process 啟動時只收到自己的 <code>DYAD_USER_ID</code>。環境變數不是使用者清單，只表示這個 process 從啟動到結束代表誰。</p>
-<p>身份的可信度也不是來自環境變數本身。訊息入口已驗證使用者，再由伺服器啟動對應的 process 並注入身份，這條路徑才是信任來源。</p>
-<h3 id="每人一個-process，不代表檔案已經隔離"><a href="#每人一個-process，不代表檔案已經隔離" class="headerlink" title="每人一個 process，不代表檔案已經隔離"></a>每人一個 process，不代表檔案已經隔離</h3><p>每位使用者的對話、上下文與 process 生命週期各自分開。小明的訊息只會送進自己的 process。使用者登出或權限被撤銷時，舊 process 也要停止或重建。</p>
-<p><code>cwd</code> 讓相對路徑預設落在使用者自己的資料夾，但它不是檔案沙盒。只要 process 有任意讀檔能力，<code>../B/memory.md</code> 或完整的絕對路徑仍能離開目前目錄。</p>
-<h3 id="關掉通用工具，只留下受限功能"><a href="#關掉通用工具，只留下受限功能" class="headerlink" title="關掉通用工具，只留下受限功能"></a>關掉通用工具，只留下受限功能</h3><p>Claude CLI 原本帶有 Read、Write、Bash 等內建工具。全部保留時，模型仍能繞過記憶工具，直接讀取其他路徑。</p>
-<p>我的 bot 會關掉內建工具，只允許自己設計的 MCP 工具。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">claude -p --tools <span class="string">&quot;&quot;</span> \</span><br><span class="line">       --mcp-config mcp.json \</span><br><span class="line">       --strict-mcp-config</span><br></pre></td></tr></table></figure>
-
-<p>模型只會看到 <code>list_memory</code>、<code>propose_memory</code>、<code>delete_memory</code> 等有限功能。它沒有一般讀檔工具，也沒有命令列可以探索其他目錄。</p>
-<p>這層的代價是，每增加一項能力，都要另外設計範圍有限的工具。自訂工具本身也要限制路徑與資料範圍，不能換個名字重新提供任意讀檔能力。</p>
-<h3 id="工具使用系統注入的身份查資料"><a href="#工具使用系統注入的身份查資料" class="headerlink" title="工具使用系統注入的身份查資料"></a>工具使用系統注入的身份查資料</h3><p>我把身份從工具參數移除。Claude CLI 啟動 MCP 伺服器時，伺服器會繼承 process 的環境變數。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">USER_ID = os.environ[<span class="string">&quot;DYAD_USER_ID&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> store.get(user_id=USER_ID, memory_id=memory_id)</span><br></pre></td></tr></table></figure>
-
-<p>LLM 只提供 <code>memory_id</code>，工具自行把 <code>USER_ID</code> 加進資料查詢。即使模型知道小美的識別碼，工具定義裡也沒有位置讓它替換目前身份。</p>
-<p>四道邊界處理的範圍不同。</p>
-<table>
-<thead>
-<tr>
-<th>邊界</th>
-<th>負責處理</th>
-<th>單獨使用仍缺少</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>訊息入口</td>
-<td>驗證訊息來自哪位使用者</td>
-<td>不會自動限制工具與資料</td>
-</tr>
-<tr>
-<td>process</td>
-<td>分開對話、上下文與生命週期</td>
-<td><code>cwd</code> 擋不住任意路徑</td>
-</tr>
-<tr>
-<td>工具白名單</td>
-<td>限制模型可以使用的能力</td>
-<td>自訂工具仍可能寫錯權限</td>
-</tr>
-<tr>
-<td>資料查詢</td>
-<td>依可信身份限制實際資料</td>
-<td>上游必須先正確驗證身份</td>
-</tr>
-</tbody></table>
-<h2 id="服務更多使用者時，身份要跟著執行環境或請求走"><a href="#服務更多使用者時，身份要跟著執行環境或請求走" class="headerlink" title="服務更多使用者時，身份要跟著執行環境或請求走"></a>服務更多使用者時，身份要跟著執行環境或請求走</h2><p>環境變數可以用在更多使用者，前提是一個 process 或容器從頭到尾只代表一位使用者。每建立一個執行環境，系統只注入它代表的單一身份，不需要把所有使用者寫進環境變數。</p>
-<p>使用者變多後，可以選擇不同的執行方式。</p>
-<table>
-<thead>
-<tr>
-<th>執行方式</th>
-<th>身份放在哪裡</th>
-<th>適合的情況</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>每人一個 process 或容器</td>
-<td>啟動時由伺服器注入</td>
-<td>使用者不多，或需要較強的執行隔離</td>
-</tr>
-<tr>
-<td>多人共用 worker</td>
-<td>每次請求專用的伺服器端上下文</td>
-<td>使用者多，需要共用運算資源</td>
-</tr>
-</tbody></table>
-<p>共用 worker 不能靠修改全域 <code>CURRENT_USER</code> 切換身份。小明與小美的請求同時執行時，後寫入的值可能覆蓋前一個。</p>
-<p>身份要跟著個別請求或非同步任務傳遞。如果 agent runner 與工具伺服器分開部署，這份身份還要透過已驗證的內部連線傳遞，或綁定到伺服器管理的連線與 session。把 <code>user_id</code> 放回模型產生的 JSON，無法取代這段可信傳遞。</p>
-<p>公開的多租戶服務還需要正式的登入驗證、授權與租戶資料隔離。資料風險較高時，可以把高風險工具放進短命容器，或使用獨立的作業系統帳號。</p>
-<h2 id="Hermes-分開對話，不等於分開資料權限"><a href="#Hermes-分開對話，不等於分開資料權限" class="headerlink" title="Hermes 分開對話，不等於分開資料權限"></a>Hermes 分開對話，不等於分開資料權限</h2><p>Hermes Agent 的 <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/sessions.md">Sessions 文件</a>也把使用者資訊放在模型外面。它的 gateway 會根據平台訊息中的聊天室、使用者與討論串等資料建立 session key，再把訊息送進對應的對話紀錄。</p>
-<p>私訊會依聊天室分開。平台能提供使用者識別碼時，一般群組會把使用者放進 session key。群組討論串預設讓參與者共用對話，需要逐人分開時，可以開啟 <code>thread_sessions_per_user</code>。</p>
-<p>這個設計處理「訊息應該進入哪段對話」，不會自動限制檔案或工具權限。即使小明與小美使用不同 session，兩邊仍可能呼叫接受任意 <code>user_id</code> 的工具。</p>
-<p>Hermes 可以作為身份路由的參考，資料授權仍要由工具與儲存層處理。</p>
-<h2 id="最後檢查模型能否控制身份或繞過工具"><a href="#最後檢查模型能否控制身份或繞過工具" class="headerlink" title="最後檢查模型能否控制身份或繞過工具"></a>最後檢查模型能否控制身份或繞過工具</h2><p>如果 AI bot 會服務多名使用者，可以搜尋工具定義中的 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 與 <code>requester_id</code>。</p>
-<p>這些欄位出現在參數中不一定有錯。資源或工作區識別碼可以由模型選擇，伺服器仍要用可信身份檢查目前使用者是否有權操作。真正危險的是，工具直接把模型提供的值當成已通過認證的身份。</p>
-<p>也要檢查模型是否擁有旁路能力。Read、Write、Bash、瀏覽器、資料庫查詢與自訂 MCP 工具，都可能繞過原本設計的記憶 API。</p>
-<p>我的第一版沒有漏寫那個 <code>if</code>。我把模型產生的 <code>requester_id</code> 當成通過驗證的身份，才讓檢查看似存在，實際上仍由模型控制。</p>
-<p>兩人版可以把身份固定在專屬 process，多人共用的服務可以放進每次請求專用的伺服器端上下文。實作方式會隨規模改變，模型只負責選擇操作與資源，系統負責決定它目前代表誰，以及可以操作哪些資料。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>系統設計</tag>
-        <tag>安全</tag>
       </tags>
   </entry>
   <entry>
@@ -798,52 +624,6 @@ flowchart LR
       </tags>
   </entry>
   <entry>
-    <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <url>//when-multi-agent-works/</url>
-    <content><![CDATA[<p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
-<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
-<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
-<span id="more"></span>
-
-<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
-  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
-  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
-  RETRY --&gt; DELIVER
-</code>
-</pre>
-
-<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
-<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
-<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
-<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
-<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
-<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
-<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
-<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
-<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
-<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
-<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
-<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
-<p>一篇名為 <a href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
-<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
-<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>AI agent</tag>
-        <tag>Multi-agent</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Skill 裝得越多，AI agent 就越好用嗎？</title>
     <url>//ai-agent-skills-more-is-better/</url>
     <content><![CDATA[<p>AI agent 的 skill 很好用。網路上可以找到各式各樣的 skill，每次看到一個可能用得上的，我總會迫不及待裝起來試試看。我原本以為，skill 裝得越多，AI agent 能做的事也會越多。</p>
@@ -926,6 +706,52 @@ flowchart LR
       </tags>
   </entry>
   <entry>
+    <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
+    <url>//when-multi-agent-works/</url>
+    <content><![CDATA[<p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
+<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
+<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
+<span id="more"></span>
+
+<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
+  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
+  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
+  RETRY --&gt; DELIVER
+</code>
+</pre>
+
+<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
+<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
+<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
+<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
+<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
+<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
+<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
+<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
+<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
+<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
+<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
+<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
+<p>一篇名為 <a href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
+<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
+<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>AI agent</tag>
+        <tag>Multi-agent</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</title>
     <url>//lilyscore-launch/</url>
     <content><![CDATA[<p>用 Android 手機或平板看 PDF 樂譜時，同一份譜可能要搭配原調、降半音等不同調性的伴奏，另外還有慢速示範，你會怎麼整理？我以前只能把它們丟在音樂資料夾。今天想換一個調練，就先離開 PDF、打開播放器，再從一串檔名裡找版本；有時還得播放幾秒，才知道自己有沒有選對。</p>
@@ -960,191 +786,6 @@ flowchart LR
         <tag>個人專案</tag>
         <tag>LilyScore</tag>
         <tag>音樂</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>哪些工作該交給背景 AI agent？</title>
-    <url>//background-ai-agent-tasks/</url>
-    <content><![CDATA[<p>最近我在做一套能讓 AI agent 留在背景工作、完成後再把結果送回來的系統。最先拿來測試的，是一場多角色討論：先由一個角色找資料，其他角色從不同角度提出意見，最後再整理成結論。整個流程大約要跑 5 到 10 分鐘，中間也不需要我逐句回覆，看起來很適合丟到背景，<del>終於可以假裝自己有員工了</del>。</p>
-<p>做到一半，我卻開始卡在一些和答案聰不聰明無關的問題。資料不足時，它要直接停下來，還是自己換個題目？其中一個角色失敗後，前面完成的步驟要不要重跑？我關掉對話之後，它跑完或卡住，又要用什麼方式告訴我？</p>
-<p>本文所說的背景 AI agent，指的是工作開始後不再佔住目前的對話；我可以先去做別的事，等它完成、失敗或需要幫忙時再回來處理。那麼，一個任務預計要跑 10 分鐘，直接丟到背景就好了嗎？我實際做完才發現，執行時間只回答了我要等多久，還沒有回答它能不能在沒有人看著時繼續工作。</p>
-<span id="more"></span>
-
-<h2 id="長時間不等於適合背景"><a href="#長時間不等於適合背景" class="headerlink" title="長時間不等於適合背景"></a>長時間不等於適合背景</h2><p>背景執行可以省下等待時間，判斷仍得由人處理。Agent 跑測試、整理資料或查文件時，我可以回到原本的工作，不必盯著畫面等它交付。不過它也少了對話裡的即時往返；需求有一點模糊、途中出現新線索，或下一步牽涉取捨時，就不適合每次都停下來等我即時決定。</p>
-<p>我現在會先用四個問題判斷：執行中還可能改需求嗎？完成與停止條件能不能核對？中途需不需要人選方向？失敗後能不能查到狀態並安全處理？只看「會跑多久」，很容易把一件仍需要來回討論的工作提早丟出去。</p>
-<pre>
-<code class="mermaid">
-
-flowchart TD
-  START[&quot;準備交給背景 agent&quot;] --&gt; SCOPE{&quot;執行中還可能改需求嗎？&quot;}
-  SCOPE -- &quot;會&quot; --&gt; CHAT[&quot;留在對話裡&quot;]
-  SCOPE -- &quot;不會&quot; --&gt; DONE{&quot;完成與停止條件能核對嗎？&quot;}
-  DONE -- &quot;不能&quot; --&gt; CHAT
-  DONE -- &quot;能&quot; --&gt; CHOICE{&quot;中途需要人選方向嗎？&quot;}
-  CHOICE -- &quot;需要&quot; --&gt; CHAT
-  CHOICE -- &quot;不需要&quot; --&gt; FAILURE{&quot;失敗後能查到狀態並安全處理嗎？&quot;}
-  FAILURE -- &quot;還不能&quot; --&gt; GUARD[&quot;先補狀態、通知或人工確認&quot;]
-  FAILURE -- &quot;能&quot; --&gt; BACKGROUND[&quot;適合背景執行&quot;]
-</code>
-</pre>
-
-<h2 id="先寫好完成與停止條件"><a href="#先寫好完成與停止條件" class="headerlink" title="先寫好完成與停止條件"></a>先寫好完成與停止條件</h2><p>前面的四個問題用來判斷任務要不要交到背景；決定交出去後，我才用下面幾項把工作內容寫完整。「幫我看看最近系統有沒有問題」很難直接交給背景，AI agent 不知道該看哪些資料、查到什麼程度才算完成，也不知道找不到證據時能不能停下來。最後即使交回一份看似合理的觀察，我也很難核對它漏了什麼。</p>
-<p>如果改成「讀最近七天的錯誤紀錄與任務失敗統計，找出重複出現的問題；沒有足夠證據就回報資料不足；有的話整理成一頁摘要並附上來源，不要修改任何設定」，任務就多了幾個可以檢查的部分：要讀哪些資料、交回什麼、何時可以停止，以及哪些動作不能做。完成後再要求它回報結果或失敗原因，背景 agent 才知道自己要走到哪裡。</p>
-<p>我現在交代背景工作時，至少會寫下五件事：資料範圍、交付內容、停止條件、不能執行的動作，以及完成或失敗後的回報方式。就算不懂複雜的 agent 架構，也能先把原本藏在對話來回裡的判斷寫出來。</p>
-<div class="note info no-icon"><p>背景任務可以停下來等人。資料不足時回報缺了什麼，比自己猜完再交一份完整答案更有用。</p>
-</div>
-
-<h2 id="中途要選方向，就留在對話"><a href="#中途要選方向，就留在對話" class="headerlink" title="中途要選方向，就留在對話"></a>中途要選方向，就留在對話</h2><p>同一種工作，有時適合背景執行，有時仍要留在眼前，差別通常在於下一步能不能事先決定。修 bug 就是常見的灰色地帶：如果錯誤已經可以重現、修改範圍固定，也有一組測試能判斷修好沒有，agent 可以在背景完成；如果連原因都還不知道，查到新線索後可能要跨服務修改，甚至牽涉產品行為，對話裡的即時判斷會比較省事。</p>
-<table>
-<thead>
-<tr>
-<th>工作</th>
-<th>適合放到背景的情況</th>
-<th>適合留在對話的情況</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>修 bug</td>
-<td>已能重現，範圍固定，有測試可核對</td>
-<td>原因未知，途中可能擴大修改範圍</td>
-</tr>
-<tr>
-<td>查資料</td>
-<td>資料來源與比較項目已指定</td>
-<td>還在找問題，結果會改變研究方向</td>
-</tr>
-<tr>
-<td>批次改檔</td>
-<td>改法一致，可用檢查或測試驗收</td>
-<td>每個檔案都可能需要不同取捨</td>
-</tr>
-<tr>
-<td>寫文章</td>
-<td>格式、錯字與既定規則檢查</td>
-<td>主題、例子與語氣還在來回調整</td>
-</tr>
-</tbody></table>
-<p>這也不必硬分成「全程背景」或「全程對話」。一份探索工作可以先在背景蒐集證據，遇到岔路時停下來請人選方向，再把選定的部分交回背景執行。把人的判斷點切出來，可以分開處理探索與執行，也比較好管理。</p>
-<h2 id="看得到狀態，才敢離開"><a href="#看得到狀態，才敢離開" class="headerlink" title="看得到狀態，才敢離開"></a>看得到狀態，才敢離開</h2><p>我的第一版會保存已完成的調查與各輪討論，遇到部分預料內的成功或失敗情況，也會更新紀錄並嘗試通知。不過我回頭檢查程式才發現，如果整場討論撞到最外層的 10 分鐘上限，內部雖然會產生失敗結果，背景入口目前沒有把它轉成通知，先前建立的討論紀錄也可能還停在「執行中」。工作已經停了，畫面看起來卻像它還在跑。</p>
-<p>這個落差在同步對話裡很快就會被看到，放到背景後卻可能隔很久才發現。通知只能提醒我回來，系統還要留一個能查詢的地方，至少分得出「等待執行、執行中、已完成、失敗或逾時、等待人處理」。理想情況下，就算訊息沒有送達，我仍能靠任務編號回來確認；程式重新啟動後，也能找出上一次沒有收尾的工作。</p>
-<p>如果你主要用現成的 AI 工具，不需要先做一套狀態系統，但可以留意三件事：離開頁面後任務會不會繼續、失敗時能不能查到原因，以及它需要你做決定時會停在哪裡。少了其中一項，背景執行很容易變成「晚一點回來看看有沒有結果」。</p>
-<h2 id="外部動作不要直接重跑"><a href="#外部動作不要直接重跑" class="headerlink" title="外部動作不要直接重跑"></a>外部動作不要直接重跑</h2><p>背景工作遇到網路中斷、工具逾時或使用額度限制，重跑看起來是最直接的處理方式。讀檔、查資料、跑測試通常可以再做一次；寄信、建立排程、發版或修改正式環境就要小心，因為第一次可能已經成功，只是結果來不及傳回來。</p>
-<p>重跑前，我會先確認前一次是否完成外部動作。單靠本機留下一筆「做過了」的紀錄仍有空隙，外部動作可能已經成功，程式卻在存好紀錄前中斷。如果一定要自動重跑，外部服務還得能用固定的請求編號辨識同一筆操作；工程上常把這種重複執行不影響結果的設計稱為「冪等」。做不到時，我會讓背景 agent 只準備資料或草稿，寄出、部署或寫入仍交回人確認。這和我在<a href="/when-multi-agent-works/">上一篇談多 agent 的文章</a>遇到的重複執行問題相同，只是沒有人盯著時更難察覺。</p>
-<p>回到一開始的多角色討論，我願意把它放到背景，10 分鐘的執行時間只是次要理由。它要讀的資料、討論輪數與輸出格式都已經固定，找不到合適的題目也可以停下來；最後交回的是建議，不會直接替我改資料或發布內容。至於最外層逾時後的狀態與通知，我還得補完，否則它只能算「會自己跑」，還不到我能放心離開的程度。</p>
-<p>我現在準備把工作交給背景 agent 前，會先寫出它要讀什麼、在哪裡停、怎麼回報，以及做過的動作能不能再來一次。這幾件事寫不出來，我就繼續留在對話裡。等待久一點有點煩，回來後才發現它卡在一個沒人知道的地方，顯然更煩（？）</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>AI agent</tag>
-        <tag>工作流程</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>版本說明，別再發版時才重寫</title>
-    <url>//release-notes-from-commits/</url>
-    <content><![CDATA[<p>最近替自己的樂譜練習 App LilyScore 準備發版，功能做完、測試也跑過，最後卻卡在一個很普通的問題：這版到底更新了什麼？</p>
-<p>過程中加過播放器功能、修過樂譜庫，還順手調了幾個小地方。每個當下我都知道自己在做什麼，隔了幾天再回頭看，腦袋卻只剩下「好像改了播放器」、「還有一個 bug」。接著又開始翻 commit、issue 和對話紀錄，把剛做完的事情重新整理一次。</p>
-<p>LilyScore 第一次走完整個上架流程時，我才發現每一版都會遇到同一件事。商店要一份讓練習的人看得懂的更新說明，GitHub Release 又要保留完整紀錄；兩份都靠發版前臨時回想，很像考前一天才開始整理筆記。<del>而且還是自己出的題目。</del></p>
-<p>後來我沒有再多維護一份版本說明文件，而是把平常留下的修改紀錄，直接拿來當發版時的原料。</p>
-<span id="more"></span>
-
-<h2 id="先留下可讀的修改紀錄"><a href="#先留下可讀的修改紀錄" class="headerlink" title="先留下可讀的修改紀錄"></a>先留下可讀的修改紀錄</h2><p>Git 是程式專案常用的版本管理工具；commit 則是每次保存一小段修改時，替那次變更留下的紀錄。tag（版本標記）是替某個版本做的記號，從上一個發版 tag 往後看，就能找出這一版新增了哪些修改。</p>
-<p>如果目前還沒有發版腳本，先手動做一次就夠了：</p>
-<ol>
-<li>找到上一個發版的 tag。</li>
-<li>列出那個 tag 到現在的 commit。</li>
-<li>挑出使用者會在意的功能與修正，改寫成幾行版本說明。</li>
-</ol>
-<p>例如上一版是 <code>v2.2.0</code>，可以先用下面這行列出後續的 commit 標題：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span> v2.2.0..HEAD --pretty=%s</span><br></pre></td></tr></table></figure>
-
-<p>這裡還不用急著自動化。先讓每次修改都留下一句能看懂的紀錄，發版時就不必從聊天紀錄裡考古。如果你還沒用 Git，同樣可以把紀錄放在待辦清單或更新筆記裡，只要它能回答「上次發布後，我做了什麼」就行。</p>
-<h2 id="兩份版本說明"><a href="#兩份版本說明" class="headerlink" title="兩份版本說明"></a>兩份版本說明</h2><p>同一批 commit，我會整理成兩份內容。短版給實際使用 App 的人看，只留下多了什麼、修了什麼；完整版留給以後的我，連文件、測試與發版過程都保留。以 LilyScore 為例，短版放到 Google Play，完整版放到 GitHub Release，也就是 GitHub 上每個版本的發布頁。</p>
-<p>為了讓腳本分得出哪些修改值得對外說，我在新增功能的標題前加上 <code>feat:</code>，修正問題則用 <code>fix:</code>。這只是平常寫紀錄時採用的分類，先有一致的寫法，發版時才有規則可以篩選。</p>
-<table>
-<thead>
-<tr>
-<th>去哪裡</th>
-<th>取哪些內容</th>
-<th>用來做什麼</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Google Play</td>
-<td>新增功能與問題修正，篩選後再確認文字</td>
-<td>讓使用者知道這版增加與修正了什麼</td>
-</tr>
-<tr>
-<td>GitHub Release</td>
-<td>版本範圍內的所有 commit 標題與短編號</td>
-<td>讓自己日後追查每一筆修改</td>
-</tr>
-</tbody></table>
-<p>不過，拿掉前綴還不一定能直接放上商店。LilyScore 真的有過下面兩筆 commit，自動整理只會做到中間那欄；右邊是我把同一件事改寫給使用者看的示例，並非腳本會自動產出的文字。</p>
-<table>
-<thead>
-<tr>
-<th>原始 commit</th>
-<th>自動整理的候選文字</th>
-<th>人工改寫示例</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>feat(player): A-B 循環在進度條上可視化</code></td>
-<td>A-B 循環在進度條上可視化</td>
-<td>在播放進度條上顯示 A-B 循環範圍，方便查看反覆播放的起點與終點。</td>
-</tr>
-<tr>
-<td><code>fix(home): 空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</code></td>
-<td>空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</td>
-<td>修正尚未匯入樂譜時，畫面重複出現「匯入樂譜」按鈕的問題。</td>
-</tr>
-</tbody></table>
-<p>「空狀態」對寫程式的人很直覺，使用者卻要先猜它指的是哪個畫面。腳本能幫我找出這筆修正，換成對方看得懂的說法，仍然要由我決定。GitHub Release 則保留原本的標題、前綴與短編號，連文件、雜項維護和發版本身的 commit 都列出；要看實際改了哪些程式，再點進 commit。</p>
-<p>這張圖把人工確認也列進流程，這一步目前仍要在發版指令前手動完成。</p>
-<pre>
-<code class="mermaid">
-
-flowchart TD
-    A[留下可讀的修改紀錄] --&gt; B[選定本次更新範圍]
-    B --&gt; C[挑出新功能與問題修正]
-    C --&gt; D[人工確認與改寫]
-    D --&gt; E[Google Play 短版]
-    B --&gt; F[保留所有修改標題]
-    F --&gt; G[GitHub Release 完整版]
-</code>
-</pre>
-
-<h2 id="Commit-標題要寫給人看"><a href="#Commit-標題要寫給人看" class="headerlink" title="Commit 標題要寫給人看"></a>Commit 標題要寫給人看</h2><p>當 commit 標題有可能出現在商店裡，我就不能再寫「fix bug」、「調整一下」或「final final 真的 final」。以前這種標題只會讓幾週後的我看不懂，現在還可能直接變成使用者看到的版本說明，丟臉範圍變大了。</p>
-<p>這也是我最喜歡的副作用。版本說明的品質，早在每次保存小改動時就決定了一部分。如果你讓 AI 幫忙寫 commit，也要看一眼「這個改動要怎麼講給人聽」。否則只會得到一串文法很完整，卻不知道做了什麼的句子。</p>
-<p>當然，不是所有 commit 都適合對外說。重構、調整測試、修 CI，可能對維護很重要，卻不一定是練習的人需要知道的更新。所以我只把 <code>feat:</code> 和 <code>fix:</code> 當成商店候選內容；你也可以使用自己的分類，先決定哪些變更值得出現在使用者面前即可。</p>
-<h2 id="LilyScore-的發版流程"><a href="#LilyScore-的發版流程" class="headerlink" title="LilyScore 的發版流程"></a>LilyScore 的發版流程</h2><p>我後來把固定步驟放進 <code>scripts/release.ps1</code>。它會檢查目前是不是在主分支 <code>main</code>、有沒有已追蹤但尚未提交的修改、本機是否落後遠端、tag 是否重複，再檢查程式是否有靜態分析能找出的錯誤。通過後，腳本更新版號與建置編號、整理 Play 說明，接著建立 release commit、tag 並推上 GitHub。後續測試、簽章建置與上傳，交給 GitHub Actions 自動執行，這就是下面提到的 CI。</p>
-<h3 id="發版前先確認文字"><a href="#發版前先確認文字" class="headerlink" title="發版前先確認文字"></a>發版前先確認文字</h3><p>這裡還有個目前腳本沒補上的步驟。它會在終端印出版本說明，接著直接 commit、打 tag 並 push，沒有停下來等我確認。因此，要先檢查文字，就得在執行發版指令之前，用前面的 <code>git log</code> 列出修改、整理好內容，再用 <code>-Notes</code> 傳入已確認的版本說明。例如只要說明這次循環範圍的更新，可以在 LilyScore 專案裡執行：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">.\scripts\release.ps1 <span class="literal">-Version</span> <span class="number">2.3</span>.<span class="number">0</span> <span class="literal">-Notes</span> <span class="string">&#x27;在播放進度條上顯示 A-B 循環範圍。&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>這樣會覆寫自動彙整的文字，並繼續完成發版；它是一條會提交和推送的指令。腳本也有 <code>-NoPush</code> 參數，但那仍會建立 commit 與 tag，只省略推送，不能當成單純預覽。想把「產生候選文字、人工確認、正式送出」接成不中斷的流程，還需要替腳本補上預覽與確認步驟。</p>
-<h3 id="測試版的更新範圍"><a href="#測試版的更新範圍" class="headerlink" title="測試版的更新範圍"></a>測試版的更新範圍</h3><p>兩份紀錄還有個小差別，從哪個版本開始算。假設上次送到 Play 的版本是 <code>v2.2.0</code>，中間做過 <code>v2.3.0-alpha.1</code> 與 <code>v2.3.0-beta.1</code>，現在準備送出 <code>v2.3.0</code>，商店說明應該包含整段測試期間累積的功能。GitHub Release 則每個測試版都有紀錄，可以分開追查這幾次修改。</p>
-<p>LilyScore 因此把名稱含 <code>-</code> 的 tag 視為測試版，只建立 GitHub Release；不含 <code>-</code> 才送進 Play 封閉測試軌道，讓加入測試的人收到更新，這不代表已經發布到正式軌道。Play 說明從上一個不含 <code>-</code> 的 tag 開始，GitHub Release 則取排除本次 tag 後、依版本號排序的第一個 <code>v*</code> tag 作為起點。這是我目前專案的分流規則，其他專案可以按自己的發布方式調整。</p>
-<h2 id="自動彙整的四個邊界"><a href="#自動彙整的四個邊界" class="headerlink" title="自動彙整的四個邊界"></a>自動彙整的四個邊界</h2><h3 id="沒有-feat-或-fix"><a href="#沒有-feat-或-fix" class="headerlink" title="沒有 feat: 或 fix:"></a>沒有 <code>feat:</code> 或 <code>fix:</code></h3><p>這版若找不到 <code>feat:</code> 或 <code>fix:</code>，腳本目前會放入「穩定性與效能改善。」這句備用文字，避免產生空白說明。但這句話未必有 commit 可以證明；更保守的做法是中止發版，要求人工補上內容。目前腳本還沒這樣做，需要在執行前確認這版改了什麼，再用前面的 <code>-Notes</code> 傳入合適的文字。</p>
-<h3 id="內容超過商店上限"><a href="#內容超過商店上限" class="headerlink" title="內容超過商店上限"></a>內容超過商店上限</h3><p>Google Play 的 <a href="https://support.google.com/googleplay/android-developer/answer/9859348?hl=en">Prepare and roll out a release</a> 說明目前允許每種語言最多 500 個 Unicode 字元。我的腳本依新到舊逐條放入，快滿時就停止。它用 PowerShell 的字串長度做較保守的檢查，純中文通常不受影響，emoji 可能提早碰到限制；大改版仍會改用手寫說明。</p>
-<h3 id="tag-畫錯版本範圍"><a href="#tag-畫錯版本範圍" class="headerlink" title="tag 畫錯版本範圍"></a>tag 畫錯版本範圍</h3><p>目前的腳本依版本號排序找上一個 tag，前提是 release tag 都在同一條主線，版號也一直往上增加。如果專案同時維護多條版本分支或做 backport，就該限制為目前 <code>HEAD</code> 的祖先 tag，否則 <code>git log A..HEAD</code> 可能抓錯版本。重寫 Git 歷史、壓縮 commit 或把 tag 打錯位置，也會改變輸出。</p>
-<h3 id="CI-讀不到舊紀錄"><a href="#CI-讀不到舊紀錄" class="headerlink" title="CI 讀不到舊紀錄"></a>CI 讀不到舊紀錄</h3><p><code>actions/checkout</code> 預設只抓觸發 workflow 的一個 commit，runner 可能根本沒有舊 tag。本來要列整段變更的 <code>git log</code>，最後就只剩本次 commit；LilyScore 因此把 <code>fetch-depth</code> 設為 <code>0</code>，讓 CI 取得完整歷史。這類問題平常不容易出現，通常會挑發版那天才突然讓人想把電腦闔起來。</p>
-<hr>
-<p>版本說明最後還是得由我看過，因為讀者不是 CI，也不會因為內容由腳本產生就突然看得懂。有了平常留下的紀錄，發版時可以從這份清單挑選、改寫，不必再從空白頁開始回想。</p>
-<p>把已經寫在 commit 裡的資訊再整理一次，聽起來很勤勞，實際上只是我以前還沒想到要偷懶而已。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/google-play-first-release/">第一次上 Google Play，最麻煩的不是寫 App</a></li></ul></div>]]></content>
-      <categories>
-        <category>開發筆記</category>
-        <category>工具</category>
-      </categories>
-      <tags>
-        <tag>開發筆記</tag>
-        <tag>CI/CD</tag>
-        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -1512,9 +1153,194 @@ graph TD
         <category>開發</category>
       </categories>
       <tags>
-        <tag>CI/CD</tag>
         <tag>Android</tag>
         <tag>Google Play</tag>
+        <tag>CI/CD</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>哪些工作該交給背景 AI agent？</title>
+    <url>//background-ai-agent-tasks/</url>
+    <content><![CDATA[<p>最近我在做一套能讓 AI agent 留在背景工作、完成後再把結果送回來的系統。最先拿來測試的，是一場多角色討論：先由一個角色找資料，其他角色從不同角度提出意見，最後再整理成結論。整個流程大約要跑 5 到 10 分鐘，中間也不需要我逐句回覆，看起來很適合丟到背景，<del>終於可以假裝自己有員工了</del>。</p>
+<p>做到一半，我卻開始卡在一些和答案聰不聰明無關的問題。資料不足時，它要直接停下來，還是自己換個題目？其中一個角色失敗後，前面完成的步驟要不要重跑？我關掉對話之後，它跑完或卡住，又要用什麼方式告訴我？</p>
+<p>本文所說的背景 AI agent，指的是工作開始後不再佔住目前的對話；我可以先去做別的事，等它完成、失敗或需要幫忙時再回來處理。那麼，一個任務預計要跑 10 分鐘，直接丟到背景就好了嗎？我實際做完才發現，執行時間只回答了我要等多久，還沒有回答它能不能在沒有人看著時繼續工作。</p>
+<span id="more"></span>
+
+<h2 id="長時間不等於適合背景"><a href="#長時間不等於適合背景" class="headerlink" title="長時間不等於適合背景"></a>長時間不等於適合背景</h2><p>背景執行可以省下等待時間，判斷仍得由人處理。Agent 跑測試、整理資料或查文件時，我可以回到原本的工作，不必盯著畫面等它交付。不過它也少了對話裡的即時往返；需求有一點模糊、途中出現新線索，或下一步牽涉取捨時，就不適合每次都停下來等我即時決定。</p>
+<p>我現在會先用四個問題判斷：執行中還可能改需求嗎？完成與停止條件能不能核對？中途需不需要人選方向？失敗後能不能查到狀態並安全處理？只看「會跑多久」，很容易把一件仍需要來回討論的工作提早丟出去。</p>
+<pre>
+<code class="mermaid">
+
+flowchart TD
+  START[&quot;準備交給背景 agent&quot;] --&gt; SCOPE{&quot;執行中還可能改需求嗎？&quot;}
+  SCOPE -- &quot;會&quot; --&gt; CHAT[&quot;留在對話裡&quot;]
+  SCOPE -- &quot;不會&quot; --&gt; DONE{&quot;完成與停止條件能核對嗎？&quot;}
+  DONE -- &quot;不能&quot; --&gt; CHAT
+  DONE -- &quot;能&quot; --&gt; CHOICE{&quot;中途需要人選方向嗎？&quot;}
+  CHOICE -- &quot;需要&quot; --&gt; CHAT
+  CHOICE -- &quot;不需要&quot; --&gt; FAILURE{&quot;失敗後能查到狀態並安全處理嗎？&quot;}
+  FAILURE -- &quot;還不能&quot; --&gt; GUARD[&quot;先補狀態、通知或人工確認&quot;]
+  FAILURE -- &quot;能&quot; --&gt; BACKGROUND[&quot;適合背景執行&quot;]
+</code>
+</pre>
+
+<h2 id="先寫好完成與停止條件"><a href="#先寫好完成與停止條件" class="headerlink" title="先寫好完成與停止條件"></a>先寫好完成與停止條件</h2><p>前面的四個問題用來判斷任務要不要交到背景；決定交出去後，我才用下面幾項把工作內容寫完整。「幫我看看最近系統有沒有問題」很難直接交給背景，AI agent 不知道該看哪些資料、查到什麼程度才算完成，也不知道找不到證據時能不能停下來。最後即使交回一份看似合理的觀察，我也很難核對它漏了什麼。</p>
+<p>如果改成「讀最近七天的錯誤紀錄與任務失敗統計，找出重複出現的問題；沒有足夠證據就回報資料不足；有的話整理成一頁摘要並附上來源，不要修改任何設定」，任務就多了幾個可以檢查的部分：要讀哪些資料、交回什麼、何時可以停止，以及哪些動作不能做。完成後再要求它回報結果或失敗原因，背景 agent 才知道自己要走到哪裡。</p>
+<p>我現在交代背景工作時，至少會寫下五件事：資料範圍、交付內容、停止條件、不能執行的動作，以及完成或失敗後的回報方式。就算不懂複雜的 agent 架構，也能先把原本藏在對話來回裡的判斷寫出來。</p>
+<div class="note info no-icon"><p>背景任務可以停下來等人。資料不足時回報缺了什麼，比自己猜完再交一份完整答案更有用。</p>
+</div>
+
+<h2 id="中途要選方向，就留在對話"><a href="#中途要選方向，就留在對話" class="headerlink" title="中途要選方向，就留在對話"></a>中途要選方向，就留在對話</h2><p>同一種工作，有時適合背景執行，有時仍要留在眼前，差別通常在於下一步能不能事先決定。修 bug 就是常見的灰色地帶：如果錯誤已經可以重現、修改範圍固定，也有一組測試能判斷修好沒有，agent 可以在背景完成；如果連原因都還不知道，查到新線索後可能要跨服務修改，甚至牽涉產品行為，對話裡的即時判斷會比較省事。</p>
+<table>
+<thead>
+<tr>
+<th>工作</th>
+<th>適合放到背景的情況</th>
+<th>適合留在對話的情況</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>修 bug</td>
+<td>已能重現，範圍固定，有測試可核對</td>
+<td>原因未知，途中可能擴大修改範圍</td>
+</tr>
+<tr>
+<td>查資料</td>
+<td>資料來源與比較項目已指定</td>
+<td>還在找問題，結果會改變研究方向</td>
+</tr>
+<tr>
+<td>批次改檔</td>
+<td>改法一致，可用檢查或測試驗收</td>
+<td>每個檔案都可能需要不同取捨</td>
+</tr>
+<tr>
+<td>寫文章</td>
+<td>格式、錯字與既定規則檢查</td>
+<td>主題、例子與語氣還在來回調整</td>
+</tr>
+</tbody></table>
+<p>這也不必硬分成「全程背景」或「全程對話」。一份探索工作可以先在背景蒐集證據，遇到岔路時停下來請人選方向，再把選定的部分交回背景執行。把人的判斷點切出來，可以分開處理探索與執行，也比較好管理。</p>
+<h2 id="看得到狀態，才敢離開"><a href="#看得到狀態，才敢離開" class="headerlink" title="看得到狀態，才敢離開"></a>看得到狀態，才敢離開</h2><p>我的第一版會保存已完成的調查與各輪討論，遇到部分預料內的成功或失敗情況，也會更新紀錄並嘗試通知。不過我回頭檢查程式才發現，如果整場討論撞到最外層的 10 分鐘上限，內部雖然會產生失敗結果，背景入口目前沒有把它轉成通知，先前建立的討論紀錄也可能還停在「執行中」。工作已經停了，畫面看起來卻像它還在跑。</p>
+<p>這個落差在同步對話裡很快就會被看到，放到背景後卻可能隔很久才發現。通知只能提醒我回來，系統還要留一個能查詢的地方，至少分得出「等待執行、執行中、已完成、失敗或逾時、等待人處理」。理想情況下，就算訊息沒有送達，我仍能靠任務編號回來確認；程式重新啟動後，也能找出上一次沒有收尾的工作。</p>
+<p>如果你主要用現成的 AI 工具，不需要先做一套狀態系統，但可以留意三件事：離開頁面後任務會不會繼續、失敗時能不能查到原因，以及它需要你做決定時會停在哪裡。少了其中一項，背景執行很容易變成「晚一點回來看看有沒有結果」。</p>
+<h2 id="外部動作不要直接重跑"><a href="#外部動作不要直接重跑" class="headerlink" title="外部動作不要直接重跑"></a>外部動作不要直接重跑</h2><p>背景工作遇到網路中斷、工具逾時或使用額度限制，重跑看起來是最直接的處理方式。讀檔、查資料、跑測試通常可以再做一次；寄信、建立排程、發版或修改正式環境就要小心，因為第一次可能已經成功，只是結果來不及傳回來。</p>
+<p>重跑前，我會先確認前一次是否完成外部動作。單靠本機留下一筆「做過了」的紀錄仍有空隙，外部動作可能已經成功，程式卻在存好紀錄前中斷。如果一定要自動重跑，外部服務還得能用固定的請求編號辨識同一筆操作；工程上常把這種重複執行不影響結果的設計稱為「冪等」。做不到時，我會讓背景 agent 只準備資料或草稿，寄出、部署或寫入仍交回人確認。這和我在<a href="/when-multi-agent-works/">上一篇談多 agent 的文章</a>遇到的重複執行問題相同，只是沒有人盯著時更難察覺。</p>
+<p>回到一開始的多角色討論，我願意把它放到背景，10 分鐘的執行時間只是次要理由。它要讀的資料、討論輪數與輸出格式都已經固定，找不到合適的題目也可以停下來；最後交回的是建議，不會直接替我改資料或發布內容。至於最外層逾時後的狀態與通知，我還得補完，否則它只能算「會自己跑」，還不到我能放心離開的程度。</p>
+<p>我現在準備把工作交給背景 agent 前，會先寫出它要讀什麼、在哪裡停、怎麼回報，以及做過的動作能不能再來一次。這幾件事寫不出來，我就繼續留在對話裡。等待久一點有點煩，回來後才發現它卡在一個沒人知道的地方，顯然更煩（？）</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>AI agent</tag>
+        <tag>工作流程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>版本說明，別再發版時才重寫</title>
+    <url>//release-notes-from-commits/</url>
+    <content><![CDATA[<p>最近替自己的樂譜練習 App LilyScore 準備發版，功能做完、測試也跑過，最後卻卡在一個很普通的問題：這版到底更新了什麼？</p>
+<p>過程中加過播放器功能、修過樂譜庫，還順手調了幾個小地方。每個當下我都知道自己在做什麼，隔了幾天再回頭看，腦袋卻只剩下「好像改了播放器」、「還有一個 bug」。接著又開始翻 commit、issue 和對話紀錄，把剛做完的事情重新整理一次。</p>
+<p>LilyScore 第一次走完整個上架流程時，我才發現每一版都會遇到同一件事。商店要一份讓練習的人看得懂的更新說明，GitHub Release 又要保留完整紀錄；兩份都靠發版前臨時回想，很像考前一天才開始整理筆記。<del>而且還是自己出的題目。</del></p>
+<p>後來我沒有再多維護一份版本說明文件，而是把平常留下的修改紀錄，直接拿來當發版時的原料。</p>
+<span id="more"></span>
+
+<h2 id="先留下可讀的修改紀錄"><a href="#先留下可讀的修改紀錄" class="headerlink" title="先留下可讀的修改紀錄"></a>先留下可讀的修改紀錄</h2><p>Git 是程式專案常用的版本管理工具；commit 則是每次保存一小段修改時，替那次變更留下的紀錄。tag（版本標記）是替某個版本做的記號，從上一個發版 tag 往後看，就能找出這一版新增了哪些修改。</p>
+<p>如果目前還沒有發版腳本，先手動做一次就夠了：</p>
+<ol>
+<li>找到上一個發版的 tag。</li>
+<li>列出那個 tag 到現在的 commit。</li>
+<li>挑出使用者會在意的功能與修正，改寫成幾行版本說明。</li>
+</ol>
+<p>例如上一版是 <code>v2.2.0</code>，可以先用下面這行列出後續的 commit 標題：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span> v2.2.0..HEAD --pretty=%s</span><br></pre></td></tr></table></figure>
+
+<p>這裡還不用急著自動化。先讓每次修改都留下一句能看懂的紀錄，發版時就不必從聊天紀錄裡考古。如果你還沒用 Git，同樣可以把紀錄放在待辦清單或更新筆記裡，只要它能回答「上次發布後，我做了什麼」就行。</p>
+<h2 id="兩份版本說明"><a href="#兩份版本說明" class="headerlink" title="兩份版本說明"></a>兩份版本說明</h2><p>同一批 commit，我會整理成兩份內容。短版給實際使用 App 的人看，只留下多了什麼、修了什麼；完整版留給以後的我，連文件、測試與發版過程都保留。以 LilyScore 為例，短版放到 Google Play，完整版放到 GitHub Release，也就是 GitHub 上每個版本的發布頁。</p>
+<p>為了讓腳本分得出哪些修改值得對外說，我在新增功能的標題前加上 <code>feat:</code>，修正問題則用 <code>fix:</code>。這只是平常寫紀錄時採用的分類，先有一致的寫法，發版時才有規則可以篩選。</p>
+<table>
+<thead>
+<tr>
+<th>去哪裡</th>
+<th>取哪些內容</th>
+<th>用來做什麼</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Google Play</td>
+<td>新增功能與問題修正，篩選後再確認文字</td>
+<td>讓使用者知道這版增加與修正了什麼</td>
+</tr>
+<tr>
+<td>GitHub Release</td>
+<td>版本範圍內的所有 commit 標題與短編號</td>
+<td>讓自己日後追查每一筆修改</td>
+</tr>
+</tbody></table>
+<p>不過，拿掉前綴還不一定能直接放上商店。LilyScore 真的有過下面兩筆 commit，自動整理只會做到中間那欄；右邊是我把同一件事改寫給使用者看的示例，並非腳本會自動產出的文字。</p>
+<table>
+<thead>
+<tr>
+<th>原始 commit</th>
+<th>自動整理的候選文字</th>
+<th>人工改寫示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>feat(player): A-B 循環在進度條上可視化</code></td>
+<td>A-B 循環在進度條上可視化</td>
+<td>在播放進度條上顯示 A-B 循環範圍，方便查看反覆播放的起點與終點。</td>
+</tr>
+<tr>
+<td><code>fix(home): 空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</code></td>
+<td>空狀態不再放浮動按鈕，「匯入樂譜」不重複出現</td>
+<td>修正尚未匯入樂譜時，畫面重複出現「匯入樂譜」按鈕的問題。</td>
+</tr>
+</tbody></table>
+<p>「空狀態」對寫程式的人很直覺，使用者卻要先猜它指的是哪個畫面。腳本能幫我找出這筆修正，換成對方看得懂的說法，仍然要由我決定。GitHub Release 則保留原本的標題、前綴與短編號，連文件、雜項維護和發版本身的 commit 都列出；要看實際改了哪些程式，再點進 commit。</p>
+<p>這張圖把人工確認也列進流程，這一步目前仍要在發版指令前手動完成。</p>
+<pre>
+<code class="mermaid">
+
+flowchart TD
+    A[留下可讀的修改紀錄] --&gt; B[選定本次更新範圍]
+    B --&gt; C[挑出新功能與問題修正]
+    C --&gt; D[人工確認與改寫]
+    D --&gt; E[Google Play 短版]
+    B --&gt; F[保留所有修改標題]
+    F --&gt; G[GitHub Release 完整版]
+</code>
+</pre>
+
+<h2 id="Commit-標題要寫給人看"><a href="#Commit-標題要寫給人看" class="headerlink" title="Commit 標題要寫給人看"></a>Commit 標題要寫給人看</h2><p>當 commit 標題有可能出現在商店裡，我就不能再寫「fix bug」、「調整一下」或「final final 真的 final」。以前這種標題只會讓幾週後的我看不懂，現在還可能直接變成使用者看到的版本說明，丟臉範圍變大了。</p>
+<p>這也是我最喜歡的副作用。版本說明的品質，早在每次保存小改動時就決定了一部分。如果你讓 AI 幫忙寫 commit，也要看一眼「這個改動要怎麼講給人聽」。否則只會得到一串文法很完整，卻不知道做了什麼的句子。</p>
+<p>當然，不是所有 commit 都適合對外說。重構、調整測試、修 CI，可能對維護很重要，卻不一定是練習的人需要知道的更新。所以我只把 <code>feat:</code> 和 <code>fix:</code> 當成商店候選內容；你也可以使用自己的分類，先決定哪些變更值得出現在使用者面前即可。</p>
+<h2 id="LilyScore-的發版流程"><a href="#LilyScore-的發版流程" class="headerlink" title="LilyScore 的發版流程"></a>LilyScore 的發版流程</h2><p>我後來把固定步驟放進 <code>scripts/release.ps1</code>。它會檢查目前是不是在主分支 <code>main</code>、有沒有已追蹤但尚未提交的修改、本機是否落後遠端、tag 是否重複，再檢查程式是否有靜態分析能找出的錯誤。通過後，腳本更新版號與建置編號、整理 Play 說明，接著建立 release commit、tag 並推上 GitHub。後續測試、簽章建置與上傳，交給 GitHub Actions 自動執行，這就是下面提到的 CI。</p>
+<h3 id="發版前先確認文字"><a href="#發版前先確認文字" class="headerlink" title="發版前先確認文字"></a>發版前先確認文字</h3><p>這裡還有個目前腳本沒補上的步驟。它會在終端印出版本說明，接著直接 commit、打 tag 並 push，沒有停下來等我確認。因此，要先檢查文字，就得在執行發版指令之前，用前面的 <code>git log</code> 列出修改、整理好內容，再用 <code>-Notes</code> 傳入已確認的版本說明。例如只要說明這次循環範圍的更新，可以在 LilyScore 專案裡執行：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">.\scripts\release.ps1 <span class="literal">-Version</span> <span class="number">2.3</span>.<span class="number">0</span> <span class="literal">-Notes</span> <span class="string">&#x27;在播放進度條上顯示 A-B 循環範圍。&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>這樣會覆寫自動彙整的文字，並繼續完成發版；它是一條會提交和推送的指令。腳本也有 <code>-NoPush</code> 參數，但那仍會建立 commit 與 tag，只省略推送，不能當成單純預覽。想把「產生候選文字、人工確認、正式送出」接成不中斷的流程，還需要替腳本補上預覽與確認步驟。</p>
+<h3 id="測試版的更新範圍"><a href="#測試版的更新範圍" class="headerlink" title="測試版的更新範圍"></a>測試版的更新範圍</h3><p>兩份紀錄還有個小差別，從哪個版本開始算。假設上次送到 Play 的版本是 <code>v2.2.0</code>，中間做過 <code>v2.3.0-alpha.1</code> 與 <code>v2.3.0-beta.1</code>，現在準備送出 <code>v2.3.0</code>，商店說明應該包含整段測試期間累積的功能。GitHub Release 則每個測試版都有紀錄，可以分開追查這幾次修改。</p>
+<p>LilyScore 因此把名稱含 <code>-</code> 的 tag 視為測試版，只建立 GitHub Release；不含 <code>-</code> 才送進 Play 封閉測試軌道，讓加入測試的人收到更新，這不代表已經發布到正式軌道。Play 說明從上一個不含 <code>-</code> 的 tag 開始，GitHub Release 則取排除本次 tag 後、依版本號排序的第一個 <code>v*</code> tag 作為起點。這是我目前專案的分流規則，其他專案可以按自己的發布方式調整。</p>
+<h2 id="自動彙整的四個邊界"><a href="#自動彙整的四個邊界" class="headerlink" title="自動彙整的四個邊界"></a>自動彙整的四個邊界</h2><h3 id="沒有-feat-或-fix"><a href="#沒有-feat-或-fix" class="headerlink" title="沒有 feat: 或 fix:"></a>沒有 <code>feat:</code> 或 <code>fix:</code></h3><p>這版若找不到 <code>feat:</code> 或 <code>fix:</code>，腳本目前會放入「穩定性與效能改善。」這句備用文字，避免產生空白說明。但這句話未必有 commit 可以證明；更保守的做法是中止發版，要求人工補上內容。目前腳本還沒這樣做，需要在執行前確認這版改了什麼，再用前面的 <code>-Notes</code> 傳入合適的文字。</p>
+<h3 id="內容超過商店上限"><a href="#內容超過商店上限" class="headerlink" title="內容超過商店上限"></a>內容超過商店上限</h3><p>Google Play 的 <a href="https://support.google.com/googleplay/android-developer/answer/9859348?hl=en">Prepare and roll out a release</a> 說明目前允許每種語言最多 500 個 Unicode 字元。我的腳本依新到舊逐條放入，快滿時就停止。它用 PowerShell 的字串長度做較保守的檢查，純中文通常不受影響，emoji 可能提早碰到限制；大改版仍會改用手寫說明。</p>
+<h3 id="tag-畫錯版本範圍"><a href="#tag-畫錯版本範圍" class="headerlink" title="tag 畫錯版本範圍"></a>tag 畫錯版本範圍</h3><p>目前的腳本依版本號排序找上一個 tag，前提是 release tag 都在同一條主線，版號也一直往上增加。如果專案同時維護多條版本分支或做 backport，就該限制為目前 <code>HEAD</code> 的祖先 tag，否則 <code>git log A..HEAD</code> 可能抓錯版本。重寫 Git 歷史、壓縮 commit 或把 tag 打錯位置，也會改變輸出。</p>
+<h3 id="CI-讀不到舊紀錄"><a href="#CI-讀不到舊紀錄" class="headerlink" title="CI 讀不到舊紀錄"></a>CI 讀不到舊紀錄</h3><p><code>actions/checkout</code> 預設只抓觸發 workflow 的一個 commit，runner 可能根本沒有舊 tag。本來要列整段變更的 <code>git log</code>，最後就只剩本次 commit；LilyScore 因此把 <code>fetch-depth</code> 設為 <code>0</code>，讓 CI 取得完整歷史。這類問題平常不容易出現，通常會挑發版那天才突然讓人想把電腦闔起來。</p>
+<hr>
+<p>版本說明最後還是得由我看過，因為讀者不是 CI，也不會因為內容由腳本產生就突然看得懂。有了平常留下的紀錄，發版時可以從這份清單挑選、改寫，不必再從空白頁開始回想。</p>
+<p>把已經寫在 commit 裡的資訊再整理一次，聽起來很勤勞，實際上只是我以前還沒想到要偷懶而已。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/google-play-first-release/">第一次上 Google Play，最麻煩的不是寫 App</a></li></ul></div>]]></content>
+      <categories>
+        <category>開發筆記</category>
+        <category>工具</category>
+      </categories>
+      <tags>
+        <tag>CI/CD</tag>
+        <tag>開發筆記</tag>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
@@ -1777,6 +1603,180 @@ graph TD
       <tags>
         <tag>自動化</tag>
         <tag>Telegram</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>多人共用 AI bot，別讓它認錯使用者</title>
+    <url>//llm-agent-isolation/</url>
+    <content><![CDATA[<p>試著想像一個故事：小明和小美共用同一個 AI bot。兩人都會請它記住一些事情，可能是待辦、工作筆記，也可能是不想讓對方看到的私人內容。</p>
+<p>當小明問「我上次說過什麼？」時，bot 卻把小美留下的內容回傳給他。一次錯誤回答，就變成了私人資料外洩。</p>
+<p>這裡要先分清楚 bot 和 AI。bot 是整套應用系統，負責接收訊息，並串起身份確認、工具與資料。AI 是其中負責理解文字、選擇下一步操作的元件。</p>
+<p>要避免拿錯資料，bot 必須在把訊息交給 AI 之前，先從聊天平台或登入系統確認訊息是誰傳的，不能讓 AI 自己判斷身分。AI 可以判斷小明想找什麼，但不能決定自己目前是代表小明還是小美。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+    U[&quot;小明傳來訊息&quot;] --&gt; P
+    subgraph B[&quot;AI bot 系統&quot;]
+        P[&quot;訊息入口&lt;br&#x2F;&gt;確認是小明&quot;] --&gt; A[&quot;AI&lt;br&#x2F;&gt;理解小明想做什麼&quot;]
+        A --&gt; T[&quot;記憶工具&lt;br&#x2F;&gt;沿用已確認的身份&quot;]
+    end
+    T --&gt; D[&quot;只讀小明的資料&quot;]
+</code>
+</pre>
+
+<p>圖中的 AI 位於 bot 系統裡面，只負責理解需求。訊息入口先確認現在是誰，記憶工具再沿用這個結果查詢資料。把身份也交給 AI 填，它就有機會用別人的身份讀資料。</p>
+<p>模型可能誤解對話、受到提示注入影響，或在呼叫工具時填錯資料。身份是權限的起點，不能建立在「模型應該會填對」的假設上。</p>
+<span id="more"></span>
+
+<h2 id="工具把-AI-填的身份當成真的"><a href="#工具把-AI-填的身份當成真的" class="headerlink" title="工具把 AI 填的身份當成真的"></a>工具把 AI 填的身份當成真的</h2><p>我的 bot 只有兩名固定使用者。AI 要讀取記憶時，會呼叫我提供的工具。第一版的工具要求 AI 填入兩個值。</p>
+<table>
+<thead>
+<tr>
+<th>欄位</th>
+<th>代表什麼</th>
+<th>第一版由誰填</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>memory_id</code></td>
+<td>想讀哪則記憶</td>
+<td>AI</td>
+</tr>
+<tr>
+<td><code>requester_id</code></td>
+<td>現在是哪位使用者</td>
+<td>AI</td>
+</tr>
+</tbody></table>
+<p>問題就在第二個值。當小明傳來訊息時，只要 AI 取得小美某則記憶的編號，再把 <code>requester_id</code> 填成小美，工具查到的「記憶主人」就會和 <code>requester_id</code> 相同。</p>
+<p>從工具的角度看，記憶主人和提出要求的人都是小美。它沒有收到平台確認的真正身份，因此不知道原始訊息來自小明，權限檢查仍然會通過。</p>
+<p>當時的程式碼大概長這樣。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span>, requester_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    memory = load(memory_id)</span><br><span class="line">    <span class="keyword">if</span> memory.owner != requester_id:</span><br><span class="line">        <span class="keyword">raise</span> PermissionError(<span class="string">&quot;not your memory&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> memory.content</span><br></pre></td></tr></table></figure>
+
+<p>程式裡的 <code>if</code> 只確認「記憶主人」和 <code>requester_id</code> 是否相同。由於 <code>requester_id</code> 也是 AI 填的，這個檢查無法確認真正傳來訊息的人。</p>
+<p><code>memory_id</code> 可以由模型選，工具再用可信身份檢查目前使用者是否有權讀取。<code>requester_id</code> 則是認證結果，必須來自聊天平台或登入系統，不能由模型自己聲明。</p>
+<h2 id="主要靠-AI-寫程式，也能先檢查三件事"><a href="#主要靠-AI-寫程式，也能先檢查三件事" class="headerlink" title="主要靠 AI 寫程式，也能先檢查三件事"></a>主要靠 AI 寫程式，也能先檢查三件事</h2><p>如果你平常主要靠 vibe coding，不必先學會審查每一行程式。請 AI 回答下面三件事，就能找到需要進一步檢查的地方。</p>
+<h3 id="追出身份從哪裡來"><a href="#追出身份從哪裡來" class="headerlink" title="追出身份從哪裡來"></a>追出身份從哪裡來</h3><p>請 AI 畫出身份從登入或訊息平台，一路傳到工具與資料庫的流程，並標出每個值由誰產生。</p>
+<p>一張可用的圖大概會長這樣。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+    U[&quot;小明傳送訊息&quot;] --&gt; P[&quot;聊天平台&lt;br&#x2F;&gt;確認是小明&quot;]
+    P --&gt;|&quot;已驗證身份&quot;| B[&quot;bot 訊息入口&quot;]
+
+    B --&gt;|&quot;訊息內容&quot;| A[&quot;AI&lt;br&#x2F;&gt;理解想做什麼&quot;]
+    B --&gt; C[&quot;伺服器端上下文&lt;br&#x2F;&gt;保存小明的身份&quot;]
+
+    A --&gt;|&quot;想讀哪則記憶&quot;| T[&quot;記憶工具&quot;]
+    C --&gt;|&quot;小明的身份&quot;| T
+
+    T --&gt; D[&quot;只查小明的資料&quot;]
+</code>
+</pre>
+
+<p>這張圖有兩條路。AI 提供「想做什麼」，伺服器端上下文提供「現在是誰」，兩者最後在工具會合。</p>
+<p>如果使用者身份改成從 AI 流向工具，就代表模型有機會替換身份。身份若來自使用者輸入、提示詞或 LLM 的工具參數，也不能直接拿來做授權。可信來源通常是通過驗證的登入狀態、平台訊息，或伺服器建立的請求上下文。</p>
+<h3 id="假設模型能任意填寫工具參數"><a href="#假設模型能任意填寫工具參數" class="headerlink" title="假設模型能任意填寫工具參數"></a>假設模型能任意填寫工具參數</h3><p>可以直接把這段要求交給 AI。</p>
+<blockquote>
+<p>假設 LLM 可以任意填寫每個工具參數，找出它跨使用者讀取、修改或刪除資料的所有路徑。</p>
+</blockquote>
+<p>看到 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 或 <code>requester_id</code> 出現在工具參數中，可以先追查這些值的來源。欄位名稱本身不代表一定有漏洞，重點是模型能否利用它改變自己的權限。</p>
+<h3 id="同時測兩名使用者，檢查身份是否混用"><a href="#同時測兩名使用者，檢查身份是否混用" class="headerlink" title="同時測兩名使用者，檢查身份是否混用"></a>同時測兩名使用者，檢查身份是否混用</h3><p>許多 AI 產生的範例只測試一名使用者，因此看不出身份混用。請 AI 同時模擬 A 與 B，檢查對話、暫存狀態、工作目錄與請求上下文是否互相影響。</p>
+<p>如果實作會修改一個全域的目前使用者，兩個並行請求就可能互相覆寫身份。</p>
+<h2 id="系統要在入口確認身份，再一路帶到資料查詢"><a href="#系統要在入口確認身份，再一路帶到資料查詢" class="headerlink" title="系統要在入口確認身份，再一路帶到資料查詢"></a>系統要在入口確認身份，再一路帶到資料查詢</h2><p>上面的圖把身份與操作分成兩條路。要讓身份這條路可信，訊息入口還得先驗證來源。</p>
+<p>網站要先驗證登入 session 或 token，聊天平台的 webhook 也要先驗證簽章。完成驗證後，訊息入口才把身份綁進伺服器端上下文或專屬執行環境。</p>
+<p>工具從這個位置取得身份。LLM 可以選擇操作與資源，例如「讀取這則記憶」，但工具仍會用通過驗證的身份限制資料範圍。</p>
+<h2 id="我的兩人版，另外守住執行環境、工具與資料"><a href="#我的兩人版，另外守住執行環境、工具與資料" class="headerlink" title="我的兩人版，另外守住執行環境、工具與資料"></a>我的兩人版，另外守住執行環境、工具與資料</h2><p>我的 bot 讓每位使用者各自使用一個長駐 Claude CLI process。訊息入口驗證使用者後，會從伺服器端保存的對應關係找到該使用者的 process。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">proc = <span class="keyword">await</span> asyncio.create_subprocess_exec(</span><br><span class="line">    <span class="string">&quot;claude&quot;</span>, <span class="string">&quot;-p&quot;</span>, <span class="string">&quot;--input-format&quot;</span>, <span class="string">&quot;stream-json&quot;</span>,</span><br><span class="line">    cwd=<span class="string">f&quot;state/private/<span class="subst">&#123;user_id&#125;</span>/&quot;</span>,</span><br><span class="line">    env=&#123;**os.environ, <span class="string">&quot;DYAD_USER_ID&quot;</span>: user_id&#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>每個 process 啟動時只收到自己的 <code>DYAD_USER_ID</code>。環境變數不是使用者清單，只表示這個 process 從啟動到結束代表誰。</p>
+<p>身份的可信度也不是來自環境變數本身。訊息入口已驗證使用者，再由伺服器啟動對應的 process 並注入身份，這條路徑才是信任來源。</p>
+<h3 id="每人一個-process，不代表檔案已經隔離"><a href="#每人一個-process，不代表檔案已經隔離" class="headerlink" title="每人一個 process，不代表檔案已經隔離"></a>每人一個 process，不代表檔案已經隔離</h3><p>每位使用者的對話、上下文與 process 生命週期各自分開。小明的訊息只會送進自己的 process。使用者登出或權限被撤銷時，舊 process 也要停止或重建。</p>
+<p><code>cwd</code> 讓相對路徑預設落在使用者自己的資料夾，但它不是檔案沙盒。只要 process 有任意讀檔能力，<code>../B/memory.md</code> 或完整的絕對路徑仍能離開目前目錄。</p>
+<h3 id="關掉通用工具，只留下受限功能"><a href="#關掉通用工具，只留下受限功能" class="headerlink" title="關掉通用工具，只留下受限功能"></a>關掉通用工具，只留下受限功能</h3><p>Claude CLI 原本帶有 Read、Write、Bash 等內建工具。全部保留時，模型仍能繞過記憶工具，直接讀取其他路徑。</p>
+<p>我的 bot 會關掉內建工具，只允許自己設計的 MCP 工具。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">claude -p --tools <span class="string">&quot;&quot;</span> \</span><br><span class="line">       --mcp-config mcp.json \</span><br><span class="line">       --strict-mcp-config</span><br></pre></td></tr></table></figure>
+
+<p>模型只會看到 <code>list_memory</code>、<code>propose_memory</code>、<code>delete_memory</code> 等有限功能。它沒有一般讀檔工具，也沒有命令列可以探索其他目錄。</p>
+<p>這層的代價是，每增加一項能力，都要另外設計範圍有限的工具。自訂工具本身也要限制路徑與資料範圍，不能換個名字重新提供任意讀檔能力。</p>
+<h3 id="工具使用系統注入的身份查資料"><a href="#工具使用系統注入的身份查資料" class="headerlink" title="工具使用系統注入的身份查資料"></a>工具使用系統注入的身份查資料</h3><p>我把身份從工具參數移除。Claude CLI 啟動 MCP 伺服器時，伺服器會繼承 process 的環境變數。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">USER_ID = os.environ[<span class="string">&quot;DYAD_USER_ID&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">read_memory</span>(<span class="params">memory_id: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> store.get(user_id=USER_ID, memory_id=memory_id)</span><br></pre></td></tr></table></figure>
+
+<p>LLM 只提供 <code>memory_id</code>，工具自行把 <code>USER_ID</code> 加進資料查詢。即使模型知道小美的識別碼，工具定義裡也沒有位置讓它替換目前身份。</p>
+<p>四道邊界處理的範圍不同。</p>
+<table>
+<thead>
+<tr>
+<th>邊界</th>
+<th>負責處理</th>
+<th>單獨使用仍缺少</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>訊息入口</td>
+<td>驗證訊息來自哪位使用者</td>
+<td>不會自動限制工具與資料</td>
+</tr>
+<tr>
+<td>process</td>
+<td>分開對話、上下文與生命週期</td>
+<td><code>cwd</code> 擋不住任意路徑</td>
+</tr>
+<tr>
+<td>工具白名單</td>
+<td>限制模型可以使用的能力</td>
+<td>自訂工具仍可能寫錯權限</td>
+</tr>
+<tr>
+<td>資料查詢</td>
+<td>依可信身份限制實際資料</td>
+<td>上游必須先正確驗證身份</td>
+</tr>
+</tbody></table>
+<h2 id="服務更多使用者時，身份要跟著執行環境或請求走"><a href="#服務更多使用者時，身份要跟著執行環境或請求走" class="headerlink" title="服務更多使用者時，身份要跟著執行環境或請求走"></a>服務更多使用者時，身份要跟著執行環境或請求走</h2><p>環境變數可以用在更多使用者，前提是一個 process 或容器從頭到尾只代表一位使用者。每建立一個執行環境，系統只注入它代表的單一身份，不需要把所有使用者寫進環境變數。</p>
+<p>使用者變多後，可以選擇不同的執行方式。</p>
+<table>
+<thead>
+<tr>
+<th>執行方式</th>
+<th>身份放在哪裡</th>
+<th>適合的情況</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>每人一個 process 或容器</td>
+<td>啟動時由伺服器注入</td>
+<td>使用者不多，或需要較強的執行隔離</td>
+</tr>
+<tr>
+<td>多人共用 worker</td>
+<td>每次請求專用的伺服器端上下文</td>
+<td>使用者多，需要共用運算資源</td>
+</tr>
+</tbody></table>
+<p>共用 worker 不能靠修改全域 <code>CURRENT_USER</code> 切換身份。小明與小美的請求同時執行時，後寫入的值可能覆蓋前一個。</p>
+<p>身份要跟著個別請求或非同步任務傳遞。如果 agent runner 與工具伺服器分開部署，這份身份還要透過已驗證的內部連線傳遞，或綁定到伺服器管理的連線與 session。把 <code>user_id</code> 放回模型產生的 JSON，無法取代這段可信傳遞。</p>
+<p>公開的多租戶服務還需要正式的登入驗證、授權與租戶資料隔離。資料風險較高時，可以把高風險工具放進短命容器，或使用獨立的作業系統帳號。</p>
+<h2 id="Hermes-分開對話，不等於分開資料權限"><a href="#Hermes-分開對話，不等於分開資料權限" class="headerlink" title="Hermes 分開對話，不等於分開資料權限"></a>Hermes 分開對話，不等於分開資料權限</h2><p>Hermes Agent 的 <a href="https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/sessions.md">Sessions 文件</a>也把使用者資訊放在模型外面。它的 gateway 會根據平台訊息中的聊天室、使用者與討論串等資料建立 session key，再把訊息送進對應的對話紀錄。</p>
+<p>私訊會依聊天室分開。平台能提供使用者識別碼時，一般群組會把使用者放進 session key。群組討論串預設讓參與者共用對話，需要逐人分開時，可以開啟 <code>thread_sessions_per_user</code>。</p>
+<p>這個設計處理「訊息應該進入哪段對話」，不會自動限制檔案或工具權限。即使小明與小美使用不同 session，兩邊仍可能呼叫接受任意 <code>user_id</code> 的工具。</p>
+<p>Hermes 可以作為身份路由的參考，資料授權仍要由工具與儲存層處理。</p>
+<h2 id="最後檢查模型能否控制身份或繞過工具"><a href="#最後檢查模型能否控制身份或繞過工具" class="headerlink" title="最後檢查模型能否控制身份或繞過工具"></a>最後檢查模型能否控制身份或繞過工具</h2><p>如果 AI bot 會服務多名使用者，可以搜尋工具定義中的 <code>user_id</code>、<code>owner_id</code>、<code>tenant_id</code> 與 <code>requester_id</code>。</p>
+<p>這些欄位出現在參數中不一定有錯。資源或工作區識別碼可以由模型選擇，伺服器仍要用可信身份檢查目前使用者是否有權操作。真正危險的是，工具直接把模型提供的值當成已通過認證的身份。</p>
+<p>也要檢查模型是否擁有旁路能力。Read、Write、Bash、瀏覽器、資料庫查詢與自訂 MCP 工具，都可能繞過原本設計的記憶 API。</p>
+<p>我的第一版沒有漏寫那個 <code>if</code>。我把模型產生的 <code>requester_id</code> 當成通過驗證的身份，才讓檢查看似存在，實際上仍由模型控制。</p>
+<p>兩人版可以把身份固定在專屬 process，多人共用的服務可以放進每次請求專用的伺服器端上下文。實作方式會隨規模改變，模型只負責選擇操作與資源，系統負責決定它目前代表誰，以及可以操作哪些資料。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>系統設計</tag>
+        <tag>安全</tag>
       </tags>
   </entry>
 </search>
