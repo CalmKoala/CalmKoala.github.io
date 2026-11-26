@@ -1,114 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
-    <url>//tessa/</url>
-    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
-<ul>
-<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
-<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
-<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
-</ul>
-<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
-<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
-<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
-<span id="more"></span>
-
-<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
-<ul>
-<li><strong>planner</strong>：拆需求、列候選方案</li>
-<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
-<li><strong>executor</strong>：照規格動手產出</li>
-<li><strong>qa</strong>：對照規格驗收</li>
-<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
-</ul>
-<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
-<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
-<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
-<p>整個流程被拆成 6 段，依序跑：</p>
-<ol>
-<li>planner 出候選結構</li>
-<li>planning_manager 審候選</li>
-<li>planner 寫完整規格書</li>
-<li>planning_manager 審規格書</li>
-<li>executor 照規格產出</li>
-<li>qa + execution_manager 驗收</li>
-</ol>
-<p>每段中間都有「審過才往下走」的閘門。</p>
-<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
-<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
-<ul>
-<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
-<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
-<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
-<li>其中 2 條是 planner 自己也沒答的開放問題</li>
-</ul>
-<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
-<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
-<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
-<ul>
-<li>對 planner 推薦的方案逐條對齊原始需求</li>
-<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
-<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
-<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
-</ul>
-<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
-<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
-<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
-<ul>
-<li>不可以寫某幾個競品名</li>
-<li>不可以提某幾個個人專案名</li>
-<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
-</ul>
-<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
-<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
-<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
-<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
-<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
-<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
-<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
-<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
-<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
-<ul>
-<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
-<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
-<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
-</ul>
-<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
-<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
-<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
-<p>這個資料夾裡裝的是：</p>
-<ul>
-<li>幾個角色的職責描述（markdown）</li>
-<li>幾個流程的步驟清單（markdown）</li>
-<li>幾條團隊共用的紀律規則（markdown）</li>
-<li>團隊共同的記憶檔（markdown）</li>
-</ul>
-<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
-<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
-<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
-<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
-<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
-<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
-<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
-<hr>
-<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
-<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
-<li><a href="https://claude.com/claude-code">Claude Code</a></li>
-<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
-</ul>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/lilyscore-launch/">LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>個人專案</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>個人專案</tag>
-        <tag>開發工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>CI/CD(Github Action)</title>
     <url>//CI-CD-Github-Action/</url>
     <content><![CDATA[<h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
@@ -226,6 +118,114 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
       </tags>
   </entry>
   <entry>
+    <title>tessa：純 markdown 的 AI 多角色協作框架</title>
+    <url>//tessa/</url>
+    <content><![CDATA[<h1 id="為什麼會做這個"><a href="#為什麼會做這個" class="headerlink" title="為什麼會做這個"></a>為什麼會做這個</h1><p>過去半年用 AI 寫程式，常常踩到三類問題：</p>
+<ul>
+<li>同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格</li>
+<li>對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案</li>
+<li>同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題</li>
+</ul>
+<p>試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。</p>
+<p>後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同一段對話、審核跟產出由同一個身分做、決策紀錄散在 chat 歷史裡。這三件事只要任何一件還在，下一次合作還是會踩同樣的坑。</p>
+<p>於是動手寫了一套東西，叫 <strong>tessa</strong>。</p>
+<span id="more"></span>
+
+<h1 id="tessa-是什麼"><a href="#tessa-是什麼" class="headerlink" title="tessa 是什麼"></a>tessa 是什麼</h1><p>tessa 是一套純 markdown 的 AI 多角色協作框架。把跟 AI 協作的流程拆成幾個固定角色：</p>
+<ul>
+<li><strong>planner</strong>：拆需求、列候選方案</li>
+<li><strong>planning_manager</strong>：審候選、決定採哪一條、退掉哪幾條</li>
+<li><strong>executor</strong>：照規格動手產出</li>
+<li><strong>qa</strong>：對照規格驗收</li>
+<li><strong>execution_manager</strong>：最後把關、抓 spec 沒寫到的洞</li>
+</ul>
+<p>每個角色就是一份 markdown 檔，定義它的職責、紀律、輸出格式。沒有 runtime、沒有 SDK、沒有後台依賴，安裝後就是一份 <code>.claude/agents/*.md</code>（或對應 CLI 的格式），跑在你已有的 LLM CLI 上。</p>
+<p>跨 CLI 支援 Claude Code、Cursor、Kiro 三個原生 adapter，加上 Anthropic Agent Skills 標準廣撒到 20+ 個相容 CLI。</p>
+<h1 id="跑一次完整流程是什麼樣"><a href="#跑一次完整流程是什麼樣" class="headerlink" title="跑一次完整流程是什麼樣"></a>跑一次完整流程是什麼樣</h1><p>舉一個實際跑過的例子：為這套工具想名字。任務不是寫 code，是要為這一套小工具挑一個正式名字。最後拍板的結果就是 tessa 這個名字。</p>
+<p>整個流程被拆成 6 段，依序跑：</p>
+<ol>
+<li>planner 出候選結構</li>
+<li>planning_manager 審候選</li>
+<li>planner 寫完整規格書</li>
+<li>planning_manager 審規格書</li>
+<li>executor 照規格產出</li>
+<li>qa + execution_manager 驗收</li>
+</ol>
+<p>每段中間都有「審過才往下走」的閘門。</p>
+<p>第二段 planning_manager 真的退回了我，說需求文件有兩個地方語意不夠精確，要先補完才接著跑。「主管」這個角色不是按按鈕、看一遍蓋章的，它真的會擋。</p>
+<h2 id="planner-出-4-條候選"><a href="#planner-出-4-條候選" class="headerlink" title="planner 出 4 條候選"></a>planner 出 4 條候選</h2><p>planner 給的不是一條方案，是 4 條候選結構：</p>
+<ul>
+<li>每條附「吃哪幾個視角、弱在哪個視角」的論述</li>
+<li>對沒推薦的方案也寫同樣篇幅論述，不用「同上不採」帶過</li>
+<li>末尾列 RISK-FLAG，9 條風險旗標標出來請主管裁決</li>
+<li>其中 2 條是 planner 自己也沒答的開放問題</li>
+</ul>
+<p>planner 不假裝自己什麼都想清楚。自承沒想清楚也是合法輸出，甚至是被鼓勵的輸出。一個會說「這個我還沒想清楚、請你決定」的 planner，比一個假裝什麼都想透了的可信得多。</p>
+<p>好的提案不是給一個答案，是給一張包含取捨的地圖，再加一份還沒答的問題清單。</p>
+<h2 id="planning-manager-審了什麼"><a href="#planning-manager-審了什麼" class="headerlink" title="planning_manager 審了什麼"></a>planning_manager 審了什麼</h2><p>manager 做了 4 件事：</p>
+<ul>
+<li>對 planner 推薦的方案逐條對齊原始需求</li>
+<li>對沒推薦的另外三條方案各寫一段判斷論述，解釋為什麼不採</li>
+<li>跑 friction：強制找四種類型的反例（規格沒講的邊界、可疑假設、沒考慮的使用者情境、外部視角的關鍵問題）</li>
+<li>跑 bias 自承：明寫自己這次審核可能會傾向偷懶或過度找麻煩，給自己訂抵抗方法</li>
+</ul>
+<p>那場 manager 抓了 8 條漏洞。其中一條是我把章節編號引用錯：我寫「§1.3 演進階段表」，manager 跨檔讀對方檔案後發現實質內容在 §3，不是 §1.3。沒有「大概看一下」就放過。</p>
+<p>manager 的價值不在於蓋章放行，在於那 4 件事撐住了「真的有人在擋」這件事。</p>
+<h2 id="executor-寫稿時的紅線守備"><a href="#executor-寫稿時的紅線守備" class="headerlink" title="executor 寫稿時的紅線守備"></a>executor 寫稿時的紅線守備</h2><p>規格書定下來之後，executor 拿著規格動手產出。規格書裡列了一份禁字面表：</p>
+<ul>
+<li>不可以寫某幾個競品名</li>
+<li>不可以提某幾個個人專案名</li>
+<li>不可以出現拍板的最後決定字面（命名審議當時還在進行，結果應該保留 placeholder）</li>
+</ul>
+<p>executor 寫完一段就跑一次字面比對指令，確認禁區沒被踩到。寫到第三段時觸發了一條紅線：無意中提到了應該用 placeholder 代稱的名字字面。executor 沒等 manager 抓，自己跑檢查時就發現，回頭改寫了那三段，再跑一次驗證才往下寫。</p>
+<p>紅線守備是字面 grep 機械可驗，不靠人記。從規格書把禁字面字面化、到 executor 寫完自跑驗證、到 manager 再抽查重跑，這條鏈是機械的，不靠任何角色「應該記得」。</p>
+<p>紀律不依賴每個人的注意力，是寫進規格、跑得起來的。</p>
+<h2 id="qa-execution-manager-驗收"><a href="#qa-execution-manager-驗收" class="headerlink" title="qa + execution_manager 驗收"></a>qa + execution_manager 驗收</h2><p>最後一段是 qa 跟 execution_manager 接手，把產出對著規格書的 AC（驗收條件）逐條跑。</p>
+<p>那場 review 抓到一條規格書沒寫到的紅線：executor 交付的內容字面雖然沒踩禁區，但語意上等於暗示了一個應該用 placeholder 的東西。規格書原本沒涵蓋這種「字面安全但語意洩漏」的情境。</p>
+<p>review 抓出來之後，這個發現被萃成一條經驗寫進團隊記憶。下次同類任務這條紀律會被自動帶進去，不需要再踩一次同樣的坑。</p>
+<p>每跑完一個任務，留下的不只是成品，還有下一次會被帶進去用的經驗。</p>
+<h1 id="不只能寫-code"><a href="#不只能寫-code" class="headerlink" title="不只能寫 code"></a>不只能寫 code</h1><p>剛剛這個命名審議的任務本來就<strong>不是寫 code</strong>。tessa 在「為一套工具想名字」這種純語感、純判斷力的任務上一樣能跑。</p>
+<p>我自己已經實際試過、跑得起來的非工程任務有三類：</p>
+<ul>
+<li><strong>寫文章 &#x2F; 內容企劃</strong>：從題目、到切入角度、到規格書、到初稿、到冷讀檢查。整條鏈跟工程任務形狀一樣。這篇文章本身就是這樣跑出來的。</li>
+<li><strong>個人專案規劃</strong>：一週的工作排程、新功能的優先順序、學習路徑規劃。每次規劃都有「planner 丟候選、manager 挑、規格書定下來」的紀錄，一個月後回去看得懂當時為什麼這樣決定。</li>
+<li><strong>知識整理 &#x2F; 教材</strong>：把學完的主題整理成可以教別人的形狀、寫內訓教材、把研究筆記重組成長文。</li>
+</ul>
+<p>三類都不是寫 code，但都吃同一套「規劃 - 審核 - 執行 - 品保」的形狀。</p>
+<p>tessa 真正解的問題不是「怎麼寫程式」，是「<strong>怎麼跟 AI 做有結構的協作</strong>」。結構這件事，跟你做的是工程任務、寫作任務、規劃任務，沒有本質差別。</p>
+<h1 id="怎麼跑"><a href="#怎麼跑" class="headerlink" title="怎麼跑"></a>怎麼跑</h1><p>下載一個資料夾，看看裡面那幾份 markdown 檔案，跟著 markdown 跑，就有一個結構化團隊。</p>
+<p>這個資料夾裡裝的是：</p>
+<ul>
+<li>幾個角色的職責描述（markdown）</li>
+<li>幾個流程的步驟清單（markdown）</li>
+<li>幾條團隊共用的紀律規則（markdown）</li>
+<li>團隊共同的記憶檔（markdown）</li>
+</ul>
+<p>每一份就是用人話寫的 markdown，看得懂就改得動，不滿意可以自己重寫。沒有要跑什麼程式、沒有要裝什麼後台依賴、沒有要付月費、沒有要登入什麼帳號、沒有 API key 要設。</p>
+<p>tessa 不會自動幫你做事。它不是把你替換掉的東西，是給你一張合作對象清單跟合作流程。<strong>人類仍是 team lead、仍是最後拍板的人</strong>。planner 丟候選你看、manager 擋一次你看、executor 寫稿你看、qa 抓問題你看，最後決定要不要採納的人永遠是你。</p>
+<p>它解的不是「讓 AI 自動完成」，是「讓 AI 用一個你看得懂、你能審、你能改的方式分工合作」。</p>
+<p>自動化是把決策權交出去，結構化是把決策權留在自己手上但讓過程整齊。前者你失去掌控，後者你拿回掌控。</p>
+<h1 id="關於這篇文章"><a href="#關於這篇文章" class="headerlink" title="關於這篇文章"></a>關於這篇文章</h1><p>這篇文章本身是用 tessa 的內容創作預設（content-creation preset）跑出來的。從規劃結構、planner 丟候選、manager 審過退回兩次、規格書定下骨架、executor 照規格寫初稿、到 qa 抓字面，整套流程跟剛剛那個命名審議案例走的是同一條鏈。</p>
+<p>這樣做是想驗證一件事：如果 tessa 真的有用，它在「為一套工具想名字」跟「寫一篇給開發者讀的長文」這兩個性質完全不同的任務上應該都跑得起來。如果只在工程任務上成立，「不只能寫 code」這句話就站不住腳。</p>
+<p>跟 AI 協作的下一步不是更聰明的 prompt，是更結構化的工作方式。<strong>不用寫 code 也能讓 AI 幫你做有結構的協作</strong>。</p>
+<hr>
+<h1 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h1><ul>
+<li><a href="https://github.com/PingChunChung/tessa">tessa repo</a></li>
+<li><a href="https://claude.com/claude-code">Claude Code</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
+</ul>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/lilyscore-launch/">LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>個人專案</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>個人專案</tag>
+        <tag>開發工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>重複的事，別每次都讓 AI 重做一遍</title>
     <url>//script-first/</url>
     <content><![CDATA[<p>過去半年用 AI 處理雜事，一開始什麼都直接丟給 AI 都能幫我處理到好，真的是有夠方便，但用久了我發現一個問題，身為一個窮人，token 根本不夠燒啊啊啊~</p>
@@ -302,6 +302,30 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
       </tags>
   </entry>
   <entry>
+    <title>subprocess 在 Windows 的 cp950 編碼坑</title>
+    <url>//subprocess-cp950/</url>
+    <content><![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
+<span id="more"></span>
+
+<h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
+<p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p>
+<p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p>
+<h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/apscheduler-windows-misfire/">排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>Python</tag>
+        <tag>Windows</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</title>
     <url>//ffmpeg-frames-to-data/</url>
     <content><![CDATA[<p>前陣子要整理某個 App 裡的一份清單，但這個 App 沒有匯出功能也沒有 API 可以用，唯一的辦法就是自己把畫面一直往下滑，再把幾百筆內容手動抄出來，懶人如我，當然不可能真的一筆一筆抄，看來這裡又是 AI 該發揮作用的地方了。</p>
@@ -339,77 +363,6 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
         <tag>AI</tag>
         <tag>ffmpeg</tag>
         <tag>自動化</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一個人也需要 SRE</title>
-    <url>//long-running-service-watchdog/</url>
-    <content><![CDATA[<p>我有一個常駐的 AI 助理 bot，平常會主動推播提醒、報告工作進度，<del>偶爾覺得它有點吵</del>。某天下午我要重啟它裝新功能，才發現它消失了一陣子。log 最後一行停在前一天早上十點多，沒報錯，也沒留下半點線索，就這樣安靜地不見了 16 個小時。事後推測應該是機器重開的時候沒有一起把服務重啟。</p>
-<p>這讓我開始思考一個問題：要是哪天換別的原因害它死掉，我會不會一樣過了半天才發現？畢竟我平常只有在它跳出訊息的時候去確認，它沒跳訊息的時候我不會特別去看它，所以很難發現它掛了。</p>
-<p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>
-<span id="more"></span>
-
-<div class="note info no-icon"><p><strong>快速摘要</strong>：這次遇到的長駐服務失效，我先分成三種，再用三層防線去接：自動重啟、站在主機外面的心跳監控、開機自啟。背後一句話是「監測的機制不能跟被監測的東西一起死」。後來查了業界做法，發現這些問題早就在 SRE 的範圍裡，附名詞和現成工具。</p>
-<p>如果只是單機要顧一個服務，Linux 用 systemd，Windows 註冊成 Windows Service，再配一個 Healthchecks.io，三層就到齊了。</p>
-</div>
-
-<h1 id="先分清楚，它會怎麼死"><a href="#先分清楚，它會怎麼死" class="headerlink" title="先分清楚，它會怎麼死"></a>先分清楚，它會怎麼死</h1><p>服務掛掉分好幾種。這次我先把常見的失效方式分成三類，麻煩程度差很多，差在「它死得有多安靜」：</p>
-<ul>
-<li>大喊一聲才死：程式噴錯退出，留了一整串 stack trace。這種至少最好追，因為它通常會留下線索，讓我們知道該從哪裡開始查。</li>
-<li>沒斷氣、卻不做事：這就是占著茅坑不拉屎，它還在工作崗位上領它的薪水但沒有幫我做事，process 還在，功能卻停了。我之前寫過<a href="/apscheduler-windows-misfire/">排程默默不執行</a>就是這種，你去看它一切正常，就是該動的時候沒動。</li>
-<li>無聲無息消失：機器重開、記憶體被系統收走、被誰誤殺。應用程式自己的 log 可能連一行都來不及留，線索散落在系統事件或核心紀錄裡。</li>
-</ul>
-<p>越是「設好就不用管」的長駐服務，越容易死在後面兩種。你不會每天盯著它，它也沒有力氣喊救命。</p>
-<h1 id="看門的人，不能睡在屋裡"><a href="#看門的人，不能睡在屋裡" class="headerlink" title="看門的人，不能睡在屋裡"></a>看門的人，不能睡在屋裡</h1><p>先講一個你家就有的東西：煙霧偵測器。</p>
-<p>它為什麼裝在天花板、還自己帶一顆電池？因為如果它只靠家裡的電路，哪天電線走火、跳電了，它剛好跟著斷電，火最大的那一刻它已經睡死了。它至少要有獨立的備援電源，不能在房子跳電時跟著完全失效。</p>
-<p>長駐服務的守護也是同一句話：監測一個東西的機制，不能跟那個東西一起死。管理員可以跟服務住在同一台機器，但外部心跳監控得站到主機外面；開機自啟則交給作業系統。三層不是整齊的一圈包一圈，比較像一條恢復鏈，再加上一條獨立的報警線：</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  OS[第三層：作業系統開機自啟] --&gt; SUP[第一層：服務管理員]
-  SUP --&gt;|啟動與監督| SVC([長駐服務])
-  SUP -.異常退出後重啟.-&gt; SVC
-  SVC --&gt;|完成工作後定時打卡| HC[第二層：外部心跳監控]
-  HC --&gt;|逾時告警| YOU([你的手機])
-</code>
-</pre>
-
-<h1 id="第一層-管理員：倒了就扶它起來"><a href="#第一層-管理員：倒了就扶它起來" class="headerlink" title="第一層 管理員：倒了就扶它起來"></a>第一層 管理員：倒了就扶它起來</h1><p>先接最單純的死法，自己把遺書寫好的死法。</p>
-<p>這邊的處理方法很簡單，就是不要讓服務「自己跑」，我們在它旁邊派一個管理員，服務一倒就把它扶起來。</p>
-<p>但這個管理員不是隨便找一個就可以，它必須具備兩個技能。</p>
-<p>一是分辨「它是自己想重開」還是「它壞了」，這兩種的待遇不一樣。二是壞掉的時候不能秒扶秒倒。想像你去扶一個站不穩的醉漢，扶起來他又倒、你再扶他又倒，你會被拖著一起累死；服務壞了如果每秒重生一次，CPU、log 和外部依賴都可能先被它打爆。正確做法是加入重啟間隔和頻率限制，必要時再讓等待時間逐步增加，至少不能讓它無限高速重生。</p>
-<p>要做到第一件事，服務跟管理員之間得先講好一套暗號，區分「我要重開」「我壞了」「我正常收工、別扶我」。有了暗號，連「重啟」都變安全：服務好好收工、丟一個「我要重開」的信號、管理員拉新的起來。</p>
-<h1 id="第二層-哨兵：站在門外敲門"><a href="#第二層-哨兵：站在門外敲門" class="headerlink" title="第二層 哨兵：站在門外敲門"></a>第二層 哨兵：站在門外敲門</h1><p>第二種死法最陰險，沒斷氣、卻不做事，這種管理員接不住，得靠站得更外面的哨兵。</p>
-<p>你可能會問，既然管理員會自動把服務重啟，還要哨兵幹嘛？因為管理員站在服務旁邊，服務摔倒它看得到，但有兩個情況它沒辦法處理：它自己睡著了沒人管，還有服務「人在、心不在」的時候。後面這種 process 活得好好的，功能其實早就停了，管理員在旁邊只覺得一切正常。</p>
-<p>哨兵有兩種站法。一種是它定時來敲門，主動問服務還好不好；另一種是要求服務定時去外面打卡，哪天該到卻沒到，外面的人就打電話通知我。對我這種單機服務，後者更直接：bot 每次真的完成工作後，就向外部監控送一次心跳。這個角色有兩個地方最容易做錯。</p>
-<p>第一，報警要用一支跟這棟房子無關的電話。如果報警得透過房子裡的廣播系統，那房子燒了廣播也沒了。哨兵不能跟 bot 住在同一台機器上，通知我的那條路也不能經過 bot 本身。主機關機、系統卡死或服務壞掉時，外面的監控還是得有辦法直接通知手機。</p>
-<p>第二，「你還在嗎」這句話問錯了。你打電話給值班的人問「你在不在」，他回「在」，但他可能人在、正在滑手機。真正該問的是「你手上那件事，上一次做完是多久以前？」他要是說三小時前，那就算接了電話，也是掛機狀態。只證明「有人接電話」不夠，得證明「有人在做事」。所以讓服務回報的別只是「我還活著」，要能回答「我上一次真的完成工作是什麼時候」，這樣才擋得住那種沒斷氣卻不做事的死法。</p>
-<h1 id="第三層-開機自啟：停電後叫醒大家"><a href="#第三層-開機自啟：停電後叫醒大家" class="headerlink" title="第三層 開機自啟：停電後叫醒大家"></a>第三層 開機自啟：停電後叫醒大家</h1><p>最後一種死法最徹底，整台機器重開，把上面所有東西一起帶走。</p>
-<p>問題是，服務和管理員本身也都是程式。機器一重開，它們會一起歸零。我那 16 小時就死在這，前面的監督邏輯根本都寫好了，機器半夜重開一次（尤其是 Windows Update），把它們一起帶走，然後沒有任何人負責把它們叫醒。外部心跳監控倒是還活著，只是當時的我根本還沒讓它盯這件事。</p>
-<p>這一層只能交給作業系統本身，讓它在開機時自動把服務管理員拉起來。它是整串的地基，這層不做，上面寫得再漂亮，停電後也沒人開燈。</p>
-<h1 id="誰來看守看守者？"><a href="#誰來看守看守者？" class="headerlink" title="誰來看守看守者？"></a>誰來看守看守者？</h1><p>聰明的你大概已經想到了，哨兵自己也是程式，它死了怎麼辦？</p>
-<p>順著「監測者要在外面」這句話推下去，會掉進一個無底洞，哨兵要一個哨兵，那個哨兵又要一個哨兵。這個遞迴不能靠「寫一個笨到不會死的本機程式」停下來，因為它再笨，主機斷電時還是會一起消失。</p>
-<p>比較實際的停法，是把最外圈交給另一個故障域裡的外部服務。它當然也可能壞，只是至少不會跟我的 bot 因為同一次重開機、同一顆硬碟或同一段程式一起消失。再往外疊看門狗的看門狗，只會蓋出一座無限高的塔（抖</p>
-<h1 id="這整套早就有名字"><a href="#這整套早就有名字" class="headerlink" title="這整套早就有名字"></a>這整套早就有名字</h1><p>三層都寫好、服務乖乖活著之後，我順手查了「別人都怎麼防這種事」。結果發現，我自己摸索出的這套做法，正好落在 SRE（站點可靠性工程）關注的範圍裡：服務監督、健康檢查、外部告警，以及故障後自動恢復。Google 那本《Site Reliability Engineering》就是這個領域的經典教材。我那三層，每一層都有正式名字，每個念頭都有人做成現成工具。</p>
-<p>那個「管理員」，業界叫 process supervisor。Linux 常見的 systemd 就能負責這件事，內建異常後重啟、重啟間隔和啟動頻率限制，正好能處理第一層的大部分需求。在 Kubernetes 裡，容器如果反覆啟動又崩潰，系統會逐步拉長重啟間隔，最後常會看到那個熟悉的狀態：<code>CrashLoopBackOff</code>。玩過 Kubernetes 的人大概都被它的紅字瞪過。</p>
-<p>那個「哨兵敲門」，在容器平台裡常叫 health probe，而且分得比我細：liveness 管「我是不是卡死了，要不要重啟」，readiness 管「我現在能不能接工作，不能就先別把流量送過來」。我講的「不能只回一句我還在、要證明有在做事」，正是他們早就踩過的坑。至於我最後採用的外部打卡，則比較接近後面會提到的 heartbeat monitoring。</p>
-<p>這裡還讓我補到一個原本會犯的錯：外部依賴可以檢查，但不要直接綁進 liveness 的重啟判斷。資料庫連不上時，服務可能應該暫停接收新工作、回報 degraded 或發出告警，卻不一定適合不斷重啟。不然資料庫一掛，服務被判死、重啟、資料庫還是沒好、又被判死，最後自己把自己踩進 crash loop。liveness 該確認的是「我自己的工作迴圈還有沒有在跳」，不是要求整個世界都得跟著健康。</p>
-<p>「報警要走一支跟房子無關的電話」，其實是這裡面很常見的一招，叫 dead man’s switch，或叫心跳監控。現成服務一堆，像 Healthchecks.io、Dead Man’s Snitch。它們不是定時進來戳我的 bot，而是反過來要求 bot 主動去外面打卡，哪天該報平安卻沒出現，就直接通知我。連整台主機消失都能一起抓到。</p>
-<p>連我那個「誰來看守看守者」的無限遞迴，業界也有類似做法。Prometheus／Alertmanager 的常見配置裡，會放一條永遠處於 firing 狀態的 <code>Watchdog</code> 警報，再交給外部的 dead man’s switch 盯著。哪天這條本來永遠會響的警報不響了，外部就知道整套監控自己可能死了。答案不是讓最外圈永遠不壞，而是別讓它和裡面那一圈一起壞。</p>
-<p>殺雞不用牛刀，我平常寫的簡單服務在 Linux 用 systemd，Windows 註冊成 Windows Service，再配一個 Healthchecks.io，三層就到齊了。放大到公司才需要那整套，但骨架跟你在家土炮的一模一樣。</p>
-<h1 id="最後"><a href="#最後" class="headerlink" title="最後"></a>最後</h1><p>這三層防的是「它死掉」，防不了「它做錯事」。服務要是活得好好的、health 也正常回報，卻把某筆資料算錯了，看門狗只會一路跟你說一切安好。「它還在做事」跟「它做對事」是兩回事，這套只保證前者。後者是另一個題目，得靠別的東西守，這篇罩不到。</p>
-<hr>
-<p>三層設完之後，服務一斷氣，一分鐘內我手機就會叮一聲。當初還嫌這 bot 有點吵，結果我又在旁邊多養了一隻，專門在它出事的時候吵我，家裡的叮咚聲大概只會更多，但至少不會再有下一個安靜消失的 16 小時了(?</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li><li><a href="/llm-agent-isolation/">多人共用 AI bot，別讓它認錯使用者</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>系統設計</category>
-      </categories>
-      <tags>
-        <tag>自動化</tag>
-        <tag>SRE</tag>
-        <tag>系統設計</tag>
       </tags>
   </entry>
   <entry>
@@ -471,30 +424,6 @@ flowchart LR
       </categories>
       <tags>
         <tag>AI</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>subprocess 在 Windows 的 cp950 編碼坑</title>
-    <url>//subprocess-cp950/</url>
-    <content><![CDATA[<p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
-<span id="more"></span>
-
-<h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
-<p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p>
-<p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p>
-<h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/apscheduler-windows-misfire/">排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑</a></li><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>Python</tag>
-        <tag>Windows</tag>
       </tags>
   </entry>
   <entry>
@@ -669,6 +598,77 @@ flowchart LR
         <tag>AI</tag>
         <tag>系統設計</tag>
         <tag>安全</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一個人也需要 SRE</title>
+    <url>//long-running-service-watchdog/</url>
+    <content><![CDATA[<p>我有一個常駐的 AI 助理 bot，平常會主動推播提醒、報告工作進度，<del>偶爾覺得它有點吵</del>。某天下午我要重啟它裝新功能，才發現它消失了一陣子。log 最後一行停在前一天早上十點多，沒報錯，也沒留下半點線索，就這樣安靜地不見了 16 個小時。事後推測應該是機器重開的時候沒有一起把服務重啟。</p>
+<p>這讓我開始思考一個問題：要是哪天換別的原因害它死掉，我會不會一樣過了半天才發現？畢竟我平常只有在它跳出訊息的時候去確認，它沒跳訊息的時候我不會特別去看它，所以很難發現它掛了。</p>
+<p>我養這個 bot，本來就是想少花點精力在日常瑣事上。要是反過來得每天盯它有沒有在做事，那反而本末倒置。所以我幫它補了一套三層防線，還在查資料時撞到一件好笑的事。</p>
+<span id="more"></span>
+
+<div class="note info no-icon"><p><strong>快速摘要</strong>：這次遇到的長駐服務失效，我先分成三種，再用三層防線去接：自動重啟、站在主機外面的心跳監控、開機自啟。背後一句話是「監測的機制不能跟被監測的東西一起死」。後來查了業界做法，發現這些問題早就在 SRE 的範圍裡，附名詞和現成工具。</p>
+<p>如果只是單機要顧一個服務，Linux 用 systemd，Windows 註冊成 Windows Service，再配一個 Healthchecks.io，三層就到齊了。</p>
+</div>
+
+<h1 id="先分清楚，它會怎麼死"><a href="#先分清楚，它會怎麼死" class="headerlink" title="先分清楚，它會怎麼死"></a>先分清楚，它會怎麼死</h1><p>服務掛掉分好幾種。這次我先把常見的失效方式分成三類，麻煩程度差很多，差在「它死得有多安靜」：</p>
+<ul>
+<li>大喊一聲才死：程式噴錯退出，留了一整串 stack trace。這種至少最好追，因為它通常會留下線索，讓我們知道該從哪裡開始查。</li>
+<li>沒斷氣、卻不做事：這就是占著茅坑不拉屎，它還在工作崗位上領它的薪水但沒有幫我做事，process 還在，功能卻停了。我之前寫過<a href="/apscheduler-windows-misfire/">排程默默不執行</a>就是這種，你去看它一切正常，就是該動的時候沒動。</li>
+<li>無聲無息消失：機器重開、記憶體被系統收走、被誰誤殺。應用程式自己的 log 可能連一行都來不及留，線索散落在系統事件或核心紀錄裡。</li>
+</ul>
+<p>越是「設好就不用管」的長駐服務，越容易死在後面兩種。你不會每天盯著它，它也沒有力氣喊救命。</p>
+<h1 id="看門的人，不能睡在屋裡"><a href="#看門的人，不能睡在屋裡" class="headerlink" title="看門的人，不能睡在屋裡"></a>看門的人，不能睡在屋裡</h1><p>先講一個你家就有的東西：煙霧偵測器。</p>
+<p>它為什麼裝在天花板、還自己帶一顆電池？因為如果它只靠家裡的電路，哪天電線走火、跳電了，它剛好跟著斷電，火最大的那一刻它已經睡死了。它至少要有獨立的備援電源，不能在房子跳電時跟著完全失效。</p>
+<p>長駐服務的守護也是同一句話：監測一個東西的機制，不能跟那個東西一起死。管理員可以跟服務住在同一台機器，但外部心跳監控得站到主機外面；開機自啟則交給作業系統。三層不是整齊的一圈包一圈，比較像一條恢復鏈，再加上一條獨立的報警線：</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  OS[第三層：作業系統開機自啟] --&gt; SUP[第一層：服務管理員]
+  SUP --&gt;|啟動與監督| SVC([長駐服務])
+  SUP -.異常退出後重啟.-&gt; SVC
+  SVC --&gt;|完成工作後定時打卡| HC[第二層：外部心跳監控]
+  HC --&gt;|逾時告警| YOU([你的手機])
+</code>
+</pre>
+
+<h1 id="第一層-管理員：倒了就扶它起來"><a href="#第一層-管理員：倒了就扶它起來" class="headerlink" title="第一層 管理員：倒了就扶它起來"></a>第一層 管理員：倒了就扶它起來</h1><p>先接最單純的死法，自己把遺書寫好的死法。</p>
+<p>這邊的處理方法很簡單，就是不要讓服務「自己跑」，我們在它旁邊派一個管理員，服務一倒就把它扶起來。</p>
+<p>但這個管理員不是隨便找一個就可以，它必須具備兩個技能。</p>
+<p>一是分辨「它是自己想重開」還是「它壞了」，這兩種的待遇不一樣。二是壞掉的時候不能秒扶秒倒。想像你去扶一個站不穩的醉漢，扶起來他又倒、你再扶他又倒，你會被拖著一起累死；服務壞了如果每秒重生一次，CPU、log 和外部依賴都可能先被它打爆。正確做法是加入重啟間隔和頻率限制，必要時再讓等待時間逐步增加，至少不能讓它無限高速重生。</p>
+<p>要做到第一件事，服務跟管理員之間得先講好一套暗號，區分「我要重開」「我壞了」「我正常收工、別扶我」。有了暗號，連「重啟」都變安全：服務好好收工、丟一個「我要重開」的信號、管理員拉新的起來。</p>
+<h1 id="第二層-哨兵：站在門外敲門"><a href="#第二層-哨兵：站在門外敲門" class="headerlink" title="第二層 哨兵：站在門外敲門"></a>第二層 哨兵：站在門外敲門</h1><p>第二種死法最陰險，沒斷氣、卻不做事，這種管理員接不住，得靠站得更外面的哨兵。</p>
+<p>你可能會問，既然管理員會自動把服務重啟，還要哨兵幹嘛？因為管理員站在服務旁邊，服務摔倒它看得到，但有兩個情況它沒辦法處理：它自己睡著了沒人管，還有服務「人在、心不在」的時候。後面這種 process 活得好好的，功能其實早就停了，管理員在旁邊只覺得一切正常。</p>
+<p>哨兵有兩種站法。一種是它定時來敲門，主動問服務還好不好；另一種是要求服務定時去外面打卡，哪天該到卻沒到，外面的人就打電話通知我。對我這種單機服務，後者更直接：bot 每次真的完成工作後，就向外部監控送一次心跳。這個角色有兩個地方最容易做錯。</p>
+<p>第一，報警要用一支跟這棟房子無關的電話。如果報警得透過房子裡的廣播系統，那房子燒了廣播也沒了。哨兵不能跟 bot 住在同一台機器上，通知我的那條路也不能經過 bot 本身。主機關機、系統卡死或服務壞掉時，外面的監控還是得有辦法直接通知手機。</p>
+<p>第二，「你還在嗎」這句話問錯了。你打電話給值班的人問「你在不在」，他回「在」，但他可能人在、正在滑手機。真正該問的是「你手上那件事，上一次做完是多久以前？」他要是說三小時前，那就算接了電話，也是掛機狀態。只證明「有人接電話」不夠，得證明「有人在做事」。所以讓服務回報的別只是「我還活著」，要能回答「我上一次真的完成工作是什麼時候」，這樣才擋得住那種沒斷氣卻不做事的死法。</p>
+<h1 id="第三層-開機自啟：停電後叫醒大家"><a href="#第三層-開機自啟：停電後叫醒大家" class="headerlink" title="第三層 開機自啟：停電後叫醒大家"></a>第三層 開機自啟：停電後叫醒大家</h1><p>最後一種死法最徹底，整台機器重開，把上面所有東西一起帶走。</p>
+<p>問題是，服務和管理員本身也都是程式。機器一重開，它們會一起歸零。我那 16 小時就死在這，前面的監督邏輯根本都寫好了，機器半夜重開一次（尤其是 Windows Update），把它們一起帶走，然後沒有任何人負責把它們叫醒。外部心跳監控倒是還活著，只是當時的我根本還沒讓它盯這件事。</p>
+<p>這一層只能交給作業系統本身，讓它在開機時自動把服務管理員拉起來。它是整串的地基，這層不做，上面寫得再漂亮，停電後也沒人開燈。</p>
+<h1 id="誰來看守看守者？"><a href="#誰來看守看守者？" class="headerlink" title="誰來看守看守者？"></a>誰來看守看守者？</h1><p>聰明的你大概已經想到了，哨兵自己也是程式，它死了怎麼辦？</p>
+<p>順著「監測者要在外面」這句話推下去，會掉進一個無底洞，哨兵要一個哨兵，那個哨兵又要一個哨兵。這個遞迴不能靠「寫一個笨到不會死的本機程式」停下來，因為它再笨，主機斷電時還是會一起消失。</p>
+<p>比較實際的停法，是把最外圈交給另一個故障域裡的外部服務。它當然也可能壞，只是至少不會跟我的 bot 因為同一次重開機、同一顆硬碟或同一段程式一起消失。再往外疊看門狗的看門狗，只會蓋出一座無限高的塔（抖</p>
+<h1 id="這整套早就有名字"><a href="#這整套早就有名字" class="headerlink" title="這整套早就有名字"></a>這整套早就有名字</h1><p>三層都寫好、服務乖乖活著之後，我順手查了「別人都怎麼防這種事」。結果發現，我自己摸索出的這套做法，正好落在 SRE（站點可靠性工程）關注的範圍裡：服務監督、健康檢查、外部告警，以及故障後自動恢復。Google 那本《Site Reliability Engineering》就是這個領域的經典教材。我那三層，每一層都有正式名字，每個念頭都有人做成現成工具。</p>
+<p>那個「管理員」，業界叫 process supervisor。Linux 常見的 systemd 就能負責這件事，內建異常後重啟、重啟間隔和啟動頻率限制，正好能處理第一層的大部分需求。在 Kubernetes 裡，容器如果反覆啟動又崩潰，系統會逐步拉長重啟間隔，最後常會看到那個熟悉的狀態：<code>CrashLoopBackOff</code>。玩過 Kubernetes 的人大概都被它的紅字瞪過。</p>
+<p>那個「哨兵敲門」，在容器平台裡常叫 health probe，而且分得比我細：liveness 管「我是不是卡死了，要不要重啟」，readiness 管「我現在能不能接工作，不能就先別把流量送過來」。我講的「不能只回一句我還在、要證明有在做事」，正是他們早就踩過的坑。至於我最後採用的外部打卡，則比較接近後面會提到的 heartbeat monitoring。</p>
+<p>這裡還讓我補到一個原本會犯的錯：外部依賴可以檢查，但不要直接綁進 liveness 的重啟判斷。資料庫連不上時，服務可能應該暫停接收新工作、回報 degraded 或發出告警，卻不一定適合不斷重啟。不然資料庫一掛，服務被判死、重啟、資料庫還是沒好、又被判死，最後自己把自己踩進 crash loop。liveness 該確認的是「我自己的工作迴圈還有沒有在跳」，不是要求整個世界都得跟著健康。</p>
+<p>「報警要走一支跟房子無關的電話」，其實是這裡面很常見的一招，叫 dead man’s switch，或叫心跳監控。現成服務一堆，像 Healthchecks.io、Dead Man’s Snitch。它們不是定時進來戳我的 bot，而是反過來要求 bot 主動去外面打卡，哪天該報平安卻沒出現，就直接通知我。連整台主機消失都能一起抓到。</p>
+<p>連我那個「誰來看守看守者」的無限遞迴，業界也有類似做法。Prometheus／Alertmanager 的常見配置裡，會放一條永遠處於 firing 狀態的 <code>Watchdog</code> 警報，再交給外部的 dead man’s switch 盯著。哪天這條本來永遠會響的警報不響了，外部就知道整套監控自己可能死了。答案不是讓最外圈永遠不壞，而是別讓它和裡面那一圈一起壞。</p>
+<p>殺雞不用牛刀，我平常寫的簡單服務在 Linux 用 systemd，Windows 註冊成 Windows Service，再配一個 Healthchecks.io，三層就到齊了。放大到公司才需要那整套，但骨架跟你在家土炮的一模一樣。</p>
+<h1 id="最後"><a href="#最後" class="headerlink" title="最後"></a>最後</h1><p>這三層防的是「它死掉」，防不了「它做錯事」。服務要是活得好好的、health 也正常回報，卻把某筆資料算錯了，看門狗只會一路跟你說一切安好。「它還在做事」跟「它做對事」是兩回事，這套只保證前者。後者是另一個題目，得靠別的東西守，這篇罩不到。</p>
+<hr>
+<p>三層設完之後，服務一斷氣，一分鐘內我手機就會叮一聲。當初還嫌這 bot 有點吵，結果我又在旁邊多養了一隻，專門在它出事的時候吵我，家裡的叮咚聲大概只會更多，但至少不會再有下一個安靜消失的 16 小時了(?</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li><li><a href="/llm-agent-isolation/">多人共用 AI bot，別讓它認錯使用者</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>系統設計</category>
+      </categories>
+      <tags>
+        <tag>自動化</tag>
+        <tag>系統設計</tag>
+        <tag>SRE</tag>
       </tags>
   </entry>
   <entry>
@@ -877,52 +877,6 @@ flowchart LR
         <tag>AI</tag>
         <tag>AI agent</tag>
         <tag>Agent Skills</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
-    <url>//when-multi-agent-works/</url>
-    <content><![CDATA[<p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
-<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
-<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
-<span id="more"></span>
-
-<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
-<pre>
-<code class="mermaid">
-
-flowchart LR
-  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
-  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
-  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
-  RETRY --&gt; DELIVER
-</code>
-</pre>
-
-<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
-<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
-<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
-<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
-<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
-<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
-<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
-<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
-<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
-<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
-<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
-<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
-<p>一篇名為 <a href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
-<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
-<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>AI agent</tag>
-        <tag>Multi-agent</tag>
       </tags>
   </entry>
   <entry>
@@ -1414,6 +1368,52 @@ flowchart TD
       </tags>
   </entry>
   <entry>
+    <title>一個 AI agent 做不好，多開幾個就會比較好嗎？</title>
+    <url>//when-multi-agent-works/</url>
+    <content><![CDATA[<p>一個 AI agent 做不好時，多開幾個真的會比較好嗎？</p>
+<p>我最近在做一套會把工作分給不同 AI agent 的系統，剛好有一次機會實際驗證。Agent 寄信、排程或寫入資料後，有時會直接回報完成，卻沒有讀回結果，也沒有執行測試。我於是設計了一道「硬驗證閘」，準備在它交付前檢查一次；只要系統找不到驗證紀錄，就把回覆退回去，要求 agent 補做驗證。</p>
+<p>規格裡已經考慮了誤判、重試上限與功能開關，我甚至刻意不檢查答案對不對，只確認 agent 有沒有留下驗證的痕跡。寫完時，我已經準備把它做進系統。不過在實作前，我另外找了一個 agent，請它停止補完設計，改為想辦法把它打穿。它最後找出九個問題，其中三個足以讓整套機制無法成立。這次讓我發現，第二個 agent 有沒有用，要看它能不能拿到一項獨立、可以驗收的工作。如果它只是來「一起想」或「一起做」，增加的通常是重複判斷、交接與合併。</p>
+<span id="more"></span>
+
+<h2 id="一個看起來完整的設計，為什麼被推翻"><a href="#一個看起來完整的設計，為什麼被推翻" class="headerlink" title="一個看起來完整的設計，為什麼被推翻"></a>一個看起來完整的設計，為什麼被推翻</h2><p>當時的設計會先看 agent 使用過哪些工具。如果它執行了特定的外部變更，最後一次變更之後卻沒有讀取或測試，就退回一次，請它驗證後再交付。系統不需要理解任務內容，只要根據操作紀錄判斷，看起來既簡單又能套用到不同工作。</p>
+<pre>
+<code class="mermaid">
+
+flowchart LR
+  CHANGE[&quot;Agent 寄信、排程或寫入資料&quot;] --&gt; TRACE{&quot;最後有驗證紀錄嗎？&quot;}
+  TRACE -- &quot;有&quot; --&gt; DELIVER[&quot;交付結果&quot;]
+  TRACE -- &quot;沒有&quot; --&gt; RETRY[&quot;要求補做驗證&quot;]
+  RETRY --&gt; DELIVER
+</code>
+</pre>
+
+<p>第一個漏洞出在操作紀錄本身。這套系統可以改用不同的 AI 工具，其中一種不會回報自己做過哪些操作。Agent 明明已經改了資料，驗證閘仍看不見。我原本把設計寫成可以支援不同工具，實際上最前面的判斷條件就不成立。</p>
+<p>重試也比我預期的危險。Agent 完成任務後，原本的工作階段可能已經被清空，它不記得前面寄過信、建立過排程，或寫入過哪些資料。這時再補一句「請驗證剛才的結果」，它可能重新做一次相同操作。原本用來避免錯誤的檢查，反而多製造一次外部變更。</p>
+<p>即使系統看得到操作，也只能知道 agent 先寫入、後讀取，無法確認兩次操作是不是針對同一份結果。寫入 A 後讀一份無關的 B，紀錄看起來仍像做過驗證。只檢查步驟是否出現，很容易讓 agent 學會留下符合條件的紀錄，結果本身仍然沒有被確認。</p>
+<p>我最後沒有繼續修補這道硬閘，直接把自動攔截與額外紀錄整套拿掉，改成在每位 agent 都會收到的基本規則裡要求「交付前要實際驗證，並附上證據」。這條規則比較軟，agent 仍可能漏做；至少系統不會再根據一份不完整的操作紀錄，自行判斷該不該退件。</p>
+<h2 id="多一個-agent-什麼時候有用"><a href="#多一個-agent-什麼時候有用" class="headerlink" title="多一個 agent 什麼時候有用"></a>多一個 agent 什麼時候有用</h2><h3 id="小修改留給同一個-agent"><a href="#小修改留給同一個-agent" class="headerlink" title="小修改留給同一個 agent"></a>小修改留給同一個 agent</h3><p>改日期、修錯字，或處理低風險、可逆、影響範圍小的修改時，原本的 agent 已經知道上下文，完成標準也已經確定。我會先讓它把工作做完，失敗時再看缺的是資料、工具說明還是驗收條件。這些問題需要補回原本的任務，多開幾個 agent 只會增加交代與合併的工作。</p>
+<h3 id="reviewer-負責找反例"><a href="#reviewer-負責找反例" class="headerlink" title="reviewer 負責找反例"></a>reviewer 負責找反例</h3><p>驗證閘已經有完整方案，缺的是有人專門檢查它在哪些情況會失效，所以我增加了一位獨立 reviewer，也就是只負責審查的 agent。它讀同一份需求、設計、已知限制與相關程式碼，交付具體反例、成立證據和影響範圍，但不直接修改方案，也不替我決定最後怎麼做。</p>
+<p>如果我只叫第二個 agent「再幫我完善一次」，它很可能沿著原本的方向繼續補規格，最後得到一份更長的設計。這次會找到問題，與獨立的閱讀脈絡有關，也與任務寫法有關。Reviewer 被要求主動找反例、失效條件與沒有被證明的前提，最後仍由我判斷要修補、縮小範圍，或放棄整個方案。換一個 agent 不保證得到同樣結果，但比重複同一份任務更有機會看到原本的盲點。</p>
+<h3 id="能平行的工作才拆開"><a href="#能平行的工作才拆開" class="headerlink" title="能平行的工作才拆開"></a>能平行的工作才拆開</h3><p>需要搜尋大量資料時，工作比較容易拆成互不等待的部分。假設我要整理十間公司的公開資訊，可以讓幾個 agent 各自負責幾間，再由主要 agent 合併。每條搜尋路徑不必等待其他人，也不用讓同一位 agent 讀完所有網頁。Anthropic 在 <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a> 中採用的也是這類做法，以更多 token 與工具呼叫換取搜尋廣度。</p>
+<p>程式開發通常沒有這麼乾淨。幾個 agent 可能同時修改一個檔案、共用一份資料，或執行寄信這類外部動作。沒有先分開寫入範圍，結果就可能互相覆蓋或重複執行；如果每一步又要等待前一步，多 agent 也不會帶來多少平行處理的好處。這時除了分配工作，還要處理彼此的依賴、共用的資料，以及最後由誰合併。</p>
+<h2 id="工作拆開，不代表能平行"><a href="#工作拆開，不代表能平行" class="headerlink" title="工作拆開，不代表能平行"></a>工作拆開，不代表能平行</h2><p>把一個功能拆給三個 agent，不代表三份工作就能同時完成。例如前端要先知道資料格式，整合測試也要等前後端接起來，原本的前後依賴不會因為多開兩個 agent 消失。平行運算只能加快可以同時執行的部分，必須依序完成的步驟仍要照順序走。拆分之前，我會先看哪些工作真的可以獨立完成；如果第二步一定要等待第一步，就留給同一個 agent，或先定好前一步要交付什麼。</p>
+<p>共用資料也是軟體架構裡常見的問題。假設兩個 agent 都從同一個舊版本開始工作，第一個新增函式後寫回檔案，第二個稍晚才完成，卻拿著舊版本覆蓋回去，前面新增的函式就消失了。Git 可能把這種情況攔成 merge conflict，直接寫入資料時也可能形成 lost update；若最後結果會隨執行先後改變，才屬於更狹義的 race condition。實作上可以切開檔案 ownership、限制只有一位 agent 寫入，外部操作則要另外考慮重複執行時是否安全。</p>
+<p>Agent 之間每次交接都要重新說明脈絡，也可能漏掉原本的限制。程式之間傳遞訊息同樣需要格式與錯誤處理，拆得越細，花在溝通與合併的成本就越高。共同輸入還沒固定時，我會先停在單一 agent；確定可以拆開後，再指定誰負責合併，以及合併後由誰重新驗證完整結果。</p>
+<p>一篇名為 <a href="https://arxiv.org/html/2512.08296v3">Towards a Science of Scaling Agent Systems</a> 的 v3 前印本，也觀察到類似差異。在固定總 token 預算下，集中式多 agent 在可以拆成多條資料搜尋與推理工作的 Finance Agent 測試中，比單一 agent 相對提高 80.8%；獨立式多 agent 在步驟必須依序完成的 PlanCraft 測試中，則相對下降 70%。兩個數字來自不同基準與協調架構，無法直接套到日常工作，但可以看出任務的依賴方式與 agent 之間怎麼協調，都會改變最後的結果。</p>
+<h2 id="我現在怎麼決定要不要拆"><a href="#我現在怎麼決定要不要拆" class="headerlink" title="我現在怎麼決定要不要拆"></a>我現在怎麼決定要不要拆</h2><p>這次之後，只要我想多開一個 agent，就會先試著用一句話寫出它要獨立完成的工作。驗證閘的 reviewer 有明確任務，它要找出方案不能成立的情況；大量搜尋也能直接分出每位 agent 負責的範圍。如果最後只能寫成「一起把事情做好」，我通常不會拆，因為每個 agent 很可能重複讀取、重複判斷，最後再把幾份相似的答案交回來。</p>
+<p>所以，當一個 agent 做不好時，我現在不會先增加數量，而是先看它缺的是資料、工具說明，還是驗收條件。這些可以補回原任務，就交給同一個 agent；若需要獨立找反例，或工作能切成互不等待的範圍，我才會多開一個。多 agent 的價值來自明確分工；多幾份相似答案，只會把判斷留到合併時再做一次。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/ai-agent-skills-more-is-better/">Skill 裝得越多，AI agent 就越好用嗎？</a></li><li><a href="/markdown-ai-memory/">AI agent 的記憶該放哪裡？從 Markdown、SQLite 到 LLM Wiki</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>AI agent</tag>
+        <tag>Multi-agent</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>版本說明，別再發版時才重寫</title>
     <url>//release-notes-from-commits/</url>
     <content><![CDATA[<p>最近替自己的樂譜練習 App LilyScore 準備發版，功能做完、測試也跑過，最後卻卡在一個很普通的問題：這版到底更新了什麼？</p>
@@ -1518,191 +1518,6 @@ flowchart TD
       </tags>
   </entry>
   <entry>
-    <title>小工具一定要用資料庫嗎？</title>
-    <url>//google-sheets-as-database/</url>
-    <content><![CDATA[<p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p>
-<p>我之前設計過一個 Telegram 記帳 bot 的原型，當時選的是 Google Sheets。預計讓使用者從聊天視窗記錄支出，由 bot 把帳目存進試算表，需要整理時再直接打開來看。這個想法很直覺，既然平常就會用表格記帳，讓程式幫忙填進去，似乎也不用為了看幾筆資料，另外做一個管理介面。</p>
-<p>選儲存方式時，我會先看資料要怎麼使用。同樣是一張帳目表，單純記下每天花多少錢，和要處理多人分帳、個別還款，需要照顧的事情就差很多。能直接打開表格整理，是選 Google Sheets 的理由，但也要一起考慮程式會怎麼讀取、修改這些資料。</p>
-<span id="more"></span>
-
-<h2 id="先看資料怎麼用"><a href="#先看資料怎麼用" class="headerlink" title="先看資料怎麼用"></a>先看資料怎麼用</h2><p>資料需要留下來，不代表一定要用資料庫。程式可以把設定寫進檔案，把報名資料放進試算表，也可以把帳目存進資料庫。幾種方式都能保存資料，選擇時要多看一步，想想以後會怎麼讀取、修改，以及修改到一半出錯時，能不能接受留下不完整的結果。</p>
-<p>例如，一個自己使用的工具，只要記住上次選的資料夾，下次開啟時再讀出來，檔案就很適合。活動名單需要主辦人隨時打開補註記，試算表的現成介面很方便。換成預約系統，兩個人可能同時搶最後一個名額，程式就得處理誰先成功，不能讓兩邊都收到預約完成的通知。資料量還很少，操作方式卻已經影響選擇了。</p>
-<p>我會先把這些使用情境寫下來，再比較工具。這時不用急著研究資料庫語法，先想想誰會改資料、會不會同時修改，以及弄錯一筆會怎樣。這比一開始就找「最好的資料庫」更有用，也比較不會選了一套功能齊全、自己卻用不上的架構。</p>
-<h2 id="不用資料庫的選擇"><a href="#不用資料庫的選擇" class="headerlink" title="不用資料庫的選擇"></a>不用資料庫的選擇</h2><h3 id="設定與簡單紀錄，用檔案"><a href="#設定與簡單紀錄，用檔案" class="headerlink" title="設定與簡單紀錄，用檔案"></a>設定與簡單紀錄，用檔案</h3><p>設定、單機工具的少量狀態，或每次執行後產生的一份報表，都可以先考慮檔案。常見的 JSON 適合表達有層次的資料，例如設定裡同時包含資料夾位置與通知偏好；CSV 則把內容存成一列一列，方便用試算表開啟。它們是檔案格式，讀取哪一筆、怎麼更新，以及哪些值才算合法，都要由程式處理。</p>
-<p>這種做法容易開始，但「存進檔案」仍有一些工作。我會先確認檔案放在哪裡，程式重啟或更新後重新上線，也就是重新部署時，資料會不會消失，再考慮怎麼備份。如果兩個操作同時讀取舊內容，改完各自存回，後存的那份可能蓋掉前一份修改；寫到一半中斷，也得有辦法避免原本的資料跟著壞掉。只由同一個程式依序處理簡單設定時，這些事情比較容易掌握；當自己開始補上大量防止覆寫、查找與更新的邏輯，就值得比較資料庫了。</p>
-<h3 id="需要人工整理，用試算表"><a href="#需要人工整理，用試算表" class="headerlink" title="需要人工整理，用試算表"></a>需要人工整理，用試算表</h3><p>Google Sheets 適合的情況，是你本來就需要一個能直接查看、修改資料的介面。例如活動名單由程式新增，主辦人再手動補註記；或像我的記帳 bot 原型，預計從 Telegram 記帳，需要整理時再打開試算表。Google 提供 API，也就是讓程式透過網路讀寫資料的入口，bot 可以藉此新增一列或讀取帳目，相關做法可參考 <a href="https://developers.google.com/workspace/sheets/api/guides/values">Read and write cell values</a>。</p>
-<p>這裡省下的是自己做資料管理介面的工作，bot 本身仍要有地方執行，也得處理連線與權限。原型還沒有完成 Google Sheets 與 Telegram 的完整串接驗證，所以這是當時的設計考量，不能當成已經長期使用、證明可靠的成果。</p>
-<p>人能直接改表格，也代表程式依賴的格式可能被改掉。例如把「金額」欄改名，或刪除程式需要的編號，bot 就可能找不到資料。分享權限也要分開看，讓 bot 有權限開啟試算表，不代表任何傳訊息給 bot 的人都有權限查帳。因此，我會把供程式使用的原始紀錄和人工整理的報表分開，並限制誰能透過 bot 讀寫。若資料幾乎只由程式維護，這些現成介面的好處就少了，未必需要特地繞一圈用試算表。</p>
-<h2 id="資料庫能幫上什麼忙"><a href="#資料庫能幫上什麼忙" class="headerlink" title="資料庫能幫上什麼忙"></a>資料庫能幫上什麼忙</h2><p>如果工具要處理還款與撤銷操作，我會特別留意修改失敗後，帳目能不能對得起來。查找未還款紀錄、擋下重複記帳，以及把必須一起完成的修改放在一起處理，都可以用到資料庫的能力。即使只有少數人使用，這些需求也可能從第一天就存在，不必等到資料變多才考慮。</p>
-<p>假設記帳工具同時保存還款紀錄和欠款餘額。小美還了 300 元，程式要新增還款紀錄，也要把餘額減掉 300；如果只完成前半段就中斷，兩邊會對不起來。資料庫的「交易」可以把這些修改包成一組，成功時一起保留，失敗時撤回這一組修改。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">3.4. Transactions</a> 用轉帳說明這個概念。程式仍要正確劃定這一組操作並處理失敗，裝好資料庫不會自動替你決定哪些事情要一起完成。</p>
-<p>分帳規則也會影響要存的資料。假設小明先付了 900 元晚餐，三個人平均分攤，小美還了 300 元，小華還沒還。如果資料只留一個「是否結清」欄位，無論放在試算表還是資料庫，都沒辦法完整表達這個狀態。必須先把每個人應付、已付多少分開記錄，程式才有資料可以算。換工具能省掉部分儲存與查詢工作，分帳規則還是得自己想好。</p>
-<p>重複記帳也是類似的情況。使用者沒收到回覆，再送一次訊息，資料庫不會憑空知道兩次是不是同一筆。程式需要識別這次操作，再配合資料庫的唯一性規則，拒絕重複寫入；如果只是新增兩筆編號不同的紀錄，資料庫仍可能照單全收。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/ddl-constraints.html">5.5. Constraints</a> 整理了這類可由資料庫檢查的條件。這些能力有用，但要和工具本身的規則配合。</p>
-<h2 id="資料庫不一定很重"><a href="#資料庫不一定很重" class="headerlink" title="資料庫不一定很重"></a>資料庫不一定很重</h2><h3 id="SQLite，不必另外架服務"><a href="#SQLite，不必另外架服務" class="headerlink" title="SQLite，不必另外架服務"></a>SQLite，不必另外架服務</h3><p>如果資料主要由程式讀寫，又不想另外管理一套資料庫服務，SQLite 很值得放進候選。它本身就是資料庫，只是由程式直接使用本機的資料庫檔案，不需要另開一個資料庫伺服器。官方的 <a href="https://www.sqlite.org/serverless.html">SQLite Is Serverless</a> 說明了這個差異，所以「不用架資料庫服務」和「不用資料庫」是兩件事。</p>
-<p>SQLite 也有查詢與交易能力，可以拿來保存互有關聯的支出、成員與還款紀錄，不必自己在 JSON 或 CSV 裡重做整套查找和更新。它可以同時讓多個連線讀取，但每個資料庫檔案同一時間只容許一個寫入交易，細節見 <a href="https://www.sqlite.org/lang_transaction.html">Transaction</a>。也就是有兩組修改同時要存入時，程式得安排等待或重試，讓它們依序完成。短時間的修改若能這樣處理，仍然可以支援多人透過同一個 bot 使用；「多人使用」不等於「每個人都直接開啟資料庫檔案」。</p>
-<p>需要注意的是，資料庫檔案仍要放在能長期保存的位置，備份也要使用適合資料庫的方式。SQLite 不會讓沒有持久儲存空間的部署環境，自動變成適合保管帳目的地方。選它之前，我會一起確認程式跑在哪裡、資料放在哪裡，以及換一台主機時怎麼還原。</p>
-<h3 id="獨立服務，讓多個程式共用"><a href="#獨立服務，讓多個程式共用" class="headerlink" title="獨立服務，讓多個程式共用"></a>獨立服務，讓多個程式共用</h3><p>當多台主機上的程式需要共同修改資料，或同時寫入的工作多到不適合依序等待，就值得評估 PostgreSQL 這類獨立的資料庫服務。程式透過網路連線，把讀寫請求交給資料庫處理，而不必讓每台主機直接操作同一個檔案。SQLite 官方的 <a href="https://www.sqlite.org/whentouse.html">Appropriate Uses For SQLite</a> 也把寫入需求和資料的位置列為選擇依據，沒有用「幾個使用者」畫出固定分界。</p>
-<p>獨立服務可以自己架，也可以使用供應商代管的方案，例如雲端平台提供、開通後就能連線的資料庫。自己架要負責安裝、更新與備份，代管則能省下一部分工作，但還是要確認費用、連線方式、備份範圍，以及資料能不能匯出。不想自己架服務，不代表一定要退回檔案；如果程式原本就部署在雲端，而且平台已有合適的方案，一開始使用它也合理，沒有必要把所有選項照順序用過一次。</p>
-<h2 id="替自己的工具做選擇"><a href="#替自己的工具做選擇" class="headerlink" title="替自己的工具做選擇"></a>替自己的工具做選擇</h2><p>我把前面的使用情境和需要自己照顧的部分整理成下面這張表，可以拿自己的需求做第一輪比較。</p>
-<table>
-<thead>
-<tr>
-<th>使用情境</th>
-<th>可以先考慮</th>
-<th>要留意的事</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>簡單設定、依序處理的少量狀態、匯出報表</td>
-<td>JSON、CSV 等檔案</td>
-<td>更新方式、寫入中斷、存放位置與備份</td>
-</tr>
-<tr>
-<td>人需要經常開啟、整理，程式協助新增資料</td>
-<td>Google Sheets</td>
-<td>欄位變動、存取權限、網路與 API 使用限制</td>
-</tr>
-<tr>
-<td>資料主要由程式讀寫，集中在同一台主機</td>
-<td>SQLite</td>
-<td>寫入是否能排隊、資料檔保存與還原</td>
-</tr>
-<tr>
-<td>多台主機共用資料，或寫入需求較高</td>
-<td>獨立或代管資料庫服務</td>
-<td>連線權限、維運或方案費用、備份與匯出</td>
-</tr>
-</tbody></table>
-<p>以記帳 bot 為例，如果需求是記下支出，並且需要經常手動整理表格，Google Sheets 有它方便的地方。但若需要多人分帳、個別還款和撤銷操作，平常又幾乎不會打開表格，我會先評估 SQLite，前提是 bot 集中在同一台能長期保存資料的主機，寫入也能依序處理。這些都是設計時就能比較的條件，不需要等到試算表塞不下，才開始考慮資料庫。</p>
-<p>如果你是用 AI 做小工具，可以先告訴它程式預計跑在哪裡，再拿自己的兩三個實際操作，請它比較用檔案、試算表或資料庫時，資料會存在哪裡、一次修改會動到什麼。接著追問，兩個操作同時送出、寫到一半中斷、重新部署時，原本的資料會怎樣，並請它指出不建議採用的選項和原因。回答若只剩「這個比較簡單」「以後比較好擴充」，還不足以決定；把情境放進測試環境實際跑一次，才知道程式有沒有做到它說的事。</p>
-<hr>
-<p>我當時選 Google Sheets，是因為打開就能看帳，不想再做一個介面。換成只存設定或整理名單的工具，也可以先不用資料庫；要處理還款，SQLite 則可能比自己補齊檔案讀寫規則省事。做小工具時，我會先想清楚要存什麼、怎麼修改，再選資料放哪裡，免得連午餐都還沒記到，先多了一套要照顧的系統。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li><li><a href="/solo-project-jit-governance/">一個人的開源專案，文件要寫多少？</a></li><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>開發</category>
-      </categories>
-      <tags>
-        <tag>Google Sheets</tag>
-        <tag>Side Project</tag>
-        <tag>資料庫</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>測試通過，真的能用了嗎？</title>
-    <url>//tests-pass-but-does-it-work/</url>
-    <content><![CDATA[<p>你有沒有遇過，程式明明顯示測試通過，自己打開來用，卻連最常做的操作都沒辦法完成？例如做了一個能匯出報表的小工具，檢查時沒有報錯，按下按鈕也出現成功訊息，下載後才發現檔案是空的。這時再看那一排通過的結果，很難不懷疑，剛才到底測了什麼。</p>
-<p>我在做一套讓 AI 分工的工具時，也遇過類似的落差。角色設定檔產生了，檔案比對也通過，實際打開使用它的工具，卻找不到那些角色。那次通過的是「產生的檔案和預期一致」，並沒有驗到「工具真的讀得懂這些檔案」。兩件事只差一步，對使用結果的影響卻差很多。</p>
-<p>所以看到測試通過，我會接著確認它涵蓋到哪裡。檢查計算結果、檔案內容，和從平常的入口完成一件事，各自能找出不同的問題。做自己的小工具，不必一開始準備完整的測試制度，但至少要挑一條主要流程，確認從開始操作到拿到結果都走得通。</p>
-<span id="more"></span>
-
-<h2 id="檔案有了，工具卻沒讀到"><a href="#檔案有了，工具卻沒讀到" class="headerlink" title="檔案有了，工具卻沒讀到"></a>檔案有了，工具卻沒讀到</h2><p>那套工具會依照角色定義，產生給開發工具讀取的設定檔，例如負責修改程式的角色、負責審查的角色。設定檔開頭有名稱、用途等欄位，必須照固定格式填寫，開發工具才知道要怎麼使用這個角色。我另外放了一行註解，標明檔案由哪個來源產生，方便日後維護。</p>
-<p>問題出在順序。當時我把註解放在最前面，設定資料排在後面，檔案內容看起來都在，但目標工具要求設定資料必須從第一行開始。它沒有照我預期的方式讀取，幾個角色就這樣被忽略了。直到檢查工具裡的角色清單，並嘗試實際呼叫，才發現檔案有產生，角色卻沒有出現。</p>
-<p>原本的自動檢查會重新產生一份檔案，再和保存的範本比對，確認內容沒有意外改變。比對時，那段註解會先被略過，只比較剩下的設定和內文，因此沒有檢查註解與設定區塊的先後順序。它也沒有啟動目標工具，確認角色能不能被載入。檢查沒有失靈，只是我還少驗了後面那一段。</p>
-<pre>
-<code class="mermaid">
-
-graph TD
-    A[角色定義] --&gt; B[產生設定檔]
-    B --&gt; C[開發工具讀取]
-    C --&gt; D[角色出現在清單]
-    D --&gt; E[實際交付任務]
-    B -. 比對檔案內容 .-&gt; F[既有檢查通過]
-</code>
-</pre>
-
-<p>修正時，我把註解移到設定區塊之後，也把「從工具清單確認已載入，並實際呼叫一次」列為之後的驗收項目。檔案比對仍然保留，因為它適合找出不該改變的內容；只是不能再拿這個結果，代替整條使用流程的確認。這個例子甚至還沒走到複雜的程式邏輯，光是第一行放什麼，就足以讓功能消失。</p>
-<h2 id="先看測試驗到哪裡"><a href="#先看測試驗到哪裡" class="headerlink" title="先看測試驗到哪裡"></a>先看測試驗到哪裡</h2><p>測試會依照設定好的條件判斷結果。例如匯出報表時，檢查總金額是不是算對，和檢查下載的檔案能不能打開，是不同的條件。前者可以直接把資料交給計算程式，快速試很多組數字；後者要經過選資料、按匯出、產生檔案與下載，才能知道這些部分接在一起有沒有問題。</p>
-<p>還有一種常見做法，是在測試裡用預先準備好的回應，暫時代替外部服務。假設工具需要把檔案存到雲端，測試就假裝雲端已回覆「儲存成功」，觀察自己的程式接著會不會顯示正確訊息。這通常叫模擬，或 mock，可以讓測試不必每次連上網路，也方便試出失敗的情況。Playwright 的 <a href="https://playwright.dev/docs/mock">Mock APIs | Playwright</a> 就示範了攔截請求、回傳測試資料，過程中不會真的連到原本的服務。</p>
-<p>這樣的測試有用，但它沒有檢查真實帳號能不能登入、目前有沒有寫入權限，或檔案最後是否真的存在。看到「成功」之前，要先知道這個成功是外部服務回的，還是測試事先安排的。我會保留這些快速檢查，再另外驗證需要實際連接的部分，不會要求每一項測試都去操作一次雲端。</p>
-<h2 id="從平常的入口走一次"><a href="#從平常的入口走一次" class="headerlink" title="從平常的入口走一次"></a>從平常的入口走一次</h2><h3 id="先寫出完成的樣子"><a href="#先寫出完成的樣子" class="headerlink" title="先寫出完成的樣子"></a>先寫出完成的樣子</h3><p>如果我要驗收匯出報表，會先寫下一個具體結果，例如「選定日期後，下載的 CSV 用試算表打開，應該看得到這段期間的紀錄，而且金額和原始資料一致」。CSV 是能用試算表開啟的表格文字檔；這裡要檢查的終點是它裡面的內容，不能只停在按鈕變色或出現成功訊息。</p>
-<p>接著準備少量容易核對的測試資料。例如選定日期內放兩筆紀錄，金額分別是 100 和 200，再放一筆日期外的紀錄。預期匯出只有前兩筆，若工具也提供加總，結果就應該是 300。資料不用多，但要先知道正確答案，才能看出它有沒有漏掉、混入或改錯資料。這裡的報表是示範情境，換成整理照片、預約或待辦工具，也可以用同樣方式訂出完成條件。</p>
-<h3 id="用預計交付的版本操作"><a href="#用預計交付的版本操作" class="headerlink" title="用預計交付的版本操作"></a>用預計交付的版本操作</h3><p>驗收時，要從平常會用的入口開始。網頁工具就打開網頁，選日期、按匯出，再檢查下載的檔案；bot 就從聊天視窗送出操作，確認最後拿到的結果。只在程式裡直接呼叫匯出函式，即使結果正確，也還沒檢查畫面上的按鈕是不是接到了它。</p>
-<p>環境也要對得上。自己電腦裡已經登入的帳號、事先建好的資料夾、開發時留下的設定，可能讓流程剛好能跑。若工具準備放到另一台主機，或交給其他人使用，就要在對應的測試環境重新確認，並使用符合一般使用者權限的測試帳號。不能拿管理員帳號跑過一次，就當作其他人也一定能用。</p>
-<p>這類從操作入口驗到最後結果的檢查，常稱為端到端測試，英文縮寫是 E2E。它也能自動化，不必永遠靠自己點。Playwright 的 <a href="https://playwright.dev/docs/best-practices">Best Practices | Playwright</a> 建議驗證使用者看得到的行為，這也是我選驗收終點的依據。先把流程和預期結果定好，之後才有辦法判斷自動化測試是不是涵蓋了同一件事。</p>
-<h3 id="成功之外，也試一次失敗"><a href="#成功之外，也試一次失敗" class="headerlink" title="成功之外，也試一次失敗"></a>成功之外，也試一次失敗</h3><p>主要流程走通後，我會挑容易出錯、出錯後又需要人處理的情況補測。以報表來說，沒有符合日期的資料時，工具應該說明沒有資料，或產生事先約定好的空報表；儲存失敗時，不該仍然顯示「已儲存」。結果要怎麼呈現可以自己決定，但不能讓使用者以為事情做完了，實際上什麼都沒留下。</p>
-<p>不用一開始窮舉所有異常。若工具只是匯出檔案，可以先測空資料和寫入失敗；若會新增或扣除資料，就多看重複點擊與中途中斷。難以安全重現的情況，可以先用模擬回應測自己的處理邏輯，再把尚未驗證的真實連線列出來。每次只增加一個條件，也比較容易知道問題是從哪裡開始的。</p>
-<div class="note warning no-icon"><p>實跑用的是實際操作方式，不代表要拿正式資料冒險。使用可丟棄的測試資料與獨立帳號；涉及寄信、付款、刪除或對外發布時，要使用測試模式或隔離環境，不要為了驗收真的送出去。</p>
-</div>
-
-<h2 id="讓-AI-回報做過的檢查"><a href="#讓-AI-回報做過的檢查" class="headerlink" title="讓 AI 回報做過的檢查"></a>讓 AI 回報做過的檢查</h2><p>如果工具主要由 AI 協助開發，我會請它把「已完成」拆成可以核對的內容。它執行了哪個版本、用了什麼測試資料、從哪個入口開始，以及最後看到了什麼結果。拿匯出報表來說，「測試全部通過」太籠統；「用測試帳號從網頁匯出，下載後確認有兩筆紀錄，金額分別是 100 和 200」，才知道這次驗到了哪裡。再附上產出檔、截圖或執行紀錄的位置，才有辦法實際核對。</p>
-<p>報告裡也要留下沒有做的部分。如果 AI 只能讀程式、跑本機測試，卻沒有瀏覽器或測試帳號，就把網頁操作標成未驗證，交給人補做。檔案比對通過、模擬服務回應正確、實際登入後操作成功，可以分開記，不需要湊成一句全部正常。自己不熟程式碼，也能先用這些具體結果，判斷還欠哪一段驗收。</p>
-<p>檢查紀錄不用寫成長篇報告。留下版本、環境、操作、預期與實際結果，以及未驗證項目就夠了；若附截圖或執行紀錄，要先移除金鑰、個人資料與登入資訊。下次出現「我這邊可以，你那邊不行」，至少有資料能比較雙方到底用了什麼條件。</p>
-<h2 id="把漏掉的補回測試"><a href="#把漏掉的補回測試" class="headerlink" title="把漏掉的補回測試"></a>把漏掉的補回測試</h2><p>發現問題後，修好再重跑同一條流程，接著看能不能加上一項自動檢查，讓相同錯誤在日後修改時能被抓到，這也是回歸測試的用途。例如設定區塊是否從第一行開始，就很適合自動檢查；至於目標工具更新後還能不能載入，仍是另一次實跑要驗證的事。</p>
-<p>我不會因此把所有測試都改成從頭操作一次。金額計算、格式判斷這些局部規則，用小範圍測試就能快速確認；資料保存與讀回，要檢查相關部分接在一起的結果；最常用、失敗影響又大的完整流程，再保留端到端驗收。每一層都能做自己的工作，才不用改一行文字，就把整套系統重新點過一次。</p>
-<hr>
-<p>自己的工具，很適合拿平常真的要做的事驗收。挑一個主要功能，準備幾筆知道答案的資料，從正常入口做到拿到結果，再把漏掉的檢查補上。我的角色設定檔已經證明，檔案整整齊齊地躺在那裡，也可能完全沒人理它。下次看到那排通過的結果，我還是會打開工具，確認自己要用的功能真的在。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/google-sheets-as-database/">小工具一定要用資料庫嗎？</a></li><li><a href="/solo-project-jit-governance/">一個人的開源專案，文件要寫多少？</a></li><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>開發</category>
-      </categories>
-      <tags>
-        <tag>Side Project</tag>
-        <tag>軟體測試</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Telegram 訊息加了格式，怎麼就送不出去了？</title>
-    <url>//telegram-message-formatting/</url>
-    <content><![CDATA[<p>通知內容都整理好了，卻卡在最後一步，送到 Telegram 時收到 <code>400</code>。明明只是一段文字，加個標題、放個版本號，怎麼連送出去都成了問題。</p>
-<p>我做每日推播的小工具時，就修過這種錯誤。當時開啟了 Telegram 舊版 Markdown 格式，讓文字可以顯示粗體等排版，內容裡的特殊字元卻讓整則訊息被拒收。後來的修正包含兩件事，改用 MarkdownV2，並在送出前把內容轉成它接受的寫法。</p>
-<p>光換模式還不夠，文字也得跟著處理。</p>
-<span id="more"></span>
-
-<h2 id="文字裡的符號，也可能是格式指令"><a href="#文字裡的符號，也可能是格式指令" class="headerlink" title="文字裡的符號，也可能是格式指令"></a>文字裡的符號，也可能是格式指令</h2><p>平常看 <code>build_2.0</code>，會覺得它只是個版本名稱。但開啟格式解析後，底線可能有斜體的意思，星號可能是粗體的開始，方括號則可能進入連結語法。程式認為自己在傳文字，Telegram 卻會依照指定的模式，把其中一些符號當成排版指令。</p>
-<p>都叫 Markdown，寫法卻不一定相同。Telegram 的 <code>Markdown</code> 是保留相容性的舊模式，<code>MarkdownV2</code> 有另一套規則；平常在 Markdown 文件裡寫的 <code>**粗體**</code>，到了 Telegram MarkdownV2，粗體要用的是 <code>*粗體*</code>。</p>
-<p>我這次遇到的錯誤發生在舊模式。改用 V2 後，一般文字裡的底線、方括號、半形句點等符號仍要處理，不能把它當成「比較新，所以什麼文字都吃得下」。完整規則可以查 <a href="https://core.telegram.org/bots/api#formatting-options">Telegram Bot API</a> 的 Formatting options。</p>
-<h2 id="把要排版的部分和一般文字分開"><a href="#把要排版的部分和一般文字分開" class="headerlink" title="把要排版的部分和一般文字分開"></a>把要排版的部分和一般文字分開</h2><p>處理這些符號的方法叫做「跳脫」，也就是在符號前加上反斜線 <code>\</code>，告訴解析器，這裡要顯示符號本身。下面都以 MarkdownV2 解析，第一列保留粗體格式，其餘幾列則把符號當成一般文字。</p>
-<table>
-<thead>
-<tr>
-<th>原始內容</th>
-<th>送給 Telegram 的內容</th>
-<th>手機上預期看到</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>**通知**</code>，想顯示粗體</td>
-<td><code>*通知*</code></td>
-<td><strong>通知</strong></td>
-</tr>
-<tr>
-<td><code>build_2.0</code>，只是版本名稱</td>
-<td><code>build\_2\.0</code></td>
-<td>build_2.0</td>
-</tr>
-<tr>
-<td><code>[測試]</code>，只是文字標籤</td>
-<td><code>\[測試\]</code></td>
-<td>[測試]</td>
-</tr>
-<tr>
-<td><code>完成!</code>，保留半形驚嘆號</td>
-<td><code>完成\!</code></td>
-<td>完成!</td>
-</tr>
-</tbody></table>
-<p>表格中間那欄是實際送出的文字，反斜線會在 Telegram 解析時被消耗。寫進程式碼時，還要依照使用語言的字串規則處理反斜線。</p>
-<p>我的每日推播需求很少，主要是保留粗體，其他部分當一般文字。所以轉換時先找出粗體段落，把外層的 <code>**</code> 換成 <code>*</code>，段落內的一般文字照樣跳脫；剩下沒有排版需求的內容，也一起跳脫。這樣既能保留標題的粗體，又不會把版本號裡的底線當成格式。</p>
-<div class="note info no-icon"><p>這個簡化做法只處理「粗體＋一般文字」。如果還要保留連結或程式碼區塊，就得分開處理，因為連結網址和程式碼內部的跳脫規則不同。不要先對整篇內容全部跳脫，再期待原本的格式還在。</p>
-</div>
-
-<h2 id="格式失敗時，再試一次純文字"><a href="#格式失敗時，再試一次純文字" class="headerlink" title="格式失敗時，再試一次純文字"></a>格式失敗時，再試一次純文字</h2><p>除了每日推播，我也做了一個透過 Telegram 回覆訊息的聊天工具。在這個工具裡，我多加了純文字補送，先轉成 MarkdownV2 發送；如果發送套件回報 <code>BadRequest</code> 例外，表示這次請求無法處理，就再用原始文字試一次，這次關掉格式解析。</p>
-<p>這裡要拿回<strong>轉換前的原始文字</strong>。如果把已經加滿反斜線的內容拿來當純文字送，Telegram 不會再幫忙消耗那些符號，手機上就會看到 <code>build\_2\.0</code>。粗體標記也可能保留下來，雖然排版比較樸素，至少有機會先收到內容。</p>
-<p>被拒絕不全是格式問題，像訊息太長也可能失敗，所以純文字補送只是一次備援嘗試。兩次都失敗時，仍要留下錯誤紀錄，不能把重試當成已經送達。</p>
-<h2 id="先用純文字縮小問題範圍"><a href="#先用純文字縮小問題範圍" class="headerlink" title="先用純文字縮小問題範圍"></a>先用純文字縮小問題範圍</h2><p>下次碰到這類問題，我會先看錯誤說明，再檢查發送時的 <code>parse_mode</code>，也就是控制格式的設定。把同一份原始內容關掉格式解析後送出，如果成功，就回頭查格式轉換；如果仍然失敗，就繼續查長度、發送目標等其他原因。</p>
-<p>修完後，再用包含粗體、版本號和方括號的文字實際送一次，確認訊息有送達，手機上的符號和排版也符合預期。</p>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/long-running-service-watchdog/">一個人也需要 SRE</a></li><li><a href="/ffmpeg-frames-to-data/">把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</a></li><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li></ul></div>]]></content>
-      <categories>
-        <category>學習筆記</category>
-        <category>開發</category>
-      </categories>
-      <tags>
-        <tag>自動化</tag>
-        <tag>Telegram</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>一個人的開源專案，文件要寫多少？</title>
     <url>//solo-project-jit-governance/</url>
     <content><![CDATA[<p>你有沒有做完一個小工具，準備公開時，就順手請 AI 幫忙把文件也補齊？現在用 AI 整理使用說明很方便，原本懶得從空白頁寫起的安裝步驟、操作範例，都能先有個草稿。既然都請它寫了，再補一份貢獻指南、行為準則，好像也不費什麼力氣，專案看起來還更完整。</p>
@@ -1775,8 +1590,193 @@ graph TD
       </categories>
       <tags>
         <tag>工作流程</tag>
-        <tag>Side Project</tag>
         <tag>開源</tag>
+        <tag>Side Project</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>小工具一定要用資料庫嗎？</title>
+    <url>//google-sheets-as-database/</url>
+    <content><![CDATA[<p>做一個小工具時，資料該存在哪裡？存成檔案、放進試算表，或是使用資料庫，看起來都有辦法。但看到各種資料庫和雲端服務的介紹，又容易猶豫，是不是一開始就該準備得完整一點。我覺得可以先看看資料會怎麼使用，有些需求用檔案或試算表就夠了；即使需要資料庫，也不一定要另外架設一套服務。</p>
+<p>我之前設計過一個 Telegram 記帳 bot 的原型，當時選的是 Google Sheets。預計讓使用者從聊天視窗記錄支出，由 bot 把帳目存進試算表，需要整理時再直接打開來看。這個想法很直覺，既然平常就會用表格記帳，讓程式幫忙填進去，似乎也不用為了看幾筆資料，另外做一個管理介面。</p>
+<p>選儲存方式時，我會先看資料要怎麼使用。同樣是一張帳目表，單純記下每天花多少錢，和要處理多人分帳、個別還款，需要照顧的事情就差很多。能直接打開表格整理，是選 Google Sheets 的理由，但也要一起考慮程式會怎麼讀取、修改這些資料。</p>
+<span id="more"></span>
+
+<h2 id="先看資料怎麼用"><a href="#先看資料怎麼用" class="headerlink" title="先看資料怎麼用"></a>先看資料怎麼用</h2><p>資料需要留下來，不代表一定要用資料庫。程式可以把設定寫進檔案，把報名資料放進試算表，也可以把帳目存進資料庫。幾種方式都能保存資料，選擇時要多看一步，想想以後會怎麼讀取、修改，以及修改到一半出錯時，能不能接受留下不完整的結果。</p>
+<p>例如，一個自己使用的工具，只要記住上次選的資料夾，下次開啟時再讀出來，檔案就很適合。活動名單需要主辦人隨時打開補註記，試算表的現成介面很方便。換成預約系統，兩個人可能同時搶最後一個名額，程式就得處理誰先成功，不能讓兩邊都收到預約完成的通知。資料量還很少，操作方式卻已經影響選擇了。</p>
+<p>我會先把這些使用情境寫下來，再比較工具。這時不用急著研究資料庫語法，先想想誰會改資料、會不會同時修改，以及弄錯一筆會怎樣。這比一開始就找「最好的資料庫」更有用，也比較不會選了一套功能齊全、自己卻用不上的架構。</p>
+<h2 id="不用資料庫的選擇"><a href="#不用資料庫的選擇" class="headerlink" title="不用資料庫的選擇"></a>不用資料庫的選擇</h2><h3 id="設定與簡單紀錄，用檔案"><a href="#設定與簡單紀錄，用檔案" class="headerlink" title="設定與簡單紀錄，用檔案"></a>設定與簡單紀錄，用檔案</h3><p>設定、單機工具的少量狀態，或每次執行後產生的一份報表，都可以先考慮檔案。常見的 JSON 適合表達有層次的資料，例如設定裡同時包含資料夾位置與通知偏好；CSV 則把內容存成一列一列，方便用試算表開啟。它們是檔案格式，讀取哪一筆、怎麼更新，以及哪些值才算合法，都要由程式處理。</p>
+<p>這種做法容易開始，但「存進檔案」仍有一些工作。我會先確認檔案放在哪裡，程式重啟或更新後重新上線，也就是重新部署時，資料會不會消失，再考慮怎麼備份。如果兩個操作同時讀取舊內容，改完各自存回，後存的那份可能蓋掉前一份修改；寫到一半中斷，也得有辦法避免原本的資料跟著壞掉。只由同一個程式依序處理簡單設定時，這些事情比較容易掌握；當自己開始補上大量防止覆寫、查找與更新的邏輯，就值得比較資料庫了。</p>
+<h3 id="需要人工整理，用試算表"><a href="#需要人工整理，用試算表" class="headerlink" title="需要人工整理，用試算表"></a>需要人工整理，用試算表</h3><p>Google Sheets 適合的情況，是你本來就需要一個能直接查看、修改資料的介面。例如活動名單由程式新增，主辦人再手動補註記；或像我的記帳 bot 原型，預計從 Telegram 記帳，需要整理時再打開試算表。Google 提供 API，也就是讓程式透過網路讀寫資料的入口，bot 可以藉此新增一列或讀取帳目，相關做法可參考 <a href="https://developers.google.com/workspace/sheets/api/guides/values">Read and write cell values</a>。</p>
+<p>這裡省下的是自己做資料管理介面的工作，bot 本身仍要有地方執行，也得處理連線與權限。原型還沒有完成 Google Sheets 與 Telegram 的完整串接驗證，所以這是當時的設計考量，不能當成已經長期使用、證明可靠的成果。</p>
+<p>人能直接改表格，也代表程式依賴的格式可能被改掉。例如把「金額」欄改名，或刪除程式需要的編號，bot 就可能找不到資料。分享權限也要分開看，讓 bot 有權限開啟試算表，不代表任何傳訊息給 bot 的人都有權限查帳。因此，我會把供程式使用的原始紀錄和人工整理的報表分開，並限制誰能透過 bot 讀寫。若資料幾乎只由程式維護，這些現成介面的好處就少了，未必需要特地繞一圈用試算表。</p>
+<h2 id="資料庫能幫上什麼忙"><a href="#資料庫能幫上什麼忙" class="headerlink" title="資料庫能幫上什麼忙"></a>資料庫能幫上什麼忙</h2><p>如果工具要處理還款與撤銷操作，我會特別留意修改失敗後，帳目能不能對得起來。查找未還款紀錄、擋下重複記帳，以及把必須一起完成的修改放在一起處理，都可以用到資料庫的能力。即使只有少數人使用，這些需求也可能從第一天就存在，不必等到資料變多才考慮。</p>
+<p>假設記帳工具同時保存還款紀錄和欠款餘額。小美還了 300 元，程式要新增還款紀錄，也要把餘額減掉 300；如果只完成前半段就中斷，兩邊會對不起來。資料庫的「交易」可以把這些修改包成一組，成功時一起保留，失敗時撤回這一組修改。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">3.4. Transactions</a> 用轉帳說明這個概念。程式仍要正確劃定這一組操作並處理失敗，裝好資料庫不會自動替你決定哪些事情要一起完成。</p>
+<p>分帳規則也會影響要存的資料。假設小明先付了 900 元晚餐，三個人平均分攤，小美還了 300 元，小華還沒還。如果資料只留一個「是否結清」欄位，無論放在試算表還是資料庫，都沒辦法完整表達這個狀態。必須先把每個人應付、已付多少分開記錄，程式才有資料可以算。換工具能省掉部分儲存與查詢工作，分帳規則還是得自己想好。</p>
+<p>重複記帳也是類似的情況。使用者沒收到回覆，再送一次訊息，資料庫不會憑空知道兩次是不是同一筆。程式需要識別這次操作，再配合資料庫的唯一性規則，拒絕重複寫入；如果只是新增兩筆編號不同的紀錄，資料庫仍可能照單全收。PostgreSQL 的 <a href="https://www.postgresql.org/docs/current/ddl-constraints.html">5.5. Constraints</a> 整理了這類可由資料庫檢查的條件。這些能力有用，但要和工具本身的規則配合。</p>
+<h2 id="資料庫不一定很重"><a href="#資料庫不一定很重" class="headerlink" title="資料庫不一定很重"></a>資料庫不一定很重</h2><h3 id="SQLite，不必另外架服務"><a href="#SQLite，不必另外架服務" class="headerlink" title="SQLite，不必另外架服務"></a>SQLite，不必另外架服務</h3><p>如果資料主要由程式讀寫，又不想另外管理一套資料庫服務，SQLite 很值得放進候選。它本身就是資料庫，只是由程式直接使用本機的資料庫檔案，不需要另開一個資料庫伺服器。官方的 <a href="https://www.sqlite.org/serverless.html">SQLite Is Serverless</a> 說明了這個差異，所以「不用架資料庫服務」和「不用資料庫」是兩件事。</p>
+<p>SQLite 也有查詢與交易能力，可以拿來保存互有關聯的支出、成員與還款紀錄，不必自己在 JSON 或 CSV 裡重做整套查找和更新。它可以同時讓多個連線讀取，但每個資料庫檔案同一時間只容許一個寫入交易，細節見 <a href="https://www.sqlite.org/lang_transaction.html">Transaction</a>。也就是有兩組修改同時要存入時，程式得安排等待或重試，讓它們依序完成。短時間的修改若能這樣處理，仍然可以支援多人透過同一個 bot 使用；「多人使用」不等於「每個人都直接開啟資料庫檔案」。</p>
+<p>需要注意的是，資料庫檔案仍要放在能長期保存的位置，備份也要使用適合資料庫的方式。SQLite 不會讓沒有持久儲存空間的部署環境，自動變成適合保管帳目的地方。選它之前，我會一起確認程式跑在哪裡、資料放在哪裡，以及換一台主機時怎麼還原。</p>
+<h3 id="獨立服務，讓多個程式共用"><a href="#獨立服務，讓多個程式共用" class="headerlink" title="獨立服務，讓多個程式共用"></a>獨立服務，讓多個程式共用</h3><p>當多台主機上的程式需要共同修改資料，或同時寫入的工作多到不適合依序等待，就值得評估 PostgreSQL 這類獨立的資料庫服務。程式透過網路連線，把讀寫請求交給資料庫處理，而不必讓每台主機直接操作同一個檔案。SQLite 官方的 <a href="https://www.sqlite.org/whentouse.html">Appropriate Uses For SQLite</a> 也把寫入需求和資料的位置列為選擇依據，沒有用「幾個使用者」畫出固定分界。</p>
+<p>獨立服務可以自己架，也可以使用供應商代管的方案，例如雲端平台提供、開通後就能連線的資料庫。自己架要負責安裝、更新與備份，代管則能省下一部分工作，但還是要確認費用、連線方式、備份範圍，以及資料能不能匯出。不想自己架服務，不代表一定要退回檔案；如果程式原本就部署在雲端，而且平台已有合適的方案，一開始使用它也合理，沒有必要把所有選項照順序用過一次。</p>
+<h2 id="替自己的工具做選擇"><a href="#替自己的工具做選擇" class="headerlink" title="替自己的工具做選擇"></a>替自己的工具做選擇</h2><p>我把前面的使用情境和需要自己照顧的部分整理成下面這張表，可以拿自己的需求做第一輪比較。</p>
+<table>
+<thead>
+<tr>
+<th>使用情境</th>
+<th>可以先考慮</th>
+<th>要留意的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>簡單設定、依序處理的少量狀態、匯出報表</td>
+<td>JSON、CSV 等檔案</td>
+<td>更新方式、寫入中斷、存放位置與備份</td>
+</tr>
+<tr>
+<td>人需要經常開啟、整理，程式協助新增資料</td>
+<td>Google Sheets</td>
+<td>欄位變動、存取權限、網路與 API 使用限制</td>
+</tr>
+<tr>
+<td>資料主要由程式讀寫，集中在同一台主機</td>
+<td>SQLite</td>
+<td>寫入是否能排隊、資料檔保存與還原</td>
+</tr>
+<tr>
+<td>多台主機共用資料，或寫入需求較高</td>
+<td>獨立或代管資料庫服務</td>
+<td>連線權限、維運或方案費用、備份與匯出</td>
+</tr>
+</tbody></table>
+<p>以記帳 bot 為例，如果需求是記下支出，並且需要經常手動整理表格，Google Sheets 有它方便的地方。但若需要多人分帳、個別還款和撤銷操作，平常又幾乎不會打開表格，我會先評估 SQLite，前提是 bot 集中在同一台能長期保存資料的主機，寫入也能依序處理。這些都是設計時就能比較的條件，不需要等到試算表塞不下，才開始考慮資料庫。</p>
+<p>如果你是用 AI 做小工具，可以先告訴它程式預計跑在哪裡，再拿自己的兩三個實際操作，請它比較用檔案、試算表或資料庫時，資料會存在哪裡、一次修改會動到什麼。接著追問，兩個操作同時送出、寫到一半中斷、重新部署時，原本的資料會怎樣，並請它指出不建議採用的選項和原因。回答若只剩「這個比較簡單」「以後比較好擴充」，還不足以決定；把情境放進測試環境實際跑一次，才知道程式有沒有做到它說的事。</p>
+<hr>
+<p>我當時選 Google Sheets，是因為打開就能看帳，不想再做一個介面。換成只存設定或整理名單的工具，也可以先不用資料庫；要處理還款，SQLite 則可能比自己補齊檔案讀寫規則省事。做小工具時，我會先想清楚要存什麼、怎麼修改，再選資料放哪裡，免得連午餐都還沒記到，先多了一套要照顧的系統。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li><li><a href="/solo-project-jit-governance/">一個人的開源專案，文件要寫多少？</a></li><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>開發</category>
+      </categories>
+      <tags>
+        <tag>Side Project</tag>
+        <tag>Google Sheets</tag>
+        <tag>資料庫</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Telegram 訊息加了格式，怎麼就送不出去了？</title>
+    <url>//telegram-message-formatting/</url>
+    <content><![CDATA[<p>通知內容都整理好了，卻卡在最後一步，送到 Telegram 時收到 <code>400</code>。明明只是一段文字，加個標題、放個版本號，怎麼連送出去都成了問題。</p>
+<p>我做每日推播的小工具時，就修過這種錯誤。當時開啟了 Telegram 舊版 Markdown 格式，讓文字可以顯示粗體等排版，內容裡的特殊字元卻讓整則訊息被拒收。後來的修正包含兩件事，改用 MarkdownV2，並在送出前把內容轉成它接受的寫法。</p>
+<p>光換模式還不夠，文字也得跟著處理。</p>
+<span id="more"></span>
+
+<h2 id="文字裡的符號，也可能是格式指令"><a href="#文字裡的符號，也可能是格式指令" class="headerlink" title="文字裡的符號，也可能是格式指令"></a>文字裡的符號，也可能是格式指令</h2><p>平常看 <code>build_2.0</code>，會覺得它只是個版本名稱。但開啟格式解析後，底線可能有斜體的意思，星號可能是粗體的開始，方括號則可能進入連結語法。程式認為自己在傳文字，Telegram 卻會依照指定的模式，把其中一些符號當成排版指令。</p>
+<p>都叫 Markdown，寫法卻不一定相同。Telegram 的 <code>Markdown</code> 是保留相容性的舊模式，<code>MarkdownV2</code> 有另一套規則；平常在 Markdown 文件裡寫的 <code>**粗體**</code>，到了 Telegram MarkdownV2，粗體要用的是 <code>*粗體*</code>。</p>
+<p>我這次遇到的錯誤發生在舊模式。改用 V2 後，一般文字裡的底線、方括號、半形句點等符號仍要處理，不能把它當成「比較新，所以什麼文字都吃得下」。完整規則可以查 <a href="https://core.telegram.org/bots/api#formatting-options">Telegram Bot API</a> 的 Formatting options。</p>
+<h2 id="把要排版的部分和一般文字分開"><a href="#把要排版的部分和一般文字分開" class="headerlink" title="把要排版的部分和一般文字分開"></a>把要排版的部分和一般文字分開</h2><p>處理這些符號的方法叫做「跳脫」，也就是在符號前加上反斜線 <code>\</code>，告訴解析器，這裡要顯示符號本身。下面都以 MarkdownV2 解析，第一列保留粗體格式，其餘幾列則把符號當成一般文字。</p>
+<table>
+<thead>
+<tr>
+<th>原始內容</th>
+<th>送給 Telegram 的內容</th>
+<th>手機上預期看到</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>**通知**</code>，想顯示粗體</td>
+<td><code>*通知*</code></td>
+<td><strong>通知</strong></td>
+</tr>
+<tr>
+<td><code>build_2.0</code>，只是版本名稱</td>
+<td><code>build\_2\.0</code></td>
+<td>build_2.0</td>
+</tr>
+<tr>
+<td><code>[測試]</code>，只是文字標籤</td>
+<td><code>\[測試\]</code></td>
+<td>[測試]</td>
+</tr>
+<tr>
+<td><code>完成!</code>，保留半形驚嘆號</td>
+<td><code>完成\!</code></td>
+<td>完成!</td>
+</tr>
+</tbody></table>
+<p>表格中間那欄是實際送出的文字，反斜線會在 Telegram 解析時被消耗。寫進程式碼時，還要依照使用語言的字串規則處理反斜線。</p>
+<p>我的每日推播需求很少，主要是保留粗體，其他部分當一般文字。所以轉換時先找出粗體段落，把外層的 <code>**</code> 換成 <code>*</code>，段落內的一般文字照樣跳脫；剩下沒有排版需求的內容，也一起跳脫。這樣既能保留標題的粗體，又不會把版本號裡的底線當成格式。</p>
+<div class="note info no-icon"><p>這個簡化做法只處理「粗體＋一般文字」。如果還要保留連結或程式碼區塊，就得分開處理，因為連結網址和程式碼內部的跳脫規則不同。不要先對整篇內容全部跳脫，再期待原本的格式還在。</p>
+</div>
+
+<h2 id="格式失敗時，再試一次純文字"><a href="#格式失敗時，再試一次純文字" class="headerlink" title="格式失敗時，再試一次純文字"></a>格式失敗時，再試一次純文字</h2><p>除了每日推播，我也做了一個透過 Telegram 回覆訊息的聊天工具。在這個工具裡，我多加了純文字補送，先轉成 MarkdownV2 發送；如果發送套件回報 <code>BadRequest</code> 例外，表示這次請求無法處理，就再用原始文字試一次，這次關掉格式解析。</p>
+<p>這裡要拿回<strong>轉換前的原始文字</strong>。如果把已經加滿反斜線的內容拿來當純文字送，Telegram 不會再幫忙消耗那些符號，手機上就會看到 <code>build\_2\.0</code>。粗體標記也可能保留下來，雖然排版比較樸素，至少有機會先收到內容。</p>
+<p>被拒絕不全是格式問題，像訊息太長也可能失敗，所以純文字補送只是一次備援嘗試。兩次都失敗時，仍要留下錯誤紀錄，不能把重試當成已經送達。</p>
+<h2 id="先用純文字縮小問題範圍"><a href="#先用純文字縮小問題範圍" class="headerlink" title="先用純文字縮小問題範圍"></a>先用純文字縮小問題範圍</h2><p>下次碰到這類問題，我會先看錯誤說明，再檢查發送時的 <code>parse_mode</code>，也就是控制格式的設定。把同一份原始內容關掉格式解析後送出，如果成功，就回頭查格式轉換；如果仍然失敗，就繼續查長度、發送目標等其他原因。</p>
+<p>修完後，再用包含粗體、版本號和方括號的文字實際送一次，確認訊息有送達，手機上的符號和排版也符合預期。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/long-running-service-watchdog/">一個人也需要 SRE</a></li><li><a href="/ffmpeg-frames-to-data/">把螢幕錄影裡的資料抓出來——ffmpeg 抽影格 + 視覺辨識</a></li><li><a href="/tests-pass-but-does-it-work/">測試通過，真的能用了嗎？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>開發</category>
+      </categories>
+      <tags>
+        <tag>自動化</tag>
+        <tag>Telegram</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>測試通過，真的能用了嗎？</title>
+    <url>//tests-pass-but-does-it-work/</url>
+    <content><![CDATA[<p>你有沒有遇過，程式明明顯示測試通過，自己打開來用，卻連最常做的操作都沒辦法完成？例如做了一個能匯出報表的小工具，檢查時沒有報錯，按下按鈕也出現成功訊息，下載後才發現檔案是空的。這時再看那一排通過的結果，很難不懷疑，剛才到底測了什麼。</p>
+<p>我在做一套讓 AI 分工的工具時，也遇過類似的落差。角色設定檔產生了，檔案比對也通過，實際打開使用它的工具，卻找不到那些角色。那次通過的是「產生的檔案和預期一致」，並沒有驗到「工具真的讀得懂這些檔案」。兩件事只差一步，對使用結果的影響卻差很多。</p>
+<p>所以看到測試通過，我會接著確認它涵蓋到哪裡。檢查計算結果、檔案內容，和從平常的入口完成一件事，各自能找出不同的問題。做自己的小工具，不必一開始準備完整的測試制度，但至少要挑一條主要流程，確認從開始操作到拿到結果都走得通。</p>
+<span id="more"></span>
+
+<h2 id="檔案有了，工具卻沒讀到"><a href="#檔案有了，工具卻沒讀到" class="headerlink" title="檔案有了，工具卻沒讀到"></a>檔案有了，工具卻沒讀到</h2><p>那套工具會依照角色定義，產生給開發工具讀取的設定檔，例如負責修改程式的角色、負責審查的角色。設定檔開頭有名稱、用途等欄位，必須照固定格式填寫，開發工具才知道要怎麼使用這個角色。我另外放了一行註解，標明檔案由哪個來源產生，方便日後維護。</p>
+<p>問題出在順序。當時我把註解放在最前面，設定資料排在後面，檔案內容看起來都在，但目標工具要求設定資料必須從第一行開始。它沒有照我預期的方式讀取，幾個角色就這樣被忽略了。直到檢查工具裡的角色清單，並嘗試實際呼叫，才發現檔案有產生，角色卻沒有出現。</p>
+<p>原本的自動檢查會重新產生一份檔案，再和保存的範本比對，確認內容沒有意外改變。比對時，那段註解會先被略過，只比較剩下的設定和內文，因此沒有檢查註解與設定區塊的先後順序。它也沒有啟動目標工具，確認角色能不能被載入。檢查沒有失靈，只是我還少驗了後面那一段。</p>
+<pre>
+<code class="mermaid">
+
+graph TD
+    A[角色定義] --&gt; B[產生設定檔]
+    B --&gt; C[開發工具讀取]
+    C --&gt; D[角色出現在清單]
+    D --&gt; E[實際交付任務]
+    B -. 比對檔案內容 .-&gt; F[既有檢查通過]
+</code>
+</pre>
+
+<p>修正時，我把註解移到設定區塊之後，也把「從工具清單確認已載入，並實際呼叫一次」列為之後的驗收項目。檔案比對仍然保留，因為它適合找出不該改變的內容；只是不能再拿這個結果，代替整條使用流程的確認。這個例子甚至還沒走到複雜的程式邏輯，光是第一行放什麼，就足以讓功能消失。</p>
+<h2 id="先看測試驗到哪裡"><a href="#先看測試驗到哪裡" class="headerlink" title="先看測試驗到哪裡"></a>先看測試驗到哪裡</h2><p>測試會依照設定好的條件判斷結果。例如匯出報表時，檢查總金額是不是算對，和檢查下載的檔案能不能打開，是不同的條件。前者可以直接把資料交給計算程式，快速試很多組數字；後者要經過選資料、按匯出、產生檔案與下載，才能知道這些部分接在一起有沒有問題。</p>
+<p>還有一種常見做法，是在測試裡用預先準備好的回應，暫時代替外部服務。假設工具需要把檔案存到雲端，測試就假裝雲端已回覆「儲存成功」，觀察自己的程式接著會不會顯示正確訊息。這通常叫模擬，或 mock，可以讓測試不必每次連上網路，也方便試出失敗的情況。Playwright 的 <a href="https://playwright.dev/docs/mock">Mock APIs | Playwright</a> 就示範了攔截請求、回傳測試資料，過程中不會真的連到原本的服務。</p>
+<p>這樣的測試有用，但它沒有檢查真實帳號能不能登入、目前有沒有寫入權限，或檔案最後是否真的存在。看到「成功」之前，要先知道這個成功是外部服務回的，還是測試事先安排的。我會保留這些快速檢查，再另外驗證需要實際連接的部分，不會要求每一項測試都去操作一次雲端。</p>
+<h2 id="從平常的入口走一次"><a href="#從平常的入口走一次" class="headerlink" title="從平常的入口走一次"></a>從平常的入口走一次</h2><h3 id="先寫出完成的樣子"><a href="#先寫出完成的樣子" class="headerlink" title="先寫出完成的樣子"></a>先寫出完成的樣子</h3><p>如果我要驗收匯出報表，會先寫下一個具體結果，例如「選定日期後，下載的 CSV 用試算表打開，應該看得到這段期間的紀錄，而且金額和原始資料一致」。CSV 是能用試算表開啟的表格文字檔；這裡要檢查的終點是它裡面的內容，不能只停在按鈕變色或出現成功訊息。</p>
+<p>接著準備少量容易核對的測試資料。例如選定日期內放兩筆紀錄，金額分別是 100 和 200，再放一筆日期外的紀錄。預期匯出只有前兩筆，若工具也提供加總，結果就應該是 300。資料不用多，但要先知道正確答案，才能看出它有沒有漏掉、混入或改錯資料。這裡的報表是示範情境，換成整理照片、預約或待辦工具，也可以用同樣方式訂出完成條件。</p>
+<h3 id="用預計交付的版本操作"><a href="#用預計交付的版本操作" class="headerlink" title="用預計交付的版本操作"></a>用預計交付的版本操作</h3><p>驗收時，要從平常會用的入口開始。網頁工具就打開網頁，選日期、按匯出，再檢查下載的檔案；bot 就從聊天視窗送出操作，確認最後拿到的結果。只在程式裡直接呼叫匯出函式，即使結果正確，也還沒檢查畫面上的按鈕是不是接到了它。</p>
+<p>環境也要對得上。自己電腦裡已經登入的帳號、事先建好的資料夾、開發時留下的設定，可能讓流程剛好能跑。若工具準備放到另一台主機，或交給其他人使用，就要在對應的測試環境重新確認，並使用符合一般使用者權限的測試帳號。不能拿管理員帳號跑過一次，就當作其他人也一定能用。</p>
+<p>這類從操作入口驗到最後結果的檢查，常稱為端到端測試，英文縮寫是 E2E。它也能自動化，不必永遠靠自己點。Playwright 的 <a href="https://playwright.dev/docs/best-practices">Best Practices | Playwright</a> 建議驗證使用者看得到的行為，這也是我選驗收終點的依據。先把流程和預期結果定好，之後才有辦法判斷自動化測試是不是涵蓋了同一件事。</p>
+<h3 id="成功之外，也試一次失敗"><a href="#成功之外，也試一次失敗" class="headerlink" title="成功之外，也試一次失敗"></a>成功之外，也試一次失敗</h3><p>主要流程走通後，我會挑容易出錯、出錯後又需要人處理的情況補測。以報表來說，沒有符合日期的資料時，工具應該說明沒有資料，或產生事先約定好的空報表；儲存失敗時，不該仍然顯示「已儲存」。結果要怎麼呈現可以自己決定，但不能讓使用者以為事情做完了，實際上什麼都沒留下。</p>
+<p>不用一開始窮舉所有異常。若工具只是匯出檔案，可以先測空資料和寫入失敗；若會新增或扣除資料，就多看重複點擊與中途中斷。難以安全重現的情況，可以先用模擬回應測自己的處理邏輯，再把尚未驗證的真實連線列出來。每次只增加一個條件，也比較容易知道問題是從哪裡開始的。</p>
+<div class="note warning no-icon"><p>實跑用的是實際操作方式，不代表要拿正式資料冒險。使用可丟棄的測試資料與獨立帳號；涉及寄信、付款、刪除或對外發布時，要使用測試模式或隔離環境，不要為了驗收真的送出去。</p>
+</div>
+
+<h2 id="讓-AI-回報做過的檢查"><a href="#讓-AI-回報做過的檢查" class="headerlink" title="讓 AI 回報做過的檢查"></a>讓 AI 回報做過的檢查</h2><p>如果工具主要由 AI 協助開發，我會請它把「已完成」拆成可以核對的內容。它執行了哪個版本、用了什麼測試資料、從哪個入口開始，以及最後看到了什麼結果。拿匯出報表來說，「測試全部通過」太籠統；「用測試帳號從網頁匯出，下載後確認有兩筆紀錄，金額分別是 100 和 200」，才知道這次驗到了哪裡。再附上產出檔、截圖或執行紀錄的位置，才有辦法實際核對。</p>
+<p>報告裡也要留下沒有做的部分。如果 AI 只能讀程式、跑本機測試，卻沒有瀏覽器或測試帳號，就把網頁操作標成未驗證，交給人補做。檔案比對通過、模擬服務回應正確、實際登入後操作成功，可以分開記，不需要湊成一句全部正常。自己不熟程式碼，也能先用這些具體結果，判斷還欠哪一段驗收。</p>
+<p>檢查紀錄不用寫成長篇報告。留下版本、環境、操作、預期與實際結果，以及未驗證項目就夠了；若附截圖或執行紀錄，要先移除金鑰、個人資料與登入資訊。下次出現「我這邊可以，你那邊不行」，至少有資料能比較雙方到底用了什麼條件。</p>
+<h2 id="把漏掉的補回測試"><a href="#把漏掉的補回測試" class="headerlink" title="把漏掉的補回測試"></a>把漏掉的補回測試</h2><p>發現問題後，修好再重跑同一條流程，接著看能不能加上一項自動檢查，讓相同錯誤在日後修改時能被抓到，這也是回歸測試的用途。例如設定區塊是否從第一行開始，就很適合自動檢查；至於目標工具更新後還能不能載入，仍是另一次實跑要驗證的事。</p>
+<p>我不會因此把所有測試都改成從頭操作一次。金額計算、格式判斷這些局部規則，用小範圍測試就能快速確認；資料保存與讀回，要檢查相關部分接在一起的結果；最常用、失敗影響又大的完整流程，再保留端到端驗收。每一層都能做自己的工作，才不用改一行文字，就把整套系統重新點過一次。</p>
+<hr>
+<p>自己的工具，很適合拿平常真的要做的事驗收。挑一個主要功能，準備幾筆知道答案的資料，從正常入口做到拿到結果，再把漏掉的檢查補上。我的角色設定檔已經證明，檔案整整齊齊地躺在那裡，也可能完全沒人理它。下次看到那排通過的結果，我還是會打開工具，確認自己要用的功能真的在。</p>
+<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/google-sheets-as-database/">小工具一定要用資料庫嗎？</a></li><li><a href="/solo-project-jit-governance/">一個人的開源專案，文件要寫多少？</a></li><li><a href="/telegram-message-formatting/">Telegram 訊息加了格式，怎麼就送不出去了？</a></li></ul></div>]]></content>
+      <categories>
+        <category>學習筆記</category>
+        <category>開發</category>
+      </categories>
+      <tags>
+        <tag>Side Project</tag>
+        <tag>軟體測試</tag>
       </tags>
   </entry>
 </search>
