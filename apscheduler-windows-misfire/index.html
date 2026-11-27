@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":false,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":false,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":true,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":true,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="APScheduler 排程在 Windows 上連續幾天沒執行卻完全沒報錯，追查 log 發現預設 misfire_grace_time 只有 1 秒，放寬寬限時間即可解決。">
 <meta property="og:type" content="article">
@@ -57,6 +57,7 @@
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/7.2.1/pangu.umd.js" integrity="sha256-kRsxecBnwG6mULFPe2E6UKnNm8XfDOuDwCOprjLZuX8=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
@@ -75,7 +76,10 @@
 
 
 
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/3.0.2/quicklink.umd.js" integrity="sha256-Qo2BTvlsBVXIr5fEHp8xlBpUmkbDINr5cQZeSfMTES8=" crossorigin="anonymous" defer></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://blog.pingchun.me/apscheduler-windows-misfire/"}</script>
+  <script src="/js/third-party/quicklink.js" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"排程每天默默不執行，又不報錯——APScheduler 在 Windows 的 misfire 坑","url":"https://blog.pingchun.me/apscheduler-windows-misfire/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.pingchun.me/apscheduler-windows-misfire/"},"description":"APScheduler 排程在 Windows 上連續幾天沒執行卻完全沒報錯，追查 log 發現預設 misfire_grace_time 只有 1 秒，放寬寬限時間即可解決。","datePublished":"2026-06-21T00:00:00.000Z","dateModified":"2026-06-21T00:00:00.000Z","author":{"@type":"Person","name":"PingChun","url":"https://blog.pingchun.me/"},"publisher":{"@type":"Organization","name":"CalmKoala"},"image":"https://blog.pingchun.me/og/apscheduler-windows-misfire.png","keywords":["自動化","Python","Windows"]}</script>
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
@@ -162,7 +166,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E5%87%BA%E5%9C%A8%E3%80%8C%E9%81%B2%E5%88%B0%E4%B8%80%E7%A7%92%E5%B0%B1%E4%B8%8D%E7%AE%97%E6%95%B8%E3%80%8D"><span class="nav-number">1.</span> <span class="nav-text">問題出在「遲到一秒就不算數」</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A%E6%8A%8A%E5%AF%AC%E9%99%90%E6%99%82%E9%96%93%E6%94%BE%E5%A4%A7"><span class="nav-number">2.</span> <span class="nav-text">解法：把寬限時間放大</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%8F%E9%A1%8C%E5%87%BA%E5%9C%A8%E3%80%8C%E9%81%B2%E5%88%B0%E4%B8%80%E7%A7%92%E5%B0%B1%E4%B8%8D%E7%AE%97%E6%95%B8%E3%80%8D"><span class="nav-number">1.</span> <span class="nav-text">問題出在「遲到一秒就不算數」</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A%E6%8A%8A%E5%AF%AC%E9%99%90%E6%99%82%E9%96%93%E6%94%BE%E5%A4%A7"><span class="nav-number">2.</span> <span class="nav-text">解法：把寬限時間放大</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -303,11 +307,11 @@
 <p>通常程式掛掉，至少會留個 stack trace 給你查；但這次它根本不報錯。程式還活著、排程也還在，log 翻過去一條紅字都沒有，就是該跑的時間到了，什麼事都沒發生。活著、但不做事。</p>
 <span id="more"></span>
 
-<h1 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h1><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
+<h2 id="問題出在「遲到一秒就不算數」"><a href="#問題出在「遲到一秒就不算數」" class="headerlink" title="問題出在「遲到一秒就不算數」"></a>問題出在「遲到一秒就不算數」</h2><p>仔細翻 log，才看到一行不起眼的訊息，排程的執行時間「was missed by」幾秒。</p>
 <p>查了一下，終於找到原因，原來 APScheduler 有個參數叫 <code>misfire_grace_time</code>，預設只有 <strong>1 秒</strong>。意思是，排程到點時，如果因為某些原因晚了超過 1 秒才輪到它，APScheduler 就判定這次「misfire（錯過了）」，直接跳過不執行。</p>
 <p>我這次是在 Windows 上跑。APScheduler 的排程跑在你自己的程式裡，到了該執行的時間，只要程式當下沒能馬上輪到它，就可能晚超過這 1 秒。個人電腦常見的睡眠、休眠，或當下負載偏高、排程執行緒被前一個工作卡住，都會造成這種延遲，放在會自動睡眠的機器上又特別容易遇到。於是每天到了該跑的時間，它就被判定 misfire、整天跳過。</p>
 <p>對 APScheduler 來說，這是「照規則跳過」，不是錯誤。</p>
-<h1 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h1><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
+<h2 id="解法：把寬限時間放大"><a href="#解法：把寬限時間放大" class="headerlink" title="解法：把寬限時間放大"></a>解法：把寬限時間放大</h2><p>知道原因之後，解法很簡單，把 <code>misfire_grace_time</code> 設大一點，給它足夠的寬限。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scheduler.add_job(</span><br><span class="line">    push_job,</span><br><span class="line">    <span class="string">&quot;cron&quot;</span>,</span><br><span class="line">    hour=<span class="number">8</span>, minute=<span class="number">30</span>,</span><br><span class="line">    misfire_grace_time=<span class="number">3600</span>,  <span class="comment"># 給一小時寬限，遲到幾秒也照跑</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
 <p>我設成 3600（一小時）。對「每天推一次」這種排程來說，晚個幾秒、甚至幾分鐘都無所謂，重點是它要跑。改完之後，每天都正常推了。</p>
@@ -322,6 +326,47 @@
     
 
     <footer class="post-footer">
+<div class="post-share-bar" aria-label="分享文章">
+  <a class="post-share-btn" href="https://www.threads.net/intent/post?text=%E6%8E%92%E7%A8%8B%E6%AF%8F%E5%A4%A9%E9%BB%98%E9%BB%98%E4%B8%8D%E5%9F%B7%E8%A1%8C%EF%BC%8C%E5%8F%88%E4%B8%8D%E5%A0%B1%E9%8C%AF%E2%80%94%E2%80%94APScheduler%20%E5%9C%A8%20Windows%20%E7%9A%84%20misfire%20%E5%9D%91%20https%3A%2F%2Fblog.pingchun.me%2Fapscheduler-windows-misfire%2F" target="_blank" rel="noopener noreferrer">
+    <i class="fab fa-threads" aria-hidden="true"></i>
+    <span>分享到 Threads</span>
+  </a>
+  <button type="button" class="post-share-btn post-copy-link" data-url="https://blog.pingchun.me/apscheduler-windows-misfire/">
+    <i class="fa fa-link" aria-hidden="true"></i>
+    <span>複製文章連結</span>
+  </button>
+</div>
+<script>
+(() => {
+  const btns = document.querySelectorAll('.post-copy-link');
+  for (const btn of btns) {
+    if (btn.dataset.bound) continue;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async () => {
+      const url = btn.dataset.url || location.href;
+      const label = btn.querySelector('span');
+      const prev = label.textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+      btn.classList.add('is-copied');
+      label.textContent = '已複製連結 ✓';
+      setTimeout(() => {
+        btn.classList.remove('is-copied');
+        label.textContent = prev;
+      }, 2000);
+    });
+  }
+})();
+</script>
+
           <div class="followme">
   <span>歡迎關注我的其它發布渠道</span>
 

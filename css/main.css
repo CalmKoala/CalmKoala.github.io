@@ -1239,7 +1239,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #ff7;
+    background: #ff3c71;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -3713,4 +3713,36 @@ mark.search-keyword {
   .back-to-top.back-to-top-on {
     bottom: 18px !important;
   }
+}
+.post-share-bar {
+  display: flex;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 22px 0 8px;
+}
+.post-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+  border-bottom: 1px solid var(--ck-border) !important;
+  color: var(--text-color);
+  font-size: 0.86em;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.post-share-btn:hover,
+.post-share-btn.is-copied {
+  background: var(--ck-accent-soft);
+  border-color: var(--ck-accent-border) !important;
+  color: var(--ck-accent);
 }

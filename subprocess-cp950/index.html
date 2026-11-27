@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":false,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":false,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":true,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":true,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="在繁中 Windows 用 Python subprocess 接 LLM 的中文輸出會撞到 cp950 解碼失敗，明確指定 encoding&#x3D;&quot;utf-8&quot; 就能避開系統預設編碼坑。">
 <meta property="og:type" content="article">
@@ -57,6 +57,7 @@
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/7.2.1/pangu.umd.js" integrity="sha256-kRsxecBnwG6mULFPe2E6UKnNm8XfDOuDwCOprjLZuX8=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
@@ -75,7 +76,10 @@
 
 
 
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/3.0.2/quicklink.umd.js" integrity="sha256-Qo2BTvlsBVXIr5fEHp8xlBpUmkbDINr5cQZeSfMTES8=" crossorigin="anonymous" defer></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://blog.pingchun.me/subprocess-cp950/"}</script>
+  <script src="/js/third-party/quicklink.js" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"subprocess 在 Windows 的 cp950 編碼坑","url":"https://blog.pingchun.me/subprocess-cp950/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.pingchun.me/subprocess-cp950/"},"description":"在繁中 Windows 用 Python subprocess 接 LLM 的中文輸出會撞到 cp950 解碼失敗，明確指定 encoding=\"utf-8\" 就能避開系統預設編碼坑。","datePublished":"2026-06-28T00:00:00.000Z","dateModified":"2026-06-28T00:00:00.000Z","author":{"@type":"Person","name":"PingChun","url":"https://blog.pingchun.me/"},"publisher":{"@type":"Organization","name":"CalmKoala"},"image":"https://blog.pingchun.me/og/subprocess-cp950.png","keywords":["AI","Python","Windows"]}</script>
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
@@ -162,7 +166,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E6%9C%83%E9%81%87%E5%88%B0%E5%95%8F%E9%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">為什麼會遇到問題</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%88%A5%E8%AE%93-Python-%E8%87%AA%E5%B7%B1%E7%8C%9C"><span class="nav-number">2.</span> <span class="nav-text">解法：別讓 Python 自己猜</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC%E6%9C%83%E9%81%87%E5%88%B0%E5%95%8F%E9%A1%8C"><span class="nav-number">1.</span> <span class="nav-text">為什麼會遇到問題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%88%A5%E8%AE%93-Python-%E8%87%AA%E5%B7%B1%E7%8C%9C"><span class="nav-number">2.</span> <span class="nav-text">解法：別讓 Python 自己猜</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -302,10 +306,10 @@
     <div class="post-body" itemprop="articleBody"><p>最近做的東西常常要用程式開 subprocess 去呼叫 LLM。如果讓 LLM 直接寫檔，或輸出都是英文，都不會有問題；但只要 LLM 回傳中文，而且程式需要拿這段回傳結果接著處理，就會撞到 <code>UnicodeDecodeError</code>。</p>
 <span id="more"></span>
 
-<h1 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h1><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
+<h2 id="為什麼會遇到問題"><a href="#為什麼會遇到問題" class="headerlink" title="為什麼會遇到問題"></a>為什麼會遇到問題</h2><p>Python 的 subprocess 在文字模式下抓輸出，會拿「系統的預設編碼」去解，而這個預設每個系統不一樣，一般 Mac、Linux 是 UTF-8，但繁體中文的 Windows 是 cp950。</p>
 <p>LLM 回的中文是 UTF-8，Windows 拿 cp950 去解碼就會撞到對不上的 byte，直接爆炸。</p>
 <p>那叫 AI 改回英文不就好了？但我要的就是那段中文啊，它最後還是得從同一條管子回來，問題是 Windows 怎麼解碼，跟 AI 講哪國話無關。真為了閃這個改成全英文，等於把想要的東西也一起丟了，本末倒置。</p>
-<h1 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h1><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
+<h2 id="解法：別讓-Python-自己猜"><a href="#解法：別讓-Python-自己猜" class="headerlink" title="解法：別讓 Python 自己猜"></a>解法：別讓 Python 自己猜</h2><p>知道問題是什麼就好解決了，直接指定編碼就好</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">result = subprocess.run(</span><br><span class="line">    cmd,</span><br><span class="line">    capture_output=<span class="literal">True</span>,</span><br><span class="line">    text=<span class="literal">True</span>,</span><br><span class="line">    encoding=<span class="string">&quot;utf-8&quot;</span>,   <span class="comment"># 明講用 UTF-8，不看系統臉色</span></span><br><span class="line">    errors=<span class="string">&quot;replace&quot;</span>,   <span class="comment"># 真的有解不開的，用替代字元頂著，別整個炸掉</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
 <p>如果整個專案都在 Windows 中文環境跑，也可以更上游一點，設個環境變數 <code>PYTHONUTF8=1</code>，讓 Python 全程吃 UTF-8。</p>
@@ -317,6 +321,47 @@
     
 
     <footer class="post-footer">
+<div class="post-share-bar" aria-label="分享文章">
+  <a class="post-share-btn" href="https://www.threads.net/intent/post?text=subprocess%20%E5%9C%A8%20Windows%20%E7%9A%84%20cp950%20%E7%B7%A8%E7%A2%BC%E5%9D%91%20https%3A%2F%2Fblog.pingchun.me%2Fsubprocess-cp950%2F" target="_blank" rel="noopener noreferrer">
+    <i class="fab fa-threads" aria-hidden="true"></i>
+    <span>分享到 Threads</span>
+  </a>
+  <button type="button" class="post-share-btn post-copy-link" data-url="https://blog.pingchun.me/subprocess-cp950/">
+    <i class="fa fa-link" aria-hidden="true"></i>
+    <span>複製文章連結</span>
+  </button>
+</div>
+<script>
+(() => {
+  const btns = document.querySelectorAll('.post-copy-link');
+  for (const btn of btns) {
+    if (btn.dataset.bound) continue;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async () => {
+      const url = btn.dataset.url || location.href;
+      const label = btn.querySelector('span');
+      const prev = label.textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+      btn.classList.add('is-copied');
+      label.textContent = '已複製連結 ✓';
+      setTimeout(() => {
+        btn.classList.remove('is-copied');
+        label.textContent = prev;
+      }, 2000);
+    });
+  }
+})();
+</script>
+
           <div class="followme">
   <span>歡迎關注我的其它發布渠道</span>
 

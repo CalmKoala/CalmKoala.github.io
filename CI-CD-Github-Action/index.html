@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":false,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":false,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":true,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":true,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="整理 CI&#x2F;CD 的基本概念與常見工具比較，並以 GitHub Actions 示範如何將測試與部署流程自動化。">
 <meta property="og:type" content="article">
@@ -56,6 +56,7 @@
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/7.2.1/pangu.umd.js" integrity="sha256-kRsxecBnwG6mULFPe2E6UKnNm8XfDOuDwCOprjLZuX8=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
@@ -74,7 +75,10 @@
 
 
 
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/3.0.2/quicklink.umd.js" integrity="sha256-Qo2BTvlsBVXIr5fEHp8xlBpUmkbDINr5cQZeSfMTES8=" crossorigin="anonymous" defer></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://blog.pingchun.me/CI-CD-Github-Action/"}</script>
+  <script src="/js/third-party/quicklink.js" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"CI/CD(Github Action)","url":"https://blog.pingchun.me/CI-CD-Github-Action/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.pingchun.me/CI-CD-Github-Action/"},"description":"整理 CI/CD 的基本概念與常見工具比較，並以 GitHub Actions 示範如何將測試與部署流程自動化。","datePublished":"2023-02-07T10:04:00.000Z","dateModified":"2023-02-07T10:04:00.000Z","author":{"@type":"Person","name":"PingChun","url":"https://blog.pingchun.me/"},"publisher":{"@type":"Organization","name":"CalmKoala"},"image":"https://blog.pingchun.me/og/CI-CD-Github-Action.png","keywords":["DevOps","CI/CD"]}</script>
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
@@ -161,7 +165,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CI-CD"><span class="nav-number">1.</span> <span class="nav-text">CI&#x2F;CD</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E8%AC%82CI-CD"><span class="nav-number">1.1.</span> <span class="nav-text">何謂CI&#x2F;CD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A6%8BCI-CD%E5%B7%A5%E5%85%B7"><span class="nav-number">1.2.</span> <span class="nav-text">常見CI&#x2F;CD工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E8%A8%AD%E5%9C%A8%E6%9C%AC%E5%9C%B0%E7%AB%AF"><span class="nav-number">1.2.1.</span> <span class="nav-text">架設在本地端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%B2%E7%AB%AF"><span class="nav-number">1.2.2.</span> <span class="nav-text">雲端</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GitHub-Action"><span class="nav-number">2.</span> <span class="nav-text">GitHub Action</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AFGithub-Action%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">什麼是Github Action？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Github-Action%EF%BC%9F"><span class="nav-number">2.3.</span> <span class="nav-text">如何使用Github Action？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CI-CD"><span class="nav-number">1.</span> <span class="nav-text">CI&#x2F;CD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%95%E8%AC%82CI-CD"><span class="nav-number">1.1.</span> <span class="nav-text">何謂CI&#x2F;CD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A6%8BCI-CD%E5%B7%A5%E5%85%B7"><span class="nav-number">1.2.</span> <span class="nav-text">常見CI&#x2F;CD工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%B6%E8%A8%AD%E5%9C%A8%E6%9C%AC%E5%9C%B0%E7%AB%AF"><span class="nav-number">1.2.1.</span> <span class="nav-text">架設在本地端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%B2%E7%AB%AF"><span class="nav-number">1.2.2.</span> <span class="nav-text">雲端</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub-Action"><span class="nav-number">2.</span> <span class="nav-text">GitHub Action</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E9%BA%BC%E6%98%AFGithub-Action%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">什麼是Github Action？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Github-Action%EF%BC%9F"><span class="nav-number">2.3.</span> <span class="nav-text">如何使用Github Action？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -302,14 +306,14 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
+    <div class="post-body" itemprop="articleBody"><h2 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h2><p>大多數企業採用敏捷開發，而在程式上傳到伺服器的過程中需要經過許多步驟，因此我們可以透過自動化來減少在一連串步驟中的人為疏失，並加速整體開發流程。<del>解決人類懶惰的天性</del></p>
 <span id="more"></span>
 
-<h2 id="何謂CI-CD"><a href="#何謂CI-CD" class="headerlink" title="何謂CI&#x2F;CD"></a>何謂CI&#x2F;CD</h2><ul>
+<h3 id="何謂CI-CD"><a href="#何謂CI-CD" class="headerlink" title="何謂CI&#x2F;CD"></a>何謂CI&#x2F;CD</h3><ul>
 <li>CI(Continuous integration)持續整合or自動化整合<br>將開發至一個階段性的程式碼(通常是版本控制的一個commit)經由自動化工具測試(Unit test)，協助檢查程式碼問題並建置出佈署的版本。</li>
 <li>CD (Continuous Deployment)持續部署or自動化佈署<br>將測試通過的代碼自動部署到伺服器上，縮短部署的時間，減少了為錯誤。好的CD包含監控系統進行服務存活檢查，並在發生異常時主動通知開發人員。</li>
 </ul>
-<h2 id="常見CI-CD工具"><a href="#常見CI-CD工具" class="headerlink" title="常見CI&#x2F;CD工具"></a>常見CI&#x2F;CD工具</h2><h3 id="架設在本地端"><a href="#架設在本地端" class="headerlink" title="架設在本地端"></a>架設在本地端</h3><ul>
+<h3 id="常見CI-CD工具"><a href="#常見CI-CD工具" class="headerlink" title="常見CI&#x2F;CD工具"></a>常見CI&#x2F;CD工具</h3><h4 id="架設在本地端"><a href="#架設在本地端" class="headerlink" title="架設在本地端"></a>架設在本地端</h4><ul>
 <li>Jenkins: 最古老的工具<ul>
 <li>優點：能夠自行編寫插件達成各式各樣功能</li>
 <li>缺點：學習成本高、維護不易、設定檔難撰寫</li>
@@ -321,7 +325,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="雲端"><a href="#雲端" class="headerlink" title="雲端"></a>雲端</h3><ul>
+<h4 id="雲端"><a href="#雲端" class="headerlink" title="雲端"></a>雲端</h4><ul>
 <li>GitLab CI: 只能使用在GitLab</li>
 <li>GitHub Action: 相對年輕的工具，只能用在Github<ul>
 <li>優點：與 Github 相容性極佳、易於使用、免費、開放性、靈活性</li>
@@ -330,9 +334,9 @@
 </li>
 </ul>
 <hr>
-<h1 id="GitHub-Action"><a href="#GitHub-Action" class="headerlink" title="GitHub Action"></a>GitHub Action</h1><p>在現代軟體開發中，CI&#x2F;CD是必不可少的流程，而Github Action則是一個相當熱門的工具，可以協助開發者打造自動化的CI&#x2F;CD流程。接下來將會介紹什麼是Github Action，以及如何使用它來自動化你的軟體開發流程。</p>
-<h2 id="什麼是Github-Action？"><a href="#什麼是Github-Action？" class="headerlink" title="什麼是Github Action？"></a>什麼是Github Action？</h2><p>Github Action是一個基於事件驅動的自動化工具，它可以在你的Github repository中註冊一些行為，在某些事件發生時執行一些動作，例如：自動化測試、自動化部署等等。Github Action的核心是一個YAML語言的配置文件，你可以在其中定義工作流程、觸發事件、環境變數、依賴關係等等。Github Action是一個強大的工具，它可以大幅簡化軟體開發流程，同時也可以提升開發效率和品質。</p>
-<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><p>在使用 Github Action 之前，需要了解一些基本概念。Github Actions 由四個元素組成，範圍由大至小為：</p>
+<h2 id="GitHub-Action"><a href="#GitHub-Action" class="headerlink" title="GitHub Action"></a>GitHub Action</h2><p>在現代軟體開發中，CI&#x2F;CD是必不可少的流程，而Github Action則是一個相當熱門的工具，可以協助開發者打造自動化的CI&#x2F;CD流程。接下來將會介紹什麼是Github Action，以及如何使用它來自動化你的軟體開發流程。</p>
+<h3 id="什麼是Github-Action？"><a href="#什麼是Github-Action？" class="headerlink" title="什麼是Github Action？"></a>什麼是Github Action？</h3><p>Github Action是一個基於事件驅動的自動化工具，它可以在你的Github repository中註冊一些行為，在某些事件發生時執行一些動作，例如：自動化測試、自動化部署等等。Github Action的核心是一個YAML語言的配置文件，你可以在其中定義工作流程、觸發事件、環境變數、依賴關係等等。Github Action是一個強大的工具，它可以大幅簡化軟體開發流程，同時也可以提升開發效率和品質。</p>
+<h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><p>在使用 Github Action 之前，需要了解一些基本概念。Github Actions 由四個元素組成，範圍由大至小為：</p>
 <pre>
 <code class="mermaid">
 
@@ -351,7 +355,7 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
 <ul>
 <li>Event：事件，是觸發工作流程的觸發器，例如：程式碼提交、Pull Request等等。</li>
 </ul>
-<h2 id="如何使用Github-Action？"><a href="#如何使用Github-Action？" class="headerlink" title="如何使用Github Action？"></a>如何使用Github Action？</h2><p>使用Github Action非常簡單，只需要在Github倉庫中創建<code>.github/workflows</code>目錄，然後在其中添加YAML文件即可。通常使用 config 類型的語法都是千變萬化的，以下使用一個簡單的範例來解釋：</p>
+<h3 id="如何使用Github-Action？"><a href="#如何使用Github-Action？" class="headerlink" title="如何使用Github Action？"></a>如何使用Github Action？</h3><p>使用Github Action非常簡單，只需要在Github倉庫中創建<code>.github/workflows</code>目錄，然後在其中添加YAML文件即可。通常使用 config 類型的語法都是千變萬化的，以下使用一個簡單的範例來解釋：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Go-test</span> <span class="comment"># 可自行定義，主要目的是要能看出哪個workflow在執行</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span> [ <span class="string">&quot;master&quot;</span> ]</span><br><span class="line">  <span class="attr">workflow_dispatch:</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v3</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Set</span> <span class="string">up</span> <span class="string">Go</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/setup-go@v3</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">go-version:</span> <span class="number">1.19</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Build</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">go</span> <span class="string">build</span> <span class="string">-v</span> <span class="string">./...</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Test</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">go</span> <span class="string">test</span> <span class="string">-v</span> <span class="string">./...</span></span><br><span class="line">  <span class="attr">deploy:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">Deploy</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">environment:</span> <span class="string">production</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/checkout@v3</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">AWS</span> <span class="string">credentials</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">aws-actions/configure-aws-credentials@v1</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">aws-access-key-id:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.AWS_ACCESS_KEY_ID</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">aws-secret-access-key:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.AWS_SECRET_ACCESS_KEY</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">aws-region:</span> <span class="string">$&#123;&#123;</span> <span class="string">env.AWS_REGION</span> <span class="string">&#125;&#125;</span></span><br><span class="line">    <span class="string">...</span></span><br></pre></td></tr></table></figure>
 
 <ul>
@@ -399,7 +403,7 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
 </div>
 
 <hr>
-<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><p><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=eOlI6-BBN4E">CICD到底是什麼呢|全網最詳解</a></p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=eOlI6-BBN4E">CICD到底是什麼呢|全網最詳解</a></p>
 <section class="related-posts" aria-label="相關文章"><p class="related-posts-title"><strong>相關文章</strong></p><ul class="related-posts-grid"><li><a class="related-post-card" href="/release-notes-from-commits/"><span class="related-post-title">版本說明，別再發版時才重寫</span><span class="related-post-meta">工具 · 2026-09-12</span></a></li><li><a class="related-post-card" href="/google-play-first-release/"><span class="related-post-title">第一次上 Google Play，最麻煩的不是寫 App</span><span class="related-post-meta">開發 · 2026-08-29</span></a></li><li><a class="related-post-card" href="/long-running-service-watchdog/"><span class="related-post-title">一個人也需要 SRE</span><span class="related-post-meta">系統設計 · 2026-07-12</span></a></li></ul></section>
     </div>
 
@@ -408,6 +412,47 @@ id1(Workflow) -.-&gt; id2(Job) -.-&gt; id3(Step) -.-&gt; id4(Actions&#x2F;comman
     
 
     <footer class="post-footer">
+<div class="post-share-bar" aria-label="分享文章">
+  <a class="post-share-btn" href="https://www.threads.net/intent/post?text=CI%2FCD(Github%20Action)%20https%3A%2F%2Fblog.pingchun.me%2FCI-CD-Github-Action%2F" target="_blank" rel="noopener noreferrer">
+    <i class="fab fa-threads" aria-hidden="true"></i>
+    <span>分享到 Threads</span>
+  </a>
+  <button type="button" class="post-share-btn post-copy-link" data-url="https://blog.pingchun.me/CI-CD-Github-Action/">
+    <i class="fa fa-link" aria-hidden="true"></i>
+    <span>複製文章連結</span>
+  </button>
+</div>
+<script>
+(() => {
+  const btns = document.querySelectorAll('.post-copy-link');
+  for (const btn of btns) {
+    if (btn.dataset.bound) continue;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async () => {
+      const url = btn.dataset.url || location.href;
+      const label = btn.querySelector('span');
+      const prev = label.textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+      btn.classList.add('is-copied');
+      label.textContent = '已複製連結 ✓';
+      setTimeout(() => {
+        btn.classList.remove('is-copied');
+        label.textContent = prev;
+      }, 2000);
+    });
+  }
+})();
+</script>
+
           <div class="followme">
   <span>歡迎關注我的其它發布渠道</span>
 
