@@ -18,22 +18,22 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":false,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.pingchun.me","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"pangu":false,"comments":{"style":"tabs","active":"giscus","storage":true,"lazyload":false,"nav":null,"activeClass":"giscus"},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜尋...","empty":"我們無法找到任何有關 ${query} 的搜索結果","hits_time":"找到 ${hits} 個搜索結果（用時 ${time} 毫秒）","hits":"找到 ${hits} 個搜索結果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="為什麼會做這個過去半年用 AI 寫程式，常常踩到三類問題：  同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格 對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案 同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題  試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。 後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同">
+    <meta name="description" content="用純 Markdown 把跟 AI 寫程式的流程拆成規劃、審核、實作、驗收四個獨立角色，解決長對話忘記決策與自己審自己的問題。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="tessa：純 markdown 的 AI 多角色協作框架">
 <meta property="og:url" content="https://blog.pingchun.me/tessa/">
 <meta property="og:site_name" content="CalmKoala">
-<meta property="og:description" content="為什麼會做這個過去半年用 AI 寫程式，常常踩到三類問題：  同一份需求，不同對話會給出不同的命名、錯誤處理、註解風格 對話跑長之後 AI 會忘掉前面的決策，把砍掉的選項再拿出來提案 同一個 AI 同時當作者跟審核者，幾乎不會抓到真問題  試過用更講究的 prompt 解，沒有根本性改善。試過換更強的模型，問題照樣在。 後來想通，問題不是出在 prompt 或模型，是出在工作方式：規劃跟實作混在同">
+<meta property="og:description" content="用純 Markdown 把跟 AI 寫程式的流程拆成規劃、審核、實作、驗收四個獨立角色，解決長對話忘記決策與自己審自己的問題。">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://blog.pingchun.me/og/tessa.png">
 <meta property="article:published_time" content="2026-05-06T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-11-26T14:34:49.193Z">
+<meta property="article:modified_time" content="2026-05-06T16:00:00.000Z">
 <meta property="article:author" content="PingChun">
 <meta property="article:tag" content="AI">
-<meta property="article:tag" content="個人專案">
-<meta property="article:tag" content="開發工具">
+<meta property="article:tag" content="AI agent">
+<meta property="article:tag" content="Side Project">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://blog.pingchun.me/og/tessa.png">
 
@@ -56,9 +56,12 @@
 
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
 
   <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.1/mermaid.min.js","integrity":"sha256-BmQmdWDS8X2OTbrwELWK366LV6escyWhHHe0XCTU/Hk="}}</script>
   <script src="/js/third-party/tags/mermaid.js" defer></script>
@@ -86,6 +89,7 @@
     <div class="column">
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-search popup-trigger" aria-label="搜尋" role="button">
+      <i class="fa fa-search fa-fw fa-lg"></i>
   </div>
 
   <div class="site-meta">
@@ -106,12 +110,39 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">32</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">20</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a></li><li class="menu-item menu-item-系列"><a href="/series/" rel="section"><i class="fa fa-layer-group fa-fw"></i>系列</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類<span class="badge">12</span></a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤<span class="badge">14</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔<span class="badge">20</span></a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  
+  <template id="search-popup-template"><div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜尋..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div></template>
 
 </header>
         
@@ -152,17 +183,20 @@
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">分類</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">標籤</span></a>
       </div>
   </nav>
 </div>
   <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://www.threads.net/@ping_chun_chung" title="Threads → https:&#x2F;&#x2F;www.threads.net&#x2F;@ping_chun_chung" rel="noopener me" target="_blank"><i class="fab fa-threads fa-fw"></i>Threads</a>
+      </span>
       <span class="links-of-author-item">
         <a href="https://github.com/PingChunChung" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;PingChunChung" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
@@ -170,6 +204,8 @@
         <a href="/atom.xml" title="RSS → &#x2F;atom.xml" rel="noopener me"><i class="fa fa-rss fa-fw"></i>RSS</a>
       </span>
   </div>
+
+
 
 
         </div>
@@ -207,7 +243,7 @@
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
       <meta itemprop="name" content="tessa：純 markdown 的 AI 多角色協作框架 | CalmKoala">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content="用純 Markdown 把跟 AI 寫程式的流程拆成規劃、審核、實作、驗收四個獨立角色，解決長對話忘記決策與自己審自己的問題。">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -226,13 +262,6 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新於</span>
-      <time title="修改時間：2026-11-26 22:34:49" itemprop="dateModified" datetime="2026-11-26T22:34:49+08:00">2026-11-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分類於</span>
@@ -246,6 +275,7 @@
     </span>
 
   
+
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="文章字數">
       <span class="post-meta-item-icon">
@@ -363,7 +393,7 @@
 <li><a target="_blank" rel="noopener" href="https://claude.com/claude-code">Claude Code</a></li>
 <li><a target="_blank" rel="noopener" href="https://docs.anthropic.com/en/docs/agent-skills">Anthropic Agent Skills</a></li>
 </ul>
-<div class="related-posts"><p><strong>相關文章</strong></p><ul><li><a href="/background-ai-agent-tasks/">哪些工作該交給背景 AI agent？</a></li><li><a href="/lilyscore-launch/">LilyScore：我把 PDF 樂譜和伴奏放進同一個 App</a></li><li><a href="/when-multi-agent-works/">一個 AI agent 做不好，多開幾個就會比較好嗎？</a></li></ul></div>
+<section class="related-posts" aria-label="相關文章"><p class="related-posts-title"><strong>相關文章</strong></p><ul class="related-posts-grid"><li><a class="related-post-card" href="/background-ai-agent-tasks/"><span class="related-post-title">哪些工作該交給背景 AI agent？</span><span class="related-post-meta">AI · 2026-09-05</span></a></li><li><a class="related-post-card" href="/when-multi-agent-works/"><span class="related-post-title">一個 AI agent 做不好，多開幾個就會比較好嗎？</span><span class="related-post-meta">AI · 2026-08-15</span></a></li><li><a class="related-post-card" href="/ai-agent-skills-more-is-better/"><span class="related-post-title">Skill 裝得越多，AI agent 就越好用嗎？</span><span class="related-post-meta">AI · 2026-08-08</span></a></li></ul></section>
     </div>
 
     
@@ -371,10 +401,37 @@
     
 
     <footer class="post-footer">
+          <div class="followme">
+  <span>歡迎關注我的其它發布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="https://www.threads.net/@ping_chun_chung">
+            <span class="icon">
+              <i class="fab fa-threads"></i>
+            </span>
+
+            <span class="label">Threads</span>
+          </a>
+      </div>
+
+      <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+      </div>
+  </div>
+</div>
+
           <div class="post-tags">
               <a href="/tags/AI/" rel="tag"># AI</a>
-              <a href="/tags/%E5%80%8B%E4%BA%BA%E5%B0%88%E6%A1%88/" rel="tag"># 個人專案</a>
-              <a href="/tags/%E9%96%8B%E7%99%BC%E5%B7%A5%E5%85%B7/" rel="tag"># 開發工具</a>
+              <a href="/tags/AI-agent/" rel="tag"># AI agent</a>
+              <a href="/tags/Side-Project/" rel="tag"># Side Project</a>
           </div>
 
         
